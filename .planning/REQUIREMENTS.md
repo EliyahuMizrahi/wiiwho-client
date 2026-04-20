@@ -154,17 +154,70 @@ These are not merely deferred — they are never to be built. Moving any of thes
 
 ## Traceability
 
-Which phases cover which requirements. Populated by roadmapper.
+Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (to be filled by roadmap) | | |
+| LAUN-01 | Phase 1 | Pending |
+| LAUN-02 | Phase 1 | Pending |
+| LAUN-03 | Phase 3 | Pending |
+| LAUN-04 | Phase 3 | Pending |
+| LAUN-05 | Phase 3 | Pending |
+| LAUN-06 | Phase 1 | Pending |
+| AUTH-01 | Phase 2 | Pending |
+| AUTH-02 | Phase 2 | Pending |
+| AUTH-03 | Phase 2 | Pending |
+| AUTH-04 | Phase 2 | Pending |
+| AUTH-05 | Phase 2 | Pending |
+| AUTH-06 | Phase 2 | Pending |
+| LCH-01 | Phase 3 | Pending |
+| LCH-02 | Phase 3 | Pending |
+| LCH-03 | Phase 3 | Pending |
+| LCH-04 | Phase 4 | Pending |
+| LCH-05 | Phase 3 | Pending |
+| LCH-06 | Phase 3 | Pending |
+| LCH-07 | Phase 3 | Pending |
+| JRE-01 | Phase 3 | Pending |
+| JRE-02 | Phase 3 | Pending |
+| JRE-03 | Phase 3 | Pending |
+| MOD-01 | Phase 1 | Pending |
+| MOD-02 | Phase 1 | Pending |
+| MOD-03 | Phase 1 | Pending |
+| MOD-04 | Phase 1 | Pending |
+| MOD-05 | Phase 4 | Pending |
+| MOD-06 | Phase 4 | Pending |
+| HUD-01 | Phase 4 | Pending |
+| HUD-02 | Phase 4 | Pending |
+| HUD-03 | Phase 4 | Pending |
+| HUD-04 | Phase 4 | Pending |
+| PERF-01 | Phase 6 | Pending |
+| PERF-02 | Phase 6 | Pending |
+| PERF-03 | Phase 6 | Pending |
+| COSM-01 | Phase 5 | Pending |
+| COSM-02 | Phase 5 | Pending |
+| PKG-01 | Phase 3 | Pending |
+| PKG-02 | Phase 3 | Pending |
+| PKG-03 | Phase 7 | Pending |
+| COMP-01 | Phase 4 | Pending |
+| COMP-02 | Phase 4 | Pending |
+| COMP-03 | Phase 4 | Pending |
+| COMP-04 | Phase 1 | Pending |
+| COMP-05 | Phase 3 | Pending |
 
 **Coverage:**
-- v1 requirements: 41 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 41 (pending roadmap)
+- v1 requirements: 45 total
+- Mapped to phases: 45 (100%)
+- Unmapped: 0
+
+**Per-phase distribution:**
+- Phase 1 (Foundations): 8 requirements — COMP-04, MOD-01, MOD-02, MOD-03, MOD-04, LAUN-01, LAUN-02, LAUN-06
+- Phase 2 (Microsoft Auth): 6 requirements — AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
+- Phase 3 (Vanilla Launch, JRE, Packaging): 15 requirements — LCH-01, LCH-02, LCH-03, LCH-05, LCH-06, LCH-07, JRE-01, JRE-02, JRE-03, PKG-01, PKG-02, LAUN-03, LAUN-04, LAUN-05, COMP-05
+- Phase 4 (Forge Integration, HUD Framework, HUDs): 10 requirements — LCH-04, MOD-05, MOD-06, HUD-01, HUD-02, HUD-03, HUD-04, COMP-01, COMP-02, COMP-03
+- Phase 5 (Cosmetics Pipeline): 2 requirements — COSM-01, COSM-02
+- Phase 6 (Performance): 3 requirements — PERF-01, PERF-02, PERF-03
+- Phase 7 (Release Hardening): 1 requirement — PKG-03
 
 ---
 *Requirements defined: 2026-04-20*
-*Last updated: 2026-04-20 after initial definition*
+*Last updated: 2026-04-20 after roadmap creation (traceability table populated)*
