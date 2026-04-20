@@ -1,0 +1,10 @@
+{
+  "name": "wiiwho-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WiiWho Client — custom Minecraft 1.8.9 launcher + Forge mod. See CLAUDE.md.",
+  "scripts": {
+    "test": "node scripts/check-docs.mjs"
+  },
+  "packageManager": "pnpm@9.0.0"
+}
