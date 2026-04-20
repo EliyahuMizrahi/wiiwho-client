@@ -35,7 +35,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Azure AD app is registered with Minecraft API scope and has been submitted for Microsoft review (queue running; unblocks Phase 2)
   3. `./gradlew runClient` launches a dev Minecraft 1.8.9 with the WiiWho Forge mod loaded, DevAuth-authenticated with a real Microsoft account, and a trivial Mixin applied — verified on Windows; MODID is generic and collision-checked against CurseForge/Modrinth
   4. Running `pnpm dev` in the launcher opens an Electron window with a visible "Play" button, `contextIsolation: true` / `nodeIntegration: false` / `sandbox: true` all confirmed at runtime, and the preload bridge exposes only named auth/game/settings IPC channels
-**Plans**: TBD
+**Plans**: 5 plans
+  - [ ] 01-00-PLAN.md — Wave 0 infrastructure: policy doc skeletons (ANTICHEAT-SAFETY, mojang-asset-policy, cape-provenance) + docs-check script (COMP-04)
+  - [ ] 01-01-PLAN.md — client-mod scaffold from nea89o template, MODID collision check, ModidTest (MOD-01, MOD-03)
+  - [ ] 01-02-PLAN.md — Trivial Mixin + `./gradlew runClient` DevAuth verification on Windows (MOD-02, MOD-04)
+  - [ ] 01-03-PLAN.md — Electron launcher scaffold, Tailwind v4 + shadcn, runtime-verified security, full IPC surface stubs (LAUN-01, LAUN-02, LAUN-06)
+  - [ ] 01-04-PLAN.md — Azure AD app registration + Minecraft API form submission (phase success criterion 2)
 
 ### Phase 2: Microsoft Authentication
 **Goal**: User can log in with a real Microsoft account from inside the launcher, see their Minecraft username + UUID, persist securely, and log out cleanly — against live Microsoft endpoints.
@@ -114,7 +119,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundations | 0/TBD | Not started | - |
+| 1. Foundations | 0/5 | Not started | - |
 | 2. Microsoft Authentication | 0/TBD | Not started | - |
 | 3. Vanilla Launch, JRE Bundling & Packaging | 0/TBD | Not started | - |
 | 4. Forge Integration, HUD Framework & HUDs | 0/TBD | Not started | - |
