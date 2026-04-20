@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `./gradlew runClient` launches a dev Minecraft 1.8.9 with the WiiWho Forge mod loaded, DevAuth-authenticated with a real Microsoft account, and a trivial Mixin applied — verified on Windows; MODID is generic and collision-checked against CurseForge/Modrinth
   4. Running `pnpm dev` in the launcher opens an Electron window with a visible "Play" button, `contextIsolation: true` / `nodeIntegration: false` / `sandbox: true` all confirmed at runtime, and the preload bridge exposes only named auth/game/settings IPC channels
 **Plans**: 5 plans
-  - [ ] 01-00-PLAN.md — Wave 0 infrastructure: policy doc skeletons (ANTICHEAT-SAFETY, mojang-asset-policy, cape-provenance) + docs-check script (COMP-04)
+  - [x] 01-00-PLAN.md — Wave 0 infrastructure: policy doc skeletons (ANTICHEAT-SAFETY, mojang-asset-policy, cape-provenance) + docs-check script (COMP-04)
   - [ ] 01-01-PLAN.md — client-mod scaffold from nea89o template, MODID collision check, ModidTest (MOD-01, MOD-03)
   - [ ] 01-02-PLAN.md — Trivial Mixin + `./gradlew runClient` DevAuth verification on Windows (MOD-02, MOD-04)
   - [ ] 01-03-PLAN.md — Electron launcher scaffold, Tailwind v4 + shadcn, runtime-verified security, full IPC surface stubs (LAUN-01, LAUN-02, LAUN-06)

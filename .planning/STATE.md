@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
-status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-04-20T22:33:59.586Z"
-last_activity: 2026-04-20 — ROADMAP.md created; 45/45 v1 requirements mapped
+status: executing
+stopped_at: Completed 01-00-PLAN.md (wave-0 policy docs + docs-check)
+last_updated: "2026-04-20T23:32:20.077Z"
+last_activity: 2026-04-20
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 5
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20)
 
 **Core value:** A single-click path from "open launcher" to "in a 1.8.9 game that runs faster than Optifine and has the HUD I want" — all without tripping PvP server anticheats.
-**Current focus:** Phase 1 — Foundations
+**Current focus:** Phase 01 — foundations
 
 ## Current Position
 
-Phase: 1 of 7 (Foundations)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-04-20 — ROADMAP.md created; 45/45 v1 requirements mapped
+Phase: 01 (foundations) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-04-20
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01 P00 | 2 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,8 @@ Recent decisions affecting current work:
 - Phase 1: Mod scaffold and launcher skeleton can be built in parallel — independent toolchains
 - Phase 4: Anticheat review is ongoing across every feature phase, not a single phase; HUD framework must exist before individual HUDs
 - Phase 6: Performance benchmark methodology MUST be committed before any optimization work — no "beats Optifine" claim without reproducible numbers
+- [Phase 01]: Policy docs reproduced verbatim from 01-RESEARCH.md §Three Policy Doc Templates — no deviations from the research templates (they were designed specifically to satisfy the greppable check-docs.mjs contracts)
+- [Phase 01]: scripts/check-docs.mjs is zero-dep Node 22 ESM — runnable with just 'node scripts/check-docs.mjs' before any pnpm install, so Wave 0 docs-check is the single repo-wide invariant every later plan can rely on without bootstrapping
 
 ### Pending Todos
 
@@ -76,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-20T22:33:59.583Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-foundations/01-CONTEXT.md
+Last session: 2026-04-20T23:32:20.072Z
+Stopped at: Completed 01-00-PLAN.md (wave-0 policy docs + docs-check)
+Resume file: None

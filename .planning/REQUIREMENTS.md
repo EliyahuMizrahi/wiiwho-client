@@ -79,7 +79,7 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 - [ ] **COMP-01**: Every v0.1 feature is reviewed against Hypixel's published allowed-mods policy and receives an explicit pass/fail verdict before ship; all v0.1 features pass
 - [ ] **COMP-02**: Before release, a throwaway Microsoft account plays ≥2 hours on Hypixel with all WiiWho features enabled and is not flagged, banned, or warned by Watchdog
 - [ ] **COMP-03**: Before release, the same alt-account test is repeated on BlocksMC (≥1 hour) with no flag/ban/warning
-- [ ] **COMP-04**: WiiWho does not redistribute any Minecraft asset; launcher downloads the vanilla jar and libraries directly from Mojang at runtime
+- [x] **COMP-04**: WiiWho does not redistribute any Minecraft asset; launcher downloads the vanilla jar and libraries directly from Mojang at runtime
 - [ ] **COMP-05**: Crash logs shown in the launcher and any logs written to disk have the user's Microsoft access token, refresh token, and username redacted (no PII leak via crash-sharing)
 
 ## v2 Requirements
@@ -201,7 +201,7 @@ Which phases cover which requirements.
 | COMP-01 | Phase 4 | Pending |
 | COMP-02 | Phase 4 | Pending |
 | COMP-03 | Phase 4 | Pending |
-| COMP-04 | Phase 1 | Pending |
+| COMP-04 | Phase 1 | Complete |
 | COMP-05 | Phase 3 | Pending |
 
 **Coverage:**
