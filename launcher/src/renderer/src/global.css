@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-wiiwho-accent: #16e0ee;
+  --color-wiiwho-bg: #111111;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background-color: var(--color-wiiwho-bg);
+  color: #e5e5e5;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+}

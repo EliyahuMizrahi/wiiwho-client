@@ -4,7 +4,16 @@
   "private": true,
   "description": "WiiWho Client — custom Minecraft 1.8.9 launcher + Forge mod. See CLAUDE.md.",
   "scripts": {
-    "test": "node scripts/check-docs.mjs"
+    "test": "node scripts/check-docs.mjs && pnpm --filter ./launcher test:run",
+    "dev": "pnpm --filter ./launcher dev",
+    "build:launcher": "pnpm --filter ./launcher build"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "esbuild",
+      "electron-winstaller"
+    ]
+  }
 }

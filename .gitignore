@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out/
+.vite/
+# Note: launcher/build/ holds electron-builder icons/entitlements, NOT build output — tracked.
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+Thumbs.db
+
+# Logs
+*.log*
+.eslintcache
+
+# Local env / secrets
+.env
+.env.local
