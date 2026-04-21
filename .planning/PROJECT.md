@@ -105,4 +105,6 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-20 after initialization*
+*Last updated: 2026-04-21 after Phase 1 (foundations) completion.*
+
+**Phase 1 (foundations) shipped 2026-04-21.** Forge 1.8.9 mod scaffold (`client-mod/`) compiles and launches Minecraft 1.8.9 via DevAuth with a trivial Mixin hook confirmed firing on `Minecraft.startGame`. Electron launcher scaffold (`launcher/`) opens a hardened window (contextIsolation/sandbox/no-nodeIntegration runtime-audited) with a dead-button Play and the full v0.1 IPC surface stubbed. Azure AD app registered (`60cbce02-…`) and MCE review form submitted — approval expected by 2026-04-27. End-to-end anticheat safety validated by connecting to minemen.club (Vanicheat) as real MS user without kicks. Phase 2 (Microsoft authentication) is unblocked to plan; only external gate is the async MCE approval email.
