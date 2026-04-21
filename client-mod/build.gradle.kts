@@ -5,7 +5,7 @@ plugins {
     java
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 //Constants:
@@ -38,6 +38,9 @@ loom {
                 // This argument causes a crash on macOS
                 vmArgs.remove("-XstartOnFirstThread")
             }
+            // Forward DevAuth enablement into the spawned Minecraft JVM so
+            // `./gradlew runClient` logs in with a real MS account (anticheat-safe testing).
+            property("devauth.enabled", "true")
         }
         remove(getByName("server"))
     }
@@ -97,6 +100,15 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.named<JavaExec>("runClient") {
+    javaLauncher.set(
+        javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(8))
+            vendor.set(JvmVendorSpec.ADOPTIUM)
+        }
+    )
 }
 
 // Tasks:
