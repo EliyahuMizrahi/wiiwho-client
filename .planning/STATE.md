@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 03-00-phase-infrastructure-PLAN.md
-last_updated: "2026-04-21T09:02:00.342Z"
+stopped_at: Completed 03-05-spawn-e2e-PLAN.md (parallel Wave 2)
+last_updated: "2026-04-21T09:10:45.601Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 25
-  completed_plans: 13
+  completed_plans: 16
   percent: 0
 ---
 
@@ -65,6 +65,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-microsoft-authentication P05 | 8min | 3 tasks | 10 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P01 | 5m | 2 tasks | 4 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P00 | 6 min | 3 tasks | 9 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P05-spawn-e2e | 12min | 2 tasks | 3 files |
+| Phase 03 P02 | 10min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -102,6 +104,8 @@ Recent decisions affecting current work:
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-01: paths.ts exports 7 platform-branched resolvers (Data/Settings/Game/CrashReports/Jre/JavaBinary/ModJar); JRE-03 + Pitfall 7 (javaw.exe) enforced by test
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-01: redact.ts adds 6 D-20 patterns + sanitizeCrashReport export — single scrub() pipeline drives both electron-log hook AND crash viewer (D-21)
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-00: p-queue resolved to 9.1.2 (plan specified ^8.x; 9.x has semver-compatible add/concurrency/onIdle/onEmpty API for library-download concurrency-ceiling use). Shadcn Sheet/Slider/Tooltip land from new-york-v4 registry verbatim — registry JSONs already use unified radix-ui import convention matching existing dialog.tsx, zero import rewrites. Fixtures co-located under __fixtures__/ adjacent to consuming module (launch/__fixtures__ for manifest, monitor/__fixtures__ for boot log + crash report). Gitignore rules at repo-root .gitignore (not launcher/.gitignore) so JRE/mod resource dirs are blocked regardless of which cwd scripts run from. Wave-1 parallel executor observation: typecheck:node transiently errors from 03-01's RED-phase paths.test.ts until 03-01's GREEN commit lands — out of 03-00 scope per deviation Rule scope boundary.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: spawn.ts: execa 9.x wrapper; JRE-03 invariant enforced inline (belt-and-braces); non-zero exit returned via {exitCode}, not thrown; _JAVA_OPTIONS=undefined to block env heap-override
+- [Phase 03]: Settings persistence: plain JSON + atomic temp+rename at <userData>/settings.json. Clamp ramMb to [1024,4096] in 512 MiB steps at BOTH IPC and store layers (defense in depth). Unknown schema version → DEFAULTS; partial-invalid field → per-field fallback preserving valid siblings. wiiwho.d.ts tightened from Record<string,unknown> to SettingsV1 in Plan 03-02 (non-breaking; unblocks Plans 03-07/03-10).
 
 ### Pending Todos
 
@@ -113,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:02:00.339Z
-Stopped at: Completed 03-00-phase-infrastructure-PLAN.md
+Last session: 2026-04-21T09:10:38.646Z
+Stopped at: Completed 03-05-spawn-e2e-PLAN.md (parallel Wave 2)
 Resume file: None
