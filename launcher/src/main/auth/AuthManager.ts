@@ -67,6 +67,19 @@ export interface Status {
   uuid?: string
 }
 
+/**
+ * Fresh Minecraft Java access token + identity for the JVM spawn (LCH-06).
+ *
+ * Returned by getMinecraftToken(). Plan 03-10's orchestrator passes
+ * `accessToken` → `--accessToken`, `username` → `--username`, and
+ * `uuid` → `--uuid` into args.ts → spawnGame.
+ */
+export interface MinecraftToken {
+  accessToken: string
+  username: string
+  uuid: string
+}
+
 class CancelledError extends Error {
   constructor() {
     super('CANCELLED')
@@ -249,6 +262,76 @@ export class AuthManager {
       log.info('[auth] silent refresh failed quietly', err)
       await this.clearAllAuthState()
       return null
+    }
+  }
+
+  /**
+   * Phase 3 entrypoint — returns a fresh MC access token for the JVM spawn (LCH-06).
+   *
+   * Called by ipc/game.ts (Plan 03-10) right before building the argv. Reuses
+   * trySilentRefresh's Authflow invocation (no codeCallback — must never
+   * trigger a device-code prompt), and keeps the `token` field that
+   * trySilentRefresh discards.
+   *
+   * prismarine-auth caches the MC token (24h TTL) so repeated calls within a
+   * session do not hit Microsoft. Test "two sequential calls ... identical
+   * tokens" locks this contract.
+   *
+   * Throws when:
+   *   - OS keychain unavailable (safeStorage gate — can't decrypt the cache)
+   *   - No active account (logged out) — Plan 03-10 maps to "please log in again"
+   *   - Minecraft profile is missing from the response (re-login required)
+   *
+   * SECURITY (COMP-05): the returned accessToken is the opaque ~280-char
+   * Minecraft bearer. This method NEVER logs it. `redact.ts` already covers
+   * the `"accessToken":"..."` and `--accessToken ...` shapes as a
+   * defense-in-depth net; this method's invariant is stronger — the token
+   * value is never handed to a log method in the first place.
+   */
+  async getMinecraftToken(): Promise<MinecraftToken> {
+    if (!safeStorage.isEncryptionAvailable()) {
+      throw new Error('OS keychain unavailable — please restart the launcher.')
+    }
+
+    const store = await readAuthStore()
+    if (!store.activeAccountId || store.accounts.length === 0) {
+      throw new Error('Not logged in.')
+    }
+
+    const flow = new Authflow(
+      PRIMARY_USERNAME,
+      // Cast: prismarine-auth's `Cache` type requires a `reset()` method we
+      // don't need (it's only used by the unused forceRefresh path). Our
+      // PrismarineCache shape covers every call site prismarine-auth actually
+      // hits — getCached / setCached / setCachedPartial.
+      safeStorageCacheFactory(resolveAuthDir()) as unknown as CacheFactory,
+      { flow: 'msal', authTitle: AZURE_CLIENT_ID as never }
+      // no codeCallback — silent-refresh path; MUST NOT trigger device-code prompt
+    )
+
+    const result = (await flow.getMinecraftJavaToken({ fetchProfile: true })) as {
+      token: string
+      profile: { id: string; name: string } | null
+    }
+
+    if (!result.profile) {
+      throw new Error('Minecraft profile missing — re-login required.')
+    }
+
+    // DO NOT log `result.token` here. redact.ts WOULD scrub it at the log
+    // boundary, but keeping sensitive values out of log paths entirely is
+    // the stronger guarantee (structural test in AuthManager.test.ts
+    // asserts no log.* call in this file references `token`/`accessToken`).
+    this.status = {
+      loggedIn: true,
+      username: result.profile.name,
+      uuid: result.profile.id
+    }
+
+    return {
+      accessToken: result.token,
+      username: result.profile.name,
+      uuid: result.profile.id
     }
   }
 
