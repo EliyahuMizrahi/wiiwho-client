@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 03-07-renderer-settings-PLAN.md
-last_updated: "2026-04-21T09:19:57.573Z"
+stopped_at: Completed 03-09-preload-auth-surface-PLAN.md
+last_updated: "2026-04-21T09:27:34.001Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 25
-  completed_plans: 20
+  completed_plans: 21
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 03 (vanilla-launch-jre-bundling-packaging) — EXECUTING
-Plan: 3 of 13
+Plan: 4 of 13
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -72,6 +72,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-vanilla-launch-jre-bundling-packaging P04 | 8 | 2 tasks | 4 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P03 | 10 min | 3 tasks | 7 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P07 | 11min | 3 tasks | 6 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P09 | ~3m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,8 @@ Recent decisions affecting current work:
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-03: Natives extraction OWNED BY PLAN 03-04. installLibraries downloads classifier jars (e.g. lwjgl-platform-natives-windows.jar) to libraries/ but does NOT unzip into versions/<id>/natives/. Plan 03-04's natives.ts must iterate ResolvedVersion.libraries where isNative===true, unzip honouring extract.exclude (typically META-INF/), hand directory to args.ts for -Djava.library.path.
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-03: SC5 regression asserted via synthetic payload with locally-computed SHA1, NOT the real 3870888... client.jar SHA1 — would require shipping 8 MB of Mojang bytes (violates docs/mojang-asset-policy.md). Contract tested: on-disk SHA1 == advertised SHA1 after ensureClientJar, which is preserved regardless of which value stands in for 'advertised'. On SHA1 mismatch the temp file (.jar.tmp) is NEVER renamed to the final path — integration Test D proves no silently-wrong cache survives.
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-07: useSettingsStore mirrors main-side clamp via readSetResponse defensive parse (boundary-cast survives Phase-1 stub wiiwho.d.ts shape until 03-09 narrows). RamSlider component-scoped TooltipProvider avoids forcing upstream provider. SettingsDrawer fully controlled (open+onOpenChange); all three D-02 gestures flow through onOpenChange. Test-harness gaps: ResizeObserver jsdom stub added to pointer-capture trio (required for Radix Slider under jsdom 25). Shadcn Slider does NOT forward aria-label to Thumb — accessible-name test uses visible <label htmlFor> + root aria-label via [data-slot='slider'] querySelector. Radix Tooltip duplicates content (visible portal + sr-only announcer) — use findAllByText. Escape-dismiss test needs userEvent + dialog.focus (DismissableLayer registers in useEffect; handler only fires when layer is topmost after registration cycle flushes).
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-09 D-11 extension: new IPC surface members (game.onLog/onExited/onCrashed, logs.openCrashFolder/listCrashReports) live UNDER existing top-level keys. Channel count 13→18; 5 top-level keys unchanged.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-09 LCH-06 seam: AuthManager.getMinecraftToken() returns {accessToken, username, uuid}. Reuses silent-refresh Authflow (no codeCallback); throws on logged-out/missing-profile/unavailable-keychain. Raw token never enters log pipeline (static-source guard on top of redact.ts).
 
 ### Pending Todos
 
@@ -132,6 +135,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:19:57.569Z
-Stopped at: Completed 03-07-renderer-settings-PLAN.md
+Last session: 2026-04-21T09:27:15.282Z
+Stopped at: Completed 03-09-preload-auth-surface-PLAN.md
 Resume file: None
