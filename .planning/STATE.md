@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 02-00-PLAN.md
-last_updated: "2026-04-21T03:39:14.026Z"
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-04-21T03:52:42.769Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 12
-  completed_plans: 8
+  completed_plans: 9
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 02 (microsoft-authentication) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-microsoft-authentication P01 | 5min | 2 tasks | 4 files |
 | Phase 02 P02 | 5min | 2 tasks | 4 files |
 | Phase 02-microsoft-authentication P00 | 8min | 2 tasks | 6 files |
+| Phase 02-microsoft-authentication P03 | 6min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 02-microsoft-authentication]: Plan 02-01: AuthManager / future auth IPC handlers must call installRedactor() once at app.whenReady() before any log.* calls. Enforced as a convention; redactor is idempotent so multiple calls are safe.
 - [Phase 02]: Plan 02-02: Option B chosen for token storage — non-secret auth.bin pointer + prismarine-auth encrypted per-cache-name files under userData/auth/<username>/*.bin. AUTH-04 structurally enforced (safeStorage fail-closed; pointer regex-rejects /token|secret|refresh/i keys at write boundary). 24 tests pass.
 - [Phase 02-microsoft-authentication]: Plan 02-00: shadcn components manually inlined from new-york-v4 registry JSON (pnpm workspace hoist-pattern diff breaks npx shadcn add CLI); vitest 4 environmentMatchGlobs wrapped in 'as any' cast (runtime-works/types-removed gap)
+- [Phase 02-microsoft-authentication]: Plan 02-03: AuthManager singleton wires the full MS auth lifecycle (device-code login, silent refresh, logout, AbortController-race cancel). Cancel branch returns the locked __CANCELLED__ sentinel AuthErrorView and does NOT route through mapAuthError — frozen IPC contract preserved via JSON.stringify(res.error) into the error:string slot for the renderer store to short-circuit on. Verified prismarine-auth 3.1.1 exposes no public cancel surface (grep -i cancel|abort returned zero in both index.d.ts and src/).
+- [Phase 02-microsoft-authentication]: Plan 02-03: main/index.ts bootstrap order is load-bearing — installRedactor() runs FIRST inside app.whenReady() before any log call; createWindow is async and awaits getAuthManager().trySilentRefresh() BEFORE mainWindow.loadURL so the renderer's first auth:status sees the resolved state (D-02, Pitfall 7 — avoids login-flicker). registerAuthHandlers takes a getPrimaryWindow callback so macOS window-close-and-reopen cycles always resolve to the live BrowserWindow.
+- [Phase 02-microsoft-authentication]: Plan 02-03: Rule 1 fixes — prismarine-auth 3.1.1's index.d.ts types are wrong in two places that our AuthManager straddles: (1) Cache interface demands a reset() method our PrismarineCache doesn't expose (cast to CacheFactory at boundary, keep Plan 02-02's locked surface); (2) codeCallback parameter is declared as snake_case ServerDeviceCodeResponse (live-flow only) but MSAL actually emits camelCase (typed param as unknown + narrow at boundary). Both casts documented inline with verification links.
 
 ### Pending Todos
 
@@ -98,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T03:39:14.022Z
-Stopped at: Completed 02-00-PLAN.md
+Last session: 2026-04-21T03:52:25.347Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
