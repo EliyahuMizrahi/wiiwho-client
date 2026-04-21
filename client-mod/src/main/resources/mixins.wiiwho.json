@@ -4,6 +4,6 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "mixins.wiiwho.refmap.json",
   "minVersion": "0.7.11",
-  "client": [],
+  "client": ["MixinMinecraft"],
   "injectors": { "defaultRequire": 1 }
 }
