@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useAuthStore } from './stores/auth'
 import { LoginScreen } from './components/LoginScreen'
 import { LoadingScreen } from './components/LoadingScreen'
+import { AccountBadge } from './components/AccountBadge'
 
 // Renderer-side security assertions — fire on page load. If the launcher's
 // BrowserWindow ever regresses on contextIsolation/nodeIntegration/sandbox,
@@ -25,12 +26,19 @@ const LOADING_FALLBACK_MS = 8000
 
 function App(): React.JSX.Element {
   const state = useAuthStore((s) => s.state)
-  const username = useAuthStore((s) => s.username)
   const initialize = useAuthStore((s) => s.initialize)
   const [loadingHeld, setLoadingHeld] = useState(true)
 
   useEffect(() => {
     void initialize()
+
+    // Subscribe to auth:device-code push events (frozen IPC channel, Plan 03).
+    // The preload bridge's onDeviceCode returns an unsubscribe function that
+    // lives for the lifetime of this effect. DeviceCodeModal reads the
+    // payload off useAuthStore.deviceCode and mounts on state='logging-in'.
+    const unsubscribe = window.wiiwho.auth.onDeviceCode((payload) => {
+      useAuthStore.getState().setDeviceCode(payload)
+    })
 
     const fallback = setTimeout(() => {
       // If still loading after LOADING_FALLBACK_MS, force logged-out per UI-SPEC D-03.
@@ -48,6 +56,7 @@ function App(): React.JSX.Element {
     })()
 
     return (): void => {
+      unsubscribe()
       clearTimeout(fallback)
       clearTimeout(minHold)
     }
@@ -61,23 +70,28 @@ function App(): React.JSX.Element {
 
   if (state === 'logged-in') {
     return (
-      <div className="h-screen w-screen bg-neutral-900 flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-semibold text-[#16e0ee] mb-8">
-          Wiiwho Client
-        </h1>
-        <Button
-          size="lg"
-          className="bg-[#16e0ee] hover:bg-[#14c9d6] text-neutral-950 text-xl px-12 py-6"
-          onClick={async (): Promise<void> => {
-            const result = await window.wiiwho.game.play()
-            console.log('Play clicked:', result)
-          }}
-        >
-          Play
-        </Button>
-        <p className="text-xs font-normal text-neutral-500 mt-8">
-          {username ? `${username} · v0.1.0-dev` : 'v0.1.0-dev'}
-        </p>
+      <div className="relative h-screen w-screen bg-neutral-900">
+        <div className="absolute top-4 right-4 z-10">
+          <AccountBadge />
+        </div>
+        <div className="h-full w-full flex flex-col items-center justify-center">
+          <h1 className="text-4xl font-semibold text-[#16e0ee] mb-8">
+            Wiiwho Client
+          </h1>
+          <Button
+            size="lg"
+            className="bg-[#16e0ee] hover:bg-[#14c9d6] text-neutral-950 text-xl px-12 py-6"
+            onClick={async (): Promise<void> => {
+              const result = await window.wiiwho.game.play()
+              console.log('Play clicked:', result)
+            }}
+          >
+            Play
+          </Button>
+          <p className="text-xs font-normal text-neutral-500 mt-8">
+            v0.1.0-dev
+          </p>
+        </div>
       </div>
     )
   }

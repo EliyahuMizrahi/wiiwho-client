@@ -10,6 +10,7 @@
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '../stores/auth'
 import { ErrorBanner } from './ErrorBanner'
+import { DeviceCodeModal } from './DeviceCodeModal'
 
 export function LoginScreen(): React.JSX.Element {
   const state = useAuthStore((s) => s.state)
@@ -41,6 +42,8 @@ export function LoginScreen(): React.JSX.Element {
       ) : null}
 
       <p className="text-xs font-normal text-neutral-500 mt-8">v0.1.0-dev</p>
+
+      <DeviceCodeModal />
     </div>
   )
 }
