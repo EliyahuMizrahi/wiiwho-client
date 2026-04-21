@@ -20,3 +20,9 @@ Thumbs.db
 # Local env / secrets
 .env
 .env.local
+
+# Claude Code local settings
+.claude/
+
+# Local GSD helper scripts
+.planning/scripts/
