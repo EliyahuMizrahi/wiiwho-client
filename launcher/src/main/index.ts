@@ -5,8 +5,12 @@ import { registerAuthHandlers } from './ipc/auth'
 import { registerGameHandlers } from './ipc/game'
 import { registerSettingsHandlers } from './ipc/settings'
 import { registerSecurityHandlers, setAuditedPrefs } from './ipc/security'
+import { installRedactor } from './auth/redact'
+import { getAuthManager } from './auth/AuthManager'
 
-function createWindow(): void {
+let mainWindowRef: BrowserWindow | null = null
+
+async function createWindow(): Promise<void> {
   const webPreferences = {
     preload: join(__dirname, '../preload/index.js'),
     contextIsolation: true,
@@ -30,9 +34,24 @@ function createWindow(): void {
     webPreferences
   })
 
+  mainWindowRef = mainWindow
+
+  mainWindow.on('closed', () => {
+    if (mainWindowRef === mainWindow) mainWindowRef = null
+  })
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+
+  // D-02 / Pitfall 7: resolve silent refresh BEFORE the renderer mounts,
+  // so the renderer's first auth:status call returns the resolved state
+  // without a login→play-forward flicker.
+  try {
+    await getAuthManager().trySilentRefresh()
+  } catch {
+    // trySilentRefresh never throws in practice (D-03), but belt-and-suspenders.
+  }
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -42,13 +61,16 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // Install log redactor FIRST so nothing downstream can leak tokens into logs.
+  installRedactor()
+
   electronApp.setAppUserModelId('club.wiiwho.launcher')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  registerAuthHandlers()
+  registerAuthHandlers(() => mainWindowRef)
   registerGameHandlers()
   registerSettingsHandlers()
   registerSecurityHandlers()

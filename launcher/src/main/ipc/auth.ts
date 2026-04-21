@@ -1,23 +1,56 @@
-import { ipcMain } from 'electron'
-
 /**
- * Phase 1 stubs for the auth:* IPC surface.
- * Phase 2 replaces each handler body with the real MSAL device-code + XBL/XSTS chain.
- * The CHANNEL LIST is frozen — Phase 2 may not add new channels.
+ * Auth IPC handler bodies (Phase 2 implementation).
+ *
+ * CHANNELS ARE FROZEN (from Phase 1 D-11). This file replaces stub bodies only;
+ * it does NOT add channels or rename them. Channel names are lockstep with
+ * `launcher/src/preload/index.ts` and `launcher/src/renderer/src/wiiwho.d.ts`.
+ *
+ * Wiring:
+ *   - auth:status  → AuthManager.getStatus()
+ *   - auth:login   → AuthManager.loginWithDeviceCode(primaryWindow)
+ *                    On failure, AuthErrorView (including the __CANCELLED__
+ *                    sentinel from the cancel branch) is JSON-stringified into
+ *                    the frozen contract's `error?: string` field. The renderer
+ *                    store deserializes and routes the sentinel to silent logout.
+ *   - auth:logout  → AuthManager.logout() + AuthManager.cancelDeviceCode()
+ *     (logout must also abort any in-flight login per D-15 / D-07 spirit)
  */
-export function registerAuthHandlers(): void {
+
+import { BrowserWindow, ipcMain } from 'electron'
+import { getAuthManager } from '../auth/AuthManager'
+
+export function registerAuthHandlers(
+  getPrimaryWindow: () => BrowserWindow | null
+): void {
   ipcMain.handle('auth:status', async () => {
-    console.log('[wiiwho] auth:status (stub)')
-    return { loggedIn: false }
+    const s = getAuthManager().getStatus()
+    return s.loggedIn
+      ? { loggedIn: true, username: s.username, uuid: s.uuid }
+      : { loggedIn: false }
   })
 
   ipcMain.handle('auth:login', async () => {
-    console.log('[wiiwho] auth:login (stub — Phase 2 implements)')
-    return { ok: false, error: 'Phase 1 scaffold — auth not implemented' }
+    const win = getPrimaryWindow()
+    if (!win) {
+      return { ok: false, error: 'No active window — cannot sign in.' }
+    }
+    const res = await getAuthManager().loginWithDeviceCode(win)
+    if (res.ok) {
+      return { ok: true, username: res.username }
+    }
+    // Serialize AuthErrorView into the frozen-contract `error: string`.
+    // This includes the __CANCELLED__ sentinel on the cancel branch —
+    // the renderer store (Plan 04) parses it and short-circuits to
+    // 'logged-out' without rendering a banner (UI-SPEC line 216).
+    return {
+      ok: false,
+      error: JSON.stringify(res.error)
+    }
   })
 
   ipcMain.handle('auth:logout', async () => {
-    console.log('[wiiwho] auth:logout (stub)')
-    return { ok: true }
+    await getAuthManager().cancelDeviceCode()
+    const res = await getAuthManager().logout()
+    return res
   })
 }
