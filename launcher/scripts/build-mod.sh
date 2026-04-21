@@ -23,9 +23,16 @@ echo "[build-mod] dest:        $JAR_DEST"
 
 cd "$MOD_DIR"
 
+# Heal CRLF line endings on gradlew if Git autocrlf mangled them on clone.
+# bash refuses to exec a shebang line ending in \r ("required file not found").
+if [[ -f "./gradlew" ]] && head -1 ./gradlew | grep -q $'\r'; then
+  echo "[build-mod] gradlew has CRLF line endings; normalizing to LF in-place"
+  sed -i 's/\r$//' ./gradlew
+fi
+
 # Pick the right gradle wrapper for the host OS.
-# POSIX:   ./gradlew build -Pversion=...
-# Windows: ./gradlew.bat build -Pversion=...
+# POSIX / WSL:   ./gradlew build -Pversion=...
+# Git Bash / MSYS / Cygwin: ./gradlew.bat build -Pversion=...
 if [[ "${OSTYPE:-}" == "msys" || "${OSTYPE:-}" == "cygwin" || "${OS:-}" == "Windows_NT" ]]; then
   GRADLE_CMD="./gradlew.bat"
 else
