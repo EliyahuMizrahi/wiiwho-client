@@ -37,7 +37,7 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 
 ### JRE Bundling
 
-- [ ] **JRE-01**: Launcher installer for Windows includes an Eclipse Temurin Java 8 JRE, no user-side Java install required
+- [x] **JRE-01**: Launcher installer for Windows includes an Eclipse Temurin Java 8 JRE, no user-side Java install required
 - [ ] **JRE-02**: Launcher installer for macOS includes an Eclipse Temurin Java 8 JRE, no user-side Java install required
 - [x] **JRE-03**: On launch, launcher spawns the bundled JRE (not any system-installed Java) via a known resource path
 
@@ -70,7 +70,7 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 
 ### Packaging
 
-- [ ] **PKG-01**: `electron-builder` produces a distributable Windows installer (NSIS or portable) that bundles the launcher, the JRE, and the initial WiiWho mod jar
+- [x] **PKG-01**: `electron-builder` produces a distributable Windows installer (NSIS or portable) that bundles the launcher, the JRE, and the initial WiiWho mod jar
 - [ ] **PKG-02**: `electron-builder` produces a distributable macOS app bundle that bundles the launcher, the JRE, and the initial WiiWho mod jar (unsigned is acceptable for v0.1; right-click-Open workaround documented)
 - [ ] **PKG-03**: A clean machine (no Java, no Node, no prior Minecraft install) can run the installer, log in with Microsoft, and launch 1.8.9 successfully — Windows and macOS both verified
 
@@ -177,7 +177,7 @@ Which phases cover which requirements.
 | LCH-05 | Phase 3 | Complete |
 | LCH-06 | Phase 3 | Complete |
 | LCH-07 | Phase 3 | Complete |
-| JRE-01 | Phase 3 | Pending |
+| JRE-01 | Phase 3 | Complete |
 | JRE-02 | Phase 3 | Pending |
 | JRE-03 | Phase 3 | Complete |
 | MOD-01 | Phase 1 | Complete |
@@ -195,7 +195,7 @@ Which phases cover which requirements.
 | PERF-03 | Phase 6 | Pending |
 | COSM-01 | Phase 5 | Pending |
 | COSM-02 | Phase 5 | Pending |
-| PKG-01 | Phase 3 | Pending |
+| PKG-01 | Phase 3 | Complete |
 | PKG-02 | Phase 3 | Pending |
 | PKG-03 | Phase 7 | Pending |
 | COMP-01 | Phase 4 | Pending |

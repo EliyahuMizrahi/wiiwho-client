@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 03-10-orchestrator-logs-app-PLAN.md
-last_updated: "2026-04-21T09:48:25.864Z"
+stopped_at: Completed 03-11-windows-packaging-PLAN.md (NSIS build BLOCKED by environment — see SUMMARY.md Deviation §4)
+last_updated: "2026-04-21T10:19:23.159Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 25
-  completed_plans: 22
+  completed_plans: 23
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 03 (vanilla-launch-jre-bundling-packaging) — EXECUTING
-Plan: 5 of 13
+Plan: 6 of 13
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -74,6 +74,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-vanilla-launch-jre-bundling-packaging P07 | 11min | 3 tasks | 6 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P09 | ~3m | 2 tasks | 4 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P10 | 17min | 3 tasks | 10 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P11 | 23min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -128,6 +129,9 @@ Recent decisions affecting current work:
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Orchestrator emits 'downloading' BEFORE fetchAndCacheManifest runs so Cancel covers the manifest fetch too (D-13 widened)
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Dropped 'failed' phase emit from main orchestrator — renderer's 6s fallback timer is the single trigger (avoids race)
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Established vi.hoisted() mock-bag pattern for all TypeScript vitest tests with vi.mock() factories
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-11: Open Q §1 RESOLVED — x64 Temurin ships in BOTH mac slots (mac-x64 + mac-arm64). Temurin has no arm64 JRE; 1.8.9 LWJGL natives are x86_64-only; Rosetta 2 handles execution transparently. Saves ~70 MB vs Azul Zulu arm64 + keeps a single SHA256 API surface.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-11: PKG-01 NSIS smoke-build BLOCKED by environmental issue — electron-builder 26.8.1 unconditionally extracts winCodeSign-2.6.0.7z (contains macOS dylib symlinks); Windows without Developer Mode/admin cannot create symlinks. Unblock via Settings → Privacy & Security → For developers → Developer Mode: On. electron-builder.yml config + dist:win script chain verified complete; win-unpacked/ produced correctly with all extraResources.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-11: prefetch-jre.mjs Windows-specific hardening — bsdtar (System32/tar.exe) for .tar.gz (MSYS GNU tar misparses C:\ as rsh host:path); renameSync retry+cpSync fallback for AV/indexer handle-retention EPERM races. Idempotent per-slot population check via <slot>/bin/javaw.exe or <slot>/Contents/Home/bin/java probe.
 
 ### Pending Todos
 
@@ -136,9 +140,10 @@ None yet.
 ### Blockers/Concerns
 
 - **External dependency:** Azure AD app Minecraft API scope approval (Microsoft review queue, 1-7 days). Must start at Phase 1 to unblock Phase 2. Track separately from phase status.
+- Phase 03 Plan 11: NSIS installer smoke build requires Windows Developer Mode enabled OR admin shell. electron-builder 26.8.1 unconditionally extracts winCodeSign-2.6.0.7z which contains macOS dylib symlinks. All config + scripts complete and committed; environmental fix alone should unblock.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:48:25.861Z
-Stopped at: Completed 03-10-orchestrator-logs-app-PLAN.md
+Last session: 2026-04-21T10:19:11.813Z
+Stopped at: Completed 03-11-windows-packaging-PLAN.md (NSIS build BLOCKED by environment — see SUMMARY.md Deviation §4)
 Resume file: None
