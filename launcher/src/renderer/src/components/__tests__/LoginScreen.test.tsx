@@ -5,8 +5,8 @@
  * verbatim copy, store integration, and ErrorBanner conditional render.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 
 const authApi = {
@@ -38,6 +38,13 @@ describe('LoginScreen', () => {
     authApi.login.mockReset()
     authApi.status.mockReset()
     resetStore()
+  })
+
+  // vitest 4 does not auto-cleanup DOM between tests in RTL 16; explicit call
+  // prevents "Found multiple elements" errors when a component is rendered in
+  // back-to-back tests.
+  afterEach(() => {
+    cleanup()
   })
 
   it('renders "Wiiwho Client" wordmark as a font-semibold heading', () => {

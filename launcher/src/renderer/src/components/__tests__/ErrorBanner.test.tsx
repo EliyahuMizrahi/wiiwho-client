@@ -8,8 +8,8 @@
  *   - Dismiss (×) with aria-label → dismissError
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 
 const authApi = {
@@ -37,6 +37,12 @@ describe('ErrorBanner', () => {
       uuid: undefined,
       error: undefined
     })
+  })
+
+  // vitest 4 does not auto-cleanup DOM between tests in RTL 16; explicit call
+  // prevents duplicate-element errors across back-to-back renders.
+  afterEach(() => {
+    cleanup()
   })
 
   it('renders with role=alert and the error message', () => {
