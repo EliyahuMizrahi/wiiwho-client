@@ -12,16 +12,18 @@ A single-click path from "open launcher" to "in a 1.8.9 game that runs faster th
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Electron + TypeScript + React launcher app — validated in Phase 1 (foundations) + Phase 2 (auth) + Phase 3 (launch/packaging)
+- [x] Microsoft OAuth login (MSAL device code flow) with persisted account — validated in Phase 2
+- [x] Bundled Java 8 JRE (no user-side install required) for Windows — validated in Phase 3; macOS pending PKG-02 human verification (requires Mac build machine)
+- [x] RAM allocation control in launcher (JVM heap slider) — validated in Phase 3 (LAUN-03, LAUN-04)
+- [x] Crash log viewer — validated in Phase 3 (LAUN-05, COMP-05); redaction pipeline pinned via D-21 single-sanitizer invariant
+- [x] Vanilla-side of one-click launch — validated in Phase 3 (launcher downloads/verifies vanilla 1.8.9 jar, spawns bundled JVM, reaches main menu sentinel). Forge injection deferred to Phase 4.
+- [x] Windows packaging via electron-builder (NSIS) — configuration validated in Phase 3 (PKG-01); final `.exe` pending Windows Developer Mode toggle (environmental, not code)
 
 ### Active
 
-- [ ] Electron + TypeScript + React launcher app
-- [ ] Microsoft OAuth login (MSAL device code flow) with persisted account
-- [ ] One-click launch flow — launcher downloads/verifies vanilla 1.8.9 jar, injects our Forge mod, spawns JVM with correct classpath/args
-- [ ] Bundled Java 8 JRE (no user-side install required) for both Windows and macOS
-- [ ] RAM allocation control in launcher (JVM heap slider)
-- [ ] Crash log viewer — launcher surfaces crash reports if the game process dies abnormally
+- [ ] One-click launch flow — full path with Forge mod injected (vanilla-side done Phase 3; Forge injection is Phase 4)
+- [ ] macOS packaging via electron-builder (DMG) — config complete in Phase 3; awaiting Mac build machine
 - [ ] Forge 1.8.9 mod as the in-game module (MCP mappings, Mixin for patches Forge events can't cover)
 - [ ] FPS counter HUD mod — togglable, anticheat-safe
 - [ ] Keystrokes HUD mod — live WASD/mouse overlay, anticheat-safe
@@ -105,6 +107,6 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-21 after Phase 1 (foundations) completion.*
+*Last updated: 2026-04-21 after Phase 3 (vanilla launch + JRE bundling + packaging) completion. Windows launcher now downloads/verifies vanilla 1.8.9, spawns bundled Temurin 8 JRE, and reaches main-menu sentinel; NSIS config + mac Universal DMG config ready; PKG-02 awaits Mac machine. 354/354 tests green.*
 
 **Phase 1 (foundations) shipped 2026-04-21.** Forge 1.8.9 mod scaffold (`client-mod/`) compiles and launches Minecraft 1.8.9 via DevAuth with a trivial Mixin hook confirmed firing on `Minecraft.startGame`. Electron launcher scaffold (`launcher/`) opens a hardened window (contextIsolation/sandbox/no-nodeIntegration runtime-audited) with a dead-button Play and the full v0.1 IPC surface stubbed. Azure AD app registered (`60cbce02-…`) and MCE review form submitted — approval expected by 2026-04-27. End-to-end anticheat safety validated by connecting to minemen.club (Vanicheat) as real MS user without kicks. Phase 2 (Microsoft authentication) is unblocked to plan; only external gate is the async MCE approval email.
