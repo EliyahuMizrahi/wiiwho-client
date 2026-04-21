@@ -10,7 +10,7 @@
  */
 
 import { afterEach, beforeAll, beforeEach, describe, it, expect, vi } from 'vitest'
-import { cleanup, render, screen, fireEvent } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 
@@ -112,10 +112,21 @@ describe('SettingsDrawer', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('D-02: pressing Escape invokes onOpenChange(false)', () => {
+  it('D-02: pressing Escape invokes onOpenChange(false)', async () => {
+    const user = userEvent.setup()
     const onOpenChange = vi.fn()
     render(<SettingsDrawer open={true} onOpenChange={onOpenChange} />)
-    fireEvent.keyDown(document, { key: 'Escape' })
+    // Radix DismissableLayer registers its layer via useEffect +
+    // dispatchUpdate → a second render flush is required before the
+    // Escape handler sees itself as the highest layer.
+    // user-event (async) awaits microtasks between each interaction so
+    // the layer registration settles; user.keyboard('{Escape}') fires the
+    // keydown on the focused element, which is inside the dialog (Radix
+    // auto-focuses the content on open).
+    const dialog = await screen.findByRole('dialog')
+    // Focus the dialog explicitly in case auto-focus is racing the assertion.
+    dialog.focus()
+    await user.keyboard('{Escape}')
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
