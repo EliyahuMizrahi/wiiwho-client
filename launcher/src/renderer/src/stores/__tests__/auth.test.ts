@@ -232,4 +232,79 @@ describe('useAuthStore', () => {
     expect(s.username).toBeUndefined()
     expect(s.uuid).toBeUndefined()
   })
+
+  describe('deviceCode + cancelLogin', () => {
+    it('setDeviceCode populates with receivedAt', () => {
+      const before = Date.now()
+      useAuthStore.getState().setDeviceCode({
+        userCode: 'ABCD-1234',
+        verificationUri: 'https://microsoft.com/link',
+        expiresInSec: 900
+      })
+      const dc = useAuthStore.getState().deviceCode!
+      expect(dc.userCode).toBe('ABCD-1234')
+      expect(dc.verificationUri).toBe('https://microsoft.com/link')
+      expect(dc.expiresInSec).toBe(900)
+      expect(dc.receivedAt).toBeGreaterThanOrEqual(before)
+    })
+
+    it('clearDeviceCode removes the field', () => {
+      useAuthStore.getState().setDeviceCode({
+        userCode: 'A',
+        verificationUri: 'u',
+        expiresInSec: 1
+      })
+      useAuthStore.getState().clearDeviceCode()
+      expect(useAuthStore.getState().deviceCode).toBeUndefined()
+    })
+
+    it('login success clears deviceCode', async () => {
+      authApi.status
+        .mockResolvedValueOnce({ loggedIn: false })
+        .mockResolvedValueOnce({ loggedIn: true, username: 'A', uuid: 'u' })
+      authApi.login.mockResolvedValue({ ok: true, username: 'A' })
+      await useAuthStore.getState().initialize()
+      useAuthStore.getState().setDeviceCode({
+        userCode: 'X',
+        verificationUri: 'u',
+        expiresInSec: 1
+      })
+      await useAuthStore.getState().login()
+      expect(useAuthStore.getState().deviceCode).toBeUndefined()
+    })
+
+    it('login error clears deviceCode', async () => {
+      authApi.status.mockResolvedValue({ loggedIn: false })
+      authApi.login.mockResolvedValue({
+        ok: false,
+        error: JSON.stringify({ message: 'x' })
+      })
+      await useAuthStore.getState().initialize()
+      useAuthStore.getState().setDeviceCode({
+        userCode: 'X',
+        verificationUri: 'u',
+        expiresInSec: 1
+      })
+      await useAuthStore.getState().login()
+      expect(useAuthStore.getState().deviceCode).toBeUndefined()
+    })
+
+    it('cancelLogin calls logout + resets store + clears deviceCode', async () => {
+      authApi.logout.mockResolvedValue({ ok: true })
+      useAuthStore.setState({
+        state: 'logging-in',
+        deviceCode: {
+          userCode: 'X',
+          verificationUri: 'u',
+          expiresInSec: 1,
+          receivedAt: 1
+        }
+      })
+      await useAuthStore.getState().cancelLogin()
+      expect(authApi.logout).toHaveBeenCalled()
+      const s = useAuthStore.getState()
+      expect(s.state).toBe('logged-out')
+      expect(s.deviceCode).toBeUndefined()
+    })
+  })
 })
