@@ -1,4 +1,6 @@
 /**
+ * @vitest-environment jsdom
+ *
  * Renderer-side auth store — Zustand state machine tests.
  *
  * Covers:
@@ -10,7 +12,8 @@
  *   - dismissError clears error + resets state to logged-out
  *   - __CANCELLED__ sentinel short-circuit (UI-SPEC line 216 guardrail)
  *
- * Environment: jsdom (matched by vitest `environmentMatchGlobs` src/renderer/**)
+ * Environment: jsdom (set via docblock pragma above — vitest 4 honours this
+ * even if the config-level environmentMatchGlobs shape drifts).
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -29,9 +32,9 @@ const authApi: AuthAPI = {
   onDeviceCode: vi.fn(() => () => {})
 }
 
-// @ts-expect-error — test harness shim, jsdom already provides a window, we only
-// graft our wiiwho namespace onto it.
-globalThis.window = globalThis.window ?? {}
+// Test harness shim — jsdom already provides `window`, we only graft our
+// `wiiwho` namespace onto it so the store's calls through window.wiiwho.auth.*
+// hit these vi.fn mocks.
 ;(globalThis as unknown as { window: { wiiwho: { auth: AuthAPI } } }).window.wiiwho = {
   auth: authApi
 } as never
