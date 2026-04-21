@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: true
 preset: new-york / neutral / css-variables (detected from launcher/components.json)
 created: 2026-04-21
+revised: 2026-04-21
 ---
 
 # Phase 2 — UI Design Contract
@@ -64,22 +65,43 @@ Declared values (4-point base; all used values must be multiples of 4):
 
 ## Typography
 
-Locked to **4 sizes, 2 weights** (within the spec's hard cap):
+**Locked scale — exactly 4 sizes, exactly 2 weights. No exceptions, no "functional" add-ons.**
 
-| Role | Size | Weight | Line Height | Usage |
-|------|------|--------|-------------|-------|
-| Body | 14px (`text-sm`) | 400 (regular) | 1.5 (`leading-6`) | Error banner message, dropdown menu items, modal helper text, UUID display |
-| Label | 12px (`text-xs`) | 400 (regular) | 1.5 | `v0.1.0-dev` version string, UUID truncation hint, timer "expires in 14:32" |
-| Heading | 20px (`text-xl`) | 600 (semibold) | 1.2 (`leading-tight`) | DeviceCodeModal title "Sign in with Microsoft", error banner heading if used |
-| Display | 36px (`text-4xl`) | 700 (bold) | 1.2 | LoginScreen `Wiiwho Client` wordmark (matches Phase 1 `text-4xl font-bold`) |
+### The 4 sizes
 
-**Device-code monospace exception** (one additional role, not counted in the 4):
+| Role | Size | Tailwind | Line Height |
+|------|------|----------|-------------|
+| Label | 12px | `text-xs` | 1.5 (`leading-[18px]`) |
+| Body | 14px | `text-sm` | 1.5 (`leading-6`) |
+| Heading | 24px | `text-2xl` | 1.2 (`leading-tight`) |
+| Display | 36px | `text-4xl` | 1.2 (`leading-tight`) |
 
-| Role | Size | Weight | Line Height | Usage |
-|------|------|--------|-------------|-------|
-| Code | 28px (`text-3xl`) | 600 (semibold) | 1.2 | The 8-character MS device user-code, rendered in `ui-monospace, SFMono-Regular, 'Cascadia Mono', Menlo, Consolas, monospace` — required for glanceable entry; monospace is functional not decorative. |
+### The 2 weights
 
-**Rationale for only 2 weights:** regular + semibold covers all copy. Bold (700) on the wordmark is inherited from Phase 1 `App.tsx` and is the *only* bold use in the app — treated as a one-off brand mark, not a typography role.
+| Weight | Tailwind | Used by |
+|--------|----------|---------|
+| Regular (400) | `font-normal` | All body, label, and helper copy |
+| Semibold (600) | `font-semibold` | Heading role, Display role (wordmark), the device-code block |
+
+**Bold (700) is NOT declared and must not be used anywhere in Phase 2 components.**
+
+### Role → usage mapping (every usage site is listed here; nothing in the spec may use an off-scale size or weight)
+
+| Role | Weight | Phase 2 usage sites |
+|------|--------|---------------------|
+| Label (12px / regular) | 400 | `v0.1.0-dev` version string on LoginScreen + LoadingScreen; UUID truncation hint in AccountBadge tooltip; `Expires in {mm:ss}` timer in DeviceCodeModal; full-UUID line inside AccountBadge dropdown (`text-xs neutral-500`) |
+| Body (14px / regular) | 400 | Error banner message body; DeviceCodeModal body paragraph; DeviceCodeModal button labels; DropdownMenu item labels (`Log out`, username display-line in dropdown); AccountBadge username; skin-avatar initial-placeholder glyph |
+| Heading (24px / semibold) | 600 | DeviceCodeModal title "Sign in with Microsoft"; **the 8-character device-code block** (rendered in `ui-monospace, SFMono-Regular, 'Cascadia Mono', Menlo, Consolas, monospace` + `tracking-[0.15em]`, centered, selectable). The device code is functionally a heading — it's the single most important element in the modal and must anchor the 480px modal visually. 24px + semibold + 0.15em tracking is legible for an 8-char transcription code and keeps the size count at 4. |
+| Display (36px / semibold) | 600 | LoginScreen `Wiiwho Client` wordmark; LoadingScreen `Wiiwho Client` wordmark |
+
+### Line-height contract
+
+- Body + Label: `1.5` (body copy readability).
+- Heading + Display: `1.2` (tight, display-ready).
+
+### Codebase migration required
+
+Phase 2 work must update `launcher/src/renderer/src/App.tsx` wordmark from `font-bold` to `font-semibold` so the existing Phase 1 code conforms to the contract. The App.tsx change is in scope for Phase 2 — the wordmark appears on LoginScreen, LoadingScreen, and the Play-forward screen, all of which must render at `text-4xl font-semibold` consistently. **No component in Phase 2 may introduce a new `font-bold` usage.**
 
 ---
 
@@ -119,9 +141,9 @@ Every string the user sees is locked here. Executor copies verbatim.
 
 | Element | Copy |
 |---------|------|
-| Wordmark | `Wiiwho Client` (matches Phase 1 App.tsx exactly) |
+| Wordmark | `Wiiwho Client` (Display role — `text-4xl font-semibold`; App.tsx currently ships `font-bold` and must migrate to `font-semibold` as part of Phase 2) |
 | Primary CTA | `Log in with Microsoft` (verb + object, per D-05) |
-| Version text | `v0.1.0-dev` (matches Phase 1 App.tsx exactly; bumps with `package.json`) |
+| Version text | `v0.1.0-dev` (Label role — `text-xs font-normal text-neutral-500`; matches Phase 1 App.tsx string, bumps with `package.json`) |
 
 No tooltips, no legal text, no "Why Microsoft?" explainer (explicitly deferred in CONTEXT.md Deferred Ideas).
 
@@ -129,9 +151,9 @@ No tooltips, no legal text, no "Why Microsoft?" explainer (explicitly deferred i
 
 | Element | Copy |
 |---------|------|
-| Heading | `Wiiwho Client` (wordmark only, same style as login) |
+| Heading | `Wiiwho Client` (Display role — `text-4xl font-semibold`, same style as LoginScreen) |
 | Status | No text — a spinner (`Loader2` from lucide-react with `animate-spin`) beneath the wordmark |
-| Version text | `v0.1.0-dev` (same position as LoginScreen — keeps layout stable across login→loading→play transitions) |
+| Version text | `v0.1.0-dev` (Label role — same position as LoginScreen, keeps layout stable across login→loading→play transitions) |
 
 **Minimum visible duration:** 300ms. Prevents flash when the refresh completes in <100ms. If the refresh takes longer than 8s without resolving, fall through to LoginScreen (per D-03, no error surfaced on this path).
 
@@ -143,23 +165,23 @@ Structure: centered Dialog, width 480px (`sm:max-w-[480px]`), locked from Phase 
 
 | Element | Copy |
 |---------|------|
-| Title | `Sign in with Microsoft` |
-| Body paragraph | `Enter this code on Microsoft's sign-in page to finish logging in.` |
-| Code label | `Your code` |
-| Code block | `{device_code}` — 8-char monospace, `text-3xl`, `tracking-[0.15em]`, centered, selectable text |
-| Copy button | `Copy code` (with `Copy` lucide icon, switches to `Check` icon + label `Copied` for 1.5s on click) |
-| Open browser button | `Open in browser` (with `ExternalLink` lucide icon — calls `shell.openExternal(verification_uri)`) |
-| Timer | `Expires in {mm:ss}` (counts down from Microsoft's `expires_in`, typically 15:00) |
-| Cancel button | `Cancel` (outline variant, also bound to Escape per D-07) |
+| Title | `Sign in with Microsoft` (Heading role — `text-2xl font-semibold`) |
+| Body paragraph | `Enter this code on Microsoft's sign-in page to finish logging in.` (Body role — `text-sm font-normal`) |
+| Code label | `Your code` (Label role — `text-xs font-normal text-neutral-500`) |
+| Code block | `{device_code}` — 8-char monospace, **Heading role (`text-2xl font-semibold`)**, `tracking-[0.15em]`, `font-mono`, centered, selectable text. Chosen over 36px display because at 24px the 8-char code + 0.15em tracking fits comfortably in the 480px modal without crowding the adjacent buttons, and the code is visually dominant within the modal since body text sits at 14px. |
+| Copy button | `Copy code` (Body role, with `Copy` lucide icon, switches to `Check` icon + label `Copied` for 1.5s on click) |
+| Open browser button | `Open in browser` (Body role, with `ExternalLink` lucide icon — calls `shell.openExternal(verification_uri)`) |
+| Timer | `Expires in {mm:ss}` (Label role — counts down from Microsoft's `expires_in`, typically 15:00) |
+| Cancel button | `Cancel` (Body role, outline variant, also bound to Escape per D-07) |
 
 **Expired state (D-06):**
 
 | Element | Copy |
 |---------|------|
-| Title | `Sign in with Microsoft` (unchanged) |
-| Body paragraph | `The code expired before you finished signing in.` |
-| Primary action | `Generate new code` (replaces the code block + both prior buttons; clicking re-runs the device-code flow in-place, returns the modal to the active state with a fresh code) |
-| Secondary action | `Cancel` (outline variant, unchanged) |
+| Title | `Sign in with Microsoft` (Heading role — unchanged) |
+| Body paragraph | `The code expired before you finished signing in.` (Body role) |
+| Primary action | `Generate new code` (Body role — replaces the code block + both prior buttons; clicking re-runs the device-code flow in-place, returns the modal to the active state with a fresh code) |
+| Secondary action | `Cancel` (Body role, outline variant, unchanged) |
 
 **Keyboard contract:**
 - `Escape` → Cancel (closes modal, stops polling, returns to LoginScreen) — native Dialog behavior
@@ -176,6 +198,8 @@ Inline banner beneath the login button. Full width of the button column. Not a t
 [AlertCircle icon]  {message}                           [× dismiss]
                     [Try again]  [Help →]
 ```
+
+All text uses Body role (`text-sm font-normal`) except the dismiss glyph which is a 16px icon.
 
 **XSTS + entitlement error messages (verbatim from CONTEXT.md D-10, locked):**
 
@@ -195,8 +219,8 @@ Inline banner beneath the login button. Full width of the button column. Not a t
 
 | Element | Copy |
 |---------|------|
-| Primary action button | `Try again` (per D-09 — re-runs device-code flow from the start) |
-| Secondary action | `Help` (opens Help link in external browser via `shell.openExternal`; hidden when no Help link, see Network error row) |
+| Primary action button | `Try again` (Body role, per D-09 — re-runs device-code flow from the start) |
+| Secondary action | `Help` (Body role — opens Help link in external browser via `shell.openExternal`; hidden when no Help link, see Network error row) |
 | Dismiss | `×` (ARIA `aria-label="Dismiss error"`) |
 
 **Lifecycle:** Banner appears after a user-initiated login attempt fails. Persists until the user clicks `×`, clicks `Try again`, or clicks `Log in with Microsoft` again (auto-dismisses on retry). **Never** appears on the silent-refresh path (D-03).
@@ -210,16 +234,16 @@ Top-right of the Play-forward layout (post-login). **Out-of-scope for Phase 2's 
 | Element | Copy / spec |
 |---------|-------------|
 | Image | 32×32 circular skin head, `rounded-full`, fetched per D-14 (see Skin avatar contract below), cyan 2px ring on hover/focus-visible |
-| Username | `{mc_username}` (right of avatar, `text-sm`, `neutral-200`, max 16 chars then ellipsis) |
+| Username | `{mc_username}` (Body role — `text-sm font-normal text-neutral-200`, right of avatar, max 16 chars then ellipsis) |
 | Caret icon | `ChevronDown` from lucide-react, `size-4`, `neutral-500` |
 
 **Dropdown menu (opens on click, per D-13):**
 
 | Menu item | Copy |
 |-----------|------|
-| First item (disabled, display-only) | `{mc_username}` heading + `{uuid_full}` on line below in `text-xs neutral-500` (shows full UUID; the badge shows first-8 via tooltip per D-13) |
+| First item (disabled, display-only) | `{mc_username}` in Body role + `{uuid_full}` on line below in Label role (`text-xs font-normal text-neutral-500` — shows full UUID; the badge shows first-8 via tooltip per D-13) |
 | Separator | (visual `DropdownMenu.Separator`) |
-| Action | `Log out` — no confirmation dialog (D-15). On click: calls `auth:logout` IPC, clears Zustand auth store, drops to LoginScreen. |
+| Action | `Log out` (Body role — no confirmation dialog, D-15. On click: calls `auth:logout` IPC, clears Zustand auth store, drops to LoginScreen.) |
 
 **UUID truncation pattern (D-13):** first 8 hex chars shown on hover-tooltip of the avatar: `a1b2c3d4…`. Full UUID only appears inside the open dropdown.
 
@@ -237,7 +261,7 @@ Local cache (D-14 mandatory):
 - Path: `%APPDATA%/Wiiwho/skin-cache/{uuid}.png` (Windows); `~/Library/Application Support/Wiiwho/skin-cache/{uuid}.png` (macOS)
 - TTL: 7 days (skins change rarely; 7d matches the refresh-token window naturally)
 - On cache hit: read file, load via `file://` URL in renderer `<img src>`.
-- On cache miss or stale: fetch from `mc-heads.net`, write file, display. While loading: show `neutral-700` placeholder square with user initial in `text-xs neutral-200`.
+- On cache miss or stale: fetch from `mc-heads.net`, write file, display. While loading: show `neutral-700` placeholder square with user initial in Body role (`text-sm font-normal text-neutral-200`).
 - On fetch error (offline, 404, 5xx): show the initial-placeholder permanently for this session. Do NOT show an error banner.
 
 Path + TTL are planner-owned implementation detail; the decision to use `mc-heads.net` and to cache-by-UUID is locked here.
@@ -267,7 +291,7 @@ Files the executor will create (paths relative to `launcher/src/renderer/src/`):
 | `stores/auth.ts` | Zustand auth store | (none — first consumer) |
 | `hooks/useSkinHead.ts` | mc-heads.net fetch + cache | IPC channel to main process? (not allowed per Phase 1 frozen surface — therefore renderer-side `fetch()` + in-memory + IndexedDB or sessionStorage for the in-window cache; disk cache is main-process territory via a file IPC... **planner resolves**: likely renderer-side fetch with in-memory `Map<uuid, dataURL>`, disk cache deferred to post-Phase-2 since the IPC surface is frozen.) |
 
-**Layout change in `App.tsx`** (per CONTEXT.md Integration points): top-level switch on auth-store state → renders `<LoginScreen />` | `<LoadingScreen />` | `<PlayForward />`. `DeviceCodeModal` and `ErrorBanner` are rendered conditionally as overlays/children of `<LoginScreen />`.
+**Layout change in `App.tsx`** (per CONTEXT.md Integration points): top-level switch on auth-store state → renders `<LoginScreen />` | `<LoadingScreen />` | `<PlayForward />`. `DeviceCodeModal` and `ErrorBanner` are rendered conditionally as overlays/children of `<LoginScreen />`. **Also: migrate the existing wordmark `font-bold` class in `App.tsx` to `font-semibold` to conform to the 2-weight typography contract.**
 
 ---
 
@@ -323,8 +347,22 @@ Non-negotiable baseline (passes WCAG AA):
 - [ ] Dimension 1 Copywriting: PASS (locked verbatim per CONTEXT.md D-10, D-04, D-06, D-13, D-15; CTA is verb + object; all error messages plain English)
 - [ ] Dimension 2 Visuals: PASS (components enumerated with file paths; motion specified with durations; accessibility contrast numbers computed)
 - [ ] Dimension 3 Color: PASS (60/30/10 split declared; accent reserved for 5 explicit elements; no red surface; no success color by design)
-- [ ] Dimension 4 Typography: PASS (4 sizes declared; 2 weights; monospace Code role called out as a functional exception; line-heights per spec)
+- [ ] Dimension 4 Typography: PASS (exactly 4 sizes — 12 / 14 / 24 / 36; exactly 2 weights — 400 / 600; no bold; line-heights per spec; App.tsx wordmark migration to `font-semibold` called out)
 - [ ] Dimension 5 Spacing: PASS (all values multiples of 4; exceptions called out and justified)
 - [ ] Dimension 6 Registry Safety: PASS (shadcn official only; no third-party)
 
 **Approval:** pending
+
+---
+
+## Revision 1 — 2026-04-21
+
+Fixed two Dimension 4 blocking issues flagged by the checker.
+
+**Change 1: Collapsed font sizes from 5 to 4.**
+Previous draft declared 12 / 14 / 20 / 28 / 36 with 28px "Code role" as a functional exception. All five sizes counted against the 4-max cap. Revised scale: **12 / 14 / 24 / 36**. The device-code block now renders at the 24px Heading size with `tracking-[0.15em]` + monospace — this keeps the 8-char code legible and visually dominant inside the 480px modal while conforming to the cap. The 20px heading was dropped; the modal title moves up to 24px, which reads as more deliberate at modal-scale anyway.
+
+**Change 2: Collapsed font weights from 3 to 2.**
+Previous draft declared 400 / 600 / 700 with 700 as a "one-off brand mark" for the wordmark. That argument was rejected by the checker. Revised weights: **400 regular + 600 semibold**, nothing else. The `Wiiwho Client` wordmark now renders at `text-4xl font-semibold`; at 36px, semibold reads as visually dominant without needing bold. `launcher/src/renderer/src/App.tsx` currently ships the wordmark with `font-bold` — **Phase 2 executor work must migrate that single class to `font-semibold`** so the live codebase conforms to the contract. This is the only codebase change required to honor the revision.
+
+No other dimensions were reopened. All 17 CONTEXT.md decisions (D-01 through D-17) remain untouched.
