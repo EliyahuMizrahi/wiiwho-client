@@ -54,10 +54,41 @@ export interface AuthStoreState {
   uuid?: string
   error?: AuthErrorViewClient
   initialized: boolean
+  /**
+   * Device-code prompt payload — populated by the App-level subscription to
+   * `window.wiiwho.auth.onDeviceCode` (see Plan 02-05). Undefined at rest
+   * and whenever login() resolves (success OR error). DeviceCodeModal mounts
+   * on `state === 'logging-in' && deviceCode !== undefined`.
+   */
+  deviceCode?: {
+    userCode: string
+    verificationUri: string
+    expiresInSec: number
+    receivedAt: number
+  }
   login: () => Promise<void>
   logout: () => Promise<void>
   dismissError: () => void
   initialize: () => Promise<void>
+  /**
+   * Called by App.tsx on every auth:device-code IPC push. Records the payload
+   * plus a receivedAt timestamp so DeviceCodeModal can compute the countdown.
+   */
+  setDeviceCode: (p: {
+    userCode: string
+    verificationUri: string
+    expiresInSec: number
+  }) => void
+  /** Clears the device-code payload (idempotent). */
+  clearDeviceCode: () => void
+  /**
+   * "Stop signing in" — calls auth:logout (which per Plan 03 also aborts any
+   * in-flight device-code poll) and optimistically lands the store on the
+   * same terminal state the __CANCELLED__ sentinel short-circuit produces.
+   * This is redundant-but-safe: both writes target state='logged-out' +
+   * error=undefined, so no divergence regardless of resolve order.
+   */
+  cancelLogin: () => Promise<void>
 }
 
 /**
@@ -153,7 +184,8 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
         state: 'logged-in',
         username: s.username ?? res.username,
         uuid: s.uuid,
-        error: undefined
+        error: undefined,
+        deviceCode: undefined
       })
       return
     }
@@ -168,7 +200,8 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
         state: 'logged-out',
         username: undefined,
         uuid: undefined,
-        error: undefined
+        error: undefined,
+        deviceCode: undefined
       })
       return
     }
@@ -178,7 +211,8 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       state: 'error',
       error: parseAuthError(res.error),
       username: undefined,
-      uuid: undefined
+      uuid: undefined,
+      deviceCode: undefined
     })
   },
 
@@ -188,7 +222,8 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       state: 'logged-out',
       username: undefined,
       uuid: undefined,
-      error: undefined
+      error: undefined,
+      deviceCode: undefined
     })
   },
 
@@ -196,5 +231,40 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
     if (get().state === 'error') {
       set({ state: 'logged-out', error: undefined })
     }
+  },
+
+  setDeviceCode: (p) => {
+    set({
+      deviceCode: {
+        userCode: p.userCode,
+        verificationUri: p.verificationUri,
+        expiresInSec: p.expiresInSec,
+        receivedAt: Date.now()
+      }
+    })
+  },
+
+  clearDeviceCode: () => {
+    set({ deviceCode: undefined })
+  },
+
+  cancelLogin: async () => {
+    // auth:logout also aborts any in-flight device-code poll on main (Plan 03).
+    // The in-flight login() promise will then resolve with the __CANCELLED__
+    // sentinel and Plan 04's short-circuit will set the SAME terminal state
+    // we set below. This optimistic set is therefore REDUNDANT-BUT-SAFE:
+    //   - It hides the modal immediately (before login()'s setState runs).
+    //   - Both writes target state='logged-out' + error=undefined, so there
+    //     is no state divergence regardless of which resolves first.
+    // Keep this optimistic write; removing it would flash the modal open
+    // for an extra tick between logout() ack and login() resolution.
+    await window.wiiwho.auth.logout()
+    set({
+      state: 'logged-out',
+      username: undefined,
+      uuid: undefined,
+      error: undefined,
+      deviceCode: undefined
+    })
   }
 }))
