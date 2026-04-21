@@ -18,7 +18,7 @@
  *   - Phase 4 extension point `forgeTweaks?: string[]` accepted but unused in Phase 3
  */
 
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import path from 'node:path'
 import type { ResolvedVersion } from '@xmcl/core'
 
@@ -57,18 +57,11 @@ function baseInputs(overrides: Partial<LaunchInputs> = {}): LaunchInputs {
   }
 }
 
-const originalPlatform = process.platform
-
-function setPlatform(p: NodeJS.Platform): void {
-  Object.defineProperty(process, 'platform', { value: p, configurable: true })
-}
-
-afterEach(() => {
-  Object.defineProperty(process, 'platform', {
-    value: originalPlatform,
-    configurable: true
-  })
-})
+// Note: we originally stubbed `process.platform` to exercise both
+// path-delimiter branches, but Node's `path` module caches `path.delimiter`
+// at startup — stubbing process.platform does not retroactively re-derive
+// the delimiter. Test 9 was rewritten to assert the CODE uses `path.delimiter`
+// (source-level check) + to sanity-check the current host's delimiter.
 
 describe('args.ts — buildArgv canonical vanilla 1.8.9', () => {
   it('Test 1 (mainClass — Pitfall 2): contains net.minecraft.client.main.Main and no launchwrapper/FMLTweaker', () => {
@@ -130,29 +123,50 @@ describe('args.ts — buildArgv canonical vanilla 1.8.9', () => {
     expect(argv).toContain(`-Djava.library.path=${nativesDir}`)
   })
 
-  it('Test 9a (classpath separator on win32): uses ; between jars', () => {
-    setPlatform('win32')
+  /**
+   * Classpath separator invariant is runtime-coupled to `path.delimiter`.
+   * We can't meaningfully flip it via `Object.defineProperty(process, 'platform', ...)`
+   * — Node's `path` module was already resolved at startup to the real OS
+   * flavor. So we test the CODE invariant: the classpath string is
+   * `classpath.join(path.delimiter)` for WHATEVER `path.delimiter` is on
+   * the running host. Plan 03-05 on the correct target OS gets the correct
+   * separator because the code reads from `path.delimiter` at invocation
+   * time — not a hardcoded char.
+   */
+  it('Test 9 (classpath separator): uses path.delimiter for the running platform (; on win32, : on darwin)', () => {
     const argv = buildArgv(fakeResolved, baseInputs())
     const cpIdx = argv.indexOf('-cp')
     expect(cpIdx).toBeGreaterThan(-1)
     const cpValue = argv[cpIdx + 1]
-    // path.delimiter on win32 is ';'
-    expect(path.delimiter).toBe(';')
-    expect(cpValue.includes(';')).toBe(true)
-    expect(cpValue.includes(':')).toBe(false) // no unix separator
+    const inputs = baseInputs()
+    // The classpath must equal `classpath.join(path.delimiter)` exactly.
+    expect(cpValue).toBe(inputs.classpath.join(path.delimiter))
+    // And therefore contains path.delimiter.
+    expect(cpValue.includes(path.delimiter)).toBe(true)
+
+    // Platform-sanity for the CURRENT host:
+    if (process.platform === 'win32') {
+      expect(path.delimiter).toBe(';')
+      expect(cpValue.includes(';')).toBe(true)
+    } else if (process.platform === 'darwin') {
+      expect(path.delimiter).toBe(':')
+      expect(cpValue.includes(':')).toBe(true)
+    }
   })
 
-  it('Test 9b (classpath separator on darwin): uses : between jars', () => {
-    setPlatform('darwin')
-    const argv = buildArgv(fakeResolved, baseInputs())
-    const cpIdx = argv.indexOf('-cp')
-    const cpValue = argv[cpIdx + 1]
-    // path.delimiter on darwin is ':'
-    expect(path.delimiter).toBe(':')
-    expect(cpValue.includes(':')).toBe(true)
-    // A Windows drive letter like C: would contain ':', but our fixture
-    // uses forward-slash unix paths — safe to assert no ';'
-    expect(cpValue.includes(';')).toBe(false)
+  it('Test 9-source (classpath code uses path.delimiter): args.ts source contains path.delimiter, not hardcoded : or ;', async () => {
+    // Source-level assertion — the INVARIANT that must hold across
+    // platforms is that args.ts reads path.delimiter at runtime. A
+    // hardcoded ';' or ':' in the build expression would be a bug.
+    const fs = await import('node:fs')
+    const src = fs.readFileSync(
+      path.join(__dirname, 'args.ts'),
+      'utf8'
+    )
+    expect(src).toContain('path.delimiter')
+    // Negative: no hardcoded "';'" or "':'" in join calls.
+    expect(src).not.toMatch(/classpath\.join\(['"];['"]\)/)
+    expect(src).not.toMatch(/classpath\.join\(['"]:['"]\)/)
   })
 
   it('Test 10 (placeholder substitution): explicit values flow through, no ${...} leak', () => {
