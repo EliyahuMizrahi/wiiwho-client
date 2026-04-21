@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-04-21T03:52:42.769Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-04-21T04:04:55.747Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 12
-  completed_plans: 9
+  completed_plans: 10
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 02 (microsoft-authentication) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -61,6 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02 P02 | 5min | 2 tasks | 4 files |
 | Phase 02-microsoft-authentication P00 | 8min | 2 tasks | 6 files |
 | Phase 02-microsoft-authentication P03 | 6min | 2 tasks | 6 files |
+| Phase 02-microsoft-authentication P04 | 7min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current work:
 - [Phase 02-microsoft-authentication]: Plan 02-03: AuthManager singleton wires the full MS auth lifecycle (device-code login, silent refresh, logout, AbortController-race cancel). Cancel branch returns the locked __CANCELLED__ sentinel AuthErrorView and does NOT route through mapAuthError — frozen IPC contract preserved via JSON.stringify(res.error) into the error:string slot for the renderer store to short-circuit on. Verified prismarine-auth 3.1.1 exposes no public cancel surface (grep -i cancel|abort returned zero in both index.d.ts and src/).
 - [Phase 02-microsoft-authentication]: Plan 02-03: main/index.ts bootstrap order is load-bearing — installRedactor() runs FIRST inside app.whenReady() before any log call; createWindow is async and awaits getAuthManager().trySilentRefresh() BEFORE mainWindow.loadURL so the renderer's first auth:status sees the resolved state (D-02, Pitfall 7 — avoids login-flicker). registerAuthHandlers takes a getPrimaryWindow callback so macOS window-close-and-reopen cycles always resolve to the live BrowserWindow.
 - [Phase 02-microsoft-authentication]: Plan 02-03: Rule 1 fixes — prismarine-auth 3.1.1's index.d.ts types are wrong in two places that our AuthManager straddles: (1) Cache interface demands a reset() method our PrismarineCache doesn't expose (cast to CacheFactory at boundary, keep Plan 02-02's locked surface); (2) codeCallback parameter is declared as snake_case ServerDeviceCodeResponse (live-flow only) but MSAL actually emits camelCase (typed param as unknown + narrow at boundary). Both casts documented inline with verification links.
+- [Phase 02-microsoft-authentication]: Plan 02-04: Renderer auth scaffold — Zustand useAuthStore with 5-state machine; cancel-sentinel short-circuit locked on BOTH sides of the IPC wire now (main produces __CANCELLED__, renderer isCancelledSentinel fires BEFORE parseAuthError so sentinel never surfaces as ErrorBanner copy — UI-SPEC line 216 guardrail). LoginScreen/LoadingScreen/ErrorBanner render verbatim UI-SPEC §Copywriting Contract strings. App.tsx state-driven routing with 300ms min-hold + 8s fallback. font-bold fully removed from Phase 2 codebase (migration complete).
+- [Phase 02-microsoft-authentication]: Plan 02-04: vitest 4 + RTL 16 renderer-test patterns locked — (1) @vitest-environment jsdom docblock at top of every renderer-side test file (config-level environmentMatchGlobs cast to 'any' was runtime-unreliable in vitest 4); (2) afterEach(cleanup) in every describe block of component tests (vitest 4 + RTL 16 does NOT auto-cleanup; without it 9/11 component tests fail with 'Found multiple elements'). Both patterns are now the established idiom for this launcher and any future renderer-side tests must follow them.
 
 ### Pending Todos
 
@@ -102,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T03:52:25.347Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-04-21T04:04:55.743Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
