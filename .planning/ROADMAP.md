@@ -84,7 +84,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 03-09-preload-auth-surface-PLAN.md — preload bridge extension (game.onLog/onExited/onCrashed + logs.openCrashFolder/listCrashReports) + AuthManager.getMinecraftToken (LCH-06)
   - [x] 03-10-orchestrator-logs-app-PLAN.md — ipc/game orchestrator + ipc/logs + App.tsx wiring (LCH-01/02/03/05/06/07, LAUN-05, COMP-05)
   - [x] 03-11-windows-packaging-PLAN.md — electron-builder.yml + prefetch-jre + build-mod + Windows NSIS smoke (JRE-01, JRE-03, PKG-01)
-  - [ ] 03-12-macos-dmg-PLAN.md — macOS Universal DMG smoke (autonomous: false — requires Mac access) (JRE-02, PKG-02)
+  - [x] 03-12-macos-dmg-PLAN.md — macOS Universal DMG smoke (autonomous: false — requires Mac access) (JRE-02, PKG-02)
 **UI hint**: yes
 
 ### Phase 4: Forge Integration, HUD Framework & HUDs
