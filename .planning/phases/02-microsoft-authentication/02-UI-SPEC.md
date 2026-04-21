@@ -172,7 +172,7 @@ Structure: centered Dialog, width 480px (`sm:max-w-[480px]`), locked from Phase 
 | Copy button | `Copy code` (Body role, with `Copy` lucide icon, switches to `Check` icon + label `Copied` for 1.5s on click) |
 | Open browser button | `Open in browser` (Body role, with `ExternalLink` lucide icon — calls `shell.openExternal(verification_uri)`) |
 | Timer | `Expires in {mm:ss}` (Label role — counts down from Microsoft's `expires_in`, typically 15:00) |
-| Cancel button | `Cancel` (Body role, outline variant, also bound to Escape per D-07) |
+| Stop signing in button | `Stop signing in` (Body role, outline variant, also bound to Escape per D-07 — stops polling, closes the modal, returns to LoginScreen. Honors D-07's behavior contract; the button text is the specific verb + object "Stop signing in" rather than the generic "Cancel".) |
 
 **Expired state (D-06):**
 
@@ -181,13 +181,13 @@ Structure: centered Dialog, width 480px (`sm:max-w-[480px]`), locked from Phase 
 | Title | `Sign in with Microsoft` (Heading role — unchanged) |
 | Body paragraph | `The code expired before you finished signing in.` (Body role) |
 | Primary action | `Generate new code` (Body role — replaces the code block + both prior buttons; clicking re-runs the device-code flow in-place, returns the modal to the active state with a fresh code) |
-| Secondary action | `Cancel` (Body role, outline variant, unchanged) |
+| Secondary action | `Stop signing in` (Body role, outline variant — same label and behavior as the active-state button; closes the modal and returns to LoginScreen per D-07) |
 
 **Keyboard contract:**
-- `Escape` → Cancel (closes modal, stops polling, returns to LoginScreen) — native Dialog behavior
+- `Escape` → `Stop signing in` (closes modal, stops polling, returns to LoginScreen) — native Dialog behavior, behavior matches D-07 verbatim
 - `Enter` in active state → triggers `Copy code`
 - `Enter` in expired state → triggers `Generate new code`
-- Focus on open: the code block itself (for screen readers to announce the code), tab order: code → Copy → Open in browser → Cancel
+- Focus on open: the code block itself (for screen readers to announce the code), tab order: code → Copy → Open in browser → Stop signing in
 
 ### ErrorBanner (D-08, D-09, D-10)
 
@@ -270,10 +270,12 @@ Path + TTL are planner-owned implementation detail; the decision to use `mc-head
 
 Only one destructive action in Phase 2: **Log out**. Per D-15 there is **no confirmation dialog** — logging out is cheap to reverse by logging back in. This is intentional and load-bearing; do not add an "Are you sure?" step.
 
-| Action | Confirmation approach |
-|--------|----------------------|
-| Log out | None — instant on menu-item click, per D-15 |
-| Cancel device-code flow | None — closes modal, drops polling, no network-side cleanup needed (Microsoft expires the code naturally), per D-07 |
+| Action | Button label | Confirmation approach |
+|--------|--------------|----------------------|
+| Log out | `Log out` | None — instant on menu-item click, per D-15 |
+| Stop an in-progress device-code sign-in | `Stop signing in` | None — closes modal, drops polling, no network-side cleanup needed (Microsoft expires the code naturally), per D-07. ESC also triggers this path. |
+
+**Note on D-07 compliance:** D-07 describes the behavior using the colloquial word "Cancel" in prose ("Device-code modal has an explicit Cancel button and honors ESC"). The locked button text is `Stop signing in` — a specific verb + object that names the action being stopped. The D-07 behavior contract (stops polling, closes modal, returns to LoginScreen, ESC also works) is preserved verbatim; only the surface label text is specific rather than generic.
 
 ---
 
@@ -318,7 +320,7 @@ Minimal motion — matches the "quiet, consistent" tone.
 Non-negotiable baseline (passes WCAG AA):
 
 - **Focus ring:** `focus-visible:ring-2 focus-visible:ring-[--color-wiiwho-accent]` is already the shadcn Button default. Every interactive element (buttons, dropdown triggers, dismiss × , code block when copy-via-keyboard is implemented) must be keyboard-focusable and show this ring. **No `outline: none` without a replacement.**
-- **Escape closes DeviceCodeModal** (D-07) — handled natively by shadcn Dialog's `onOpenChange`.
+- **Escape closes DeviceCodeModal** (D-07) — handled natively by shadcn Dialog's `onOpenChange`. ESC fires the same code path as the `Stop signing in` button.
 - **Contrast checks:**
   - `#e5e5e5` on `#111111` = 14.5:1 — AAA
   - `#16e0ee` cyan background with `#0a0a0a` neutral-950 text = 13.1:1 — AAA (both Play and Login buttons)
@@ -328,6 +330,7 @@ Non-negotiable baseline (passes WCAG AA):
   - Device-code block uses `aria-live="polite"` and `aria-label="Your sign-in code: {code_with_spaces_every_4}"`, ensuring the 8-char code is read as individual characters, not as a mis-tokenized word.
   - Error banner uses `role="alert"` so its appearance is announced.
   - AccountBadge dropdown trigger has `aria-label="Account menu for {username}"`.
+  - `Stop signing in` button has no extra `aria-label` — its visible text is already descriptive (verb + object).
 - **Reduced motion:** Respect `prefers-reduced-motion`. For Phase 2 this reduces to: spinner stops rotating (substitute `...` text or hold a static glyph). ErrorBanner and Dialog skip their enter/exit animations. Tailwind's `motion-safe:` prefix is the mechanism.
 
 ---
@@ -344,7 +347,7 @@ Non-negotiable baseline (passes WCAG AA):
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS (locked verbatim per CONTEXT.md D-10, D-04, D-06, D-13, D-15; CTA is verb + object; all error messages plain English)
+- [ ] Dimension 1 Copywriting: PASS (locked verbatim per CONTEXT.md D-10, D-04, D-06, D-13, D-15; CTA is verb + object; all error messages plain English; no generic-label BLOCK-list words — the modal dismiss button reads `Stop signing in`, not `Cancel`, while preserving D-07's behavior contract)
 - [ ] Dimension 2 Visuals: PASS (components enumerated with file paths; motion specified with durations; accessibility contrast numbers computed)
 - [ ] Dimension 3 Color: PASS (60/30/10 split declared; accent reserved for 5 explicit elements; no red surface; no success color by design)
 - [ ] Dimension 4 Typography: PASS (exactly 4 sizes — 12 / 14 / 24 / 36; exactly 2 weights — 400 / 600; no bold; line-heights per spec; App.tsx wordmark migration to `font-semibold` called out)
@@ -366,3 +369,12 @@ Previous draft declared 12 / 14 / 20 / 28 / 36 with 28px "Code role" as a functi
 Previous draft declared 400 / 600 / 700 with 700 as a "one-off brand mark" for the wordmark. That argument was rejected by the checker. Revised weights: **400 regular + 600 semibold**, nothing else. The `Wiiwho Client` wordmark now renders at `text-4xl font-semibold`; at 36px, semibold reads as visually dominant without needing bold. `launcher/src/renderer/src/App.tsx` currently ships the wordmark with `font-bold` — **Phase 2 executor work must migrate that single class to `font-semibold`** so the live codebase conforms to the contract. This is the only codebase change required to honor the revision.
 
 No other dimensions were reopened. All 17 CONTEXT.md decisions (D-01 through D-17) remain untouched.
+
+---
+
+## Revision 2 — 2026-04-21
+
+Fixed one Dimension 1 blocking issue flagged by the checker on Revision 1.
+
+**Change: Renamed the DeviceCodeModal dismiss button from `Cancel` to `Stop signing in`.**
+`Cancel` is a verbatim match to the generic-label BLOCK list ("Submit", "OK", "Click Here", "Cancel", "Save"). The button has been renamed to `Stop signing in` — a specific verb + object that names the action being stopped, fits the 480px dialog, and matches the D-07 behavior contract exactly (stops polling, closes modal, returns to LoginScreen; ESC also triggers this path). Applied in all locations the label appeared: the active-state button copy row, the expired-state secondary-action row, the keyboard contract for ESC, the tab-order listing, the Destructive Actions table, and the Dimension 1 checker sign-off note. D-07's behavior is unchanged; only the surface label text was refined. No other dimensions or CONTEXT.md decisions were reopened.
