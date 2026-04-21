@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 5 plans
   - [x] 01-00-PLAN.md — Wave 0 infrastructure: policy doc skeletons (ANTICHEAT-SAFETY, mojang-asset-policy, cape-provenance) + docs-check script (COMP-04)
   - [x] 01-01-PLAN.md — client-mod scaffold from nea89o template, MODID collision check, ModidTest (MOD-01, MOD-03)
-  - [ ] 01-02-PLAN.md — Trivial Mixin + `./gradlew runClient` DevAuth verification on Windows (MOD-02, MOD-04)
+  - [x] 01-02-PLAN.md — Trivial Mixin + `./gradlew runClient` DevAuth verification on Windows (MOD-02, MOD-04)
   - [x] 01-03-PLAN.md — Electron launcher scaffold, Tailwind v4 + shadcn, runtime-verified security, full IPC surface stubs (LAUN-01, LAUN-02, LAUN-06)
   - [x] 01-04-PLAN.md — Azure AD app registration + Minecraft API form submission (phase success criterion 2)
 
