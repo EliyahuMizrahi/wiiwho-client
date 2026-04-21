@@ -2,7 +2,11 @@
  * The Wiiwho preload bridge contract.
  *
  * Phase 2 fills the `auth.*` handler bodies; Phase 3 fills `game.*`, `settings.*`,
- * and `logs.*`. Neither phase adds new top-level keys or new channels.
+ * and `logs.*`. Neither phase adds new top-level keys.
+ *
+ * D-11 (frozen IPC surface): 5 top-level keys — auth, game, settings, logs,
+ * __debug. Phase 3 Plan 03-09 adds new subscriptions/invokes UNDER existing
+ * keys (no new top-level keys).
  *
  * This file is the single source of truth for the renderer↔main IPC surface.
  */
@@ -32,10 +36,19 @@ export interface WiiWhoAPI {
       ok: boolean
       stub?: boolean
       reason?: string
+      error?: string
     }>
     cancel: () => Promise<{ ok: boolean }>
     status: () => Promise<{
-      state: 'idle' | 'launching' | 'downloading' | 'playing' | 'crashed'
+      state:
+        | 'idle'
+        | 'launching'
+        | 'downloading'
+        | 'verifying'
+        | 'starting'
+        | 'playing'
+        | 'failed'
+        | 'crashed'
     }>
     onStatus: (cb: (s: { state: string }) => void) => () => void
     onProgress: (
@@ -44,6 +57,12 @@ export interface WiiWhoAPI {
         bytesTotal: number
         currentFile: string
       }) => void
+    ) => () => void
+    // Phase 3 (Plan 03-09) extensions — under existing `game` key:
+    onLog: (cb: (entry: { line: string; stream: 'out' | 'err' }) => void) => () => void
+    onExited: (cb: (ev: { exitCode: number | null }) => void) => () => void
+    onCrashed: (
+      cb: (ev: { sanitizedBody: string; crashId: string | null }) => void
     ) => () => void
   }
   settings: {
@@ -63,6 +82,11 @@ export interface WiiWhoAPI {
     readCrash: (opts?: {
       crashId?: string
     }) => Promise<{ sanitizedBody: string }>
+    // Phase 3 (Plan 03-09) extensions — under existing `logs` key:
+    openCrashFolder: (crashId?: string) => Promise<{ ok: boolean }>
+    listCrashReports: () => Promise<{
+      crashes: Array<{ crashId: string; timestamp?: string }>
+    }>
   }
   __debug: {
     securityAudit: () => Promise<{
