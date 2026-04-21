@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 01-01-PLAN.md (client-mod scaffold + MODID lock)
-last_updated: "2026-04-21T00:28:11.420Z"
+stopped_at: Completed 01-04-PLAN.md (Azure AD app registered + MCE form submitted)
+last_updated: "2026-04-21T00:41:53.302Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 01 (foundations) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P00 | 2 | 2 tasks | 6 files |
 | Phase 01 P03 | 12 min | 2 tasks | 27 files |
 | Phase 01-foundations P01 | 30min | 2 tasks | 16 files |
+| Phase 01-foundations P04 | 2 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,7 @@ Recent decisions affecting current work:
 - [Phase 01-foundations]: Named-Channel IPC surface locked at v0.1 scope: 5 top-level preload keys (auth, game, settings, logs, __debug), 13 channels total. Phase 2 fills auth.* handler bodies; Phase 3 fills game.*/settings.*/logs.*. Neither adds channels. Pitfall 5 (dead Play button) enforced by dependency absence — banned libs grep-checked out of launcher/package.json.
 - [Phase 01-foundations]: 2026-04-20 — Display name locked as 'Wiiwho' (only first W capitalized) — applied project-wide via ModidTest.displayNameIsWiiwho assertion; MODID lowercase 'wiiwho' and package club.wiiwho unchanged
 - [Phase 01-foundations]: 2026-04-20 — Azure AD app registered (Plan 01-04 Task 1). Application (client) ID: `60cbce02-072b-4963-833d-edb6f5badc2a`. Tenant ID displayed in portal: `91755ebc-8602-4281-970c-7be9bdfc35d7` (recorded as-displayed; Phase 2 uses `/consumers` authority string regardless per D-15). Audience: Personal Microsoft accounts only (consumers). Redirect URI: `https://login.microsoftonline.com/common/oauth2/nativeclient`. Public client flows: enabled. API permissions: User.Read (default — `XboxLive.signin` requested at runtime via OAuth scope, NOT in portal). Owner contact: `eliyahu6666@outlook.com`. Associated website: `https://github.com/EliyahuMizrahi/wiiwho-client`. MCE form submitted: 2026-04-20 via https://aka.ms/mce-reviewappid (MCE review form submitted). Microsoft review queue expected: 1-7 days (2026-04-21 to 2026-04-27). Client ID is non-secret per D-18 (public client / device code flow — no client secret exists). Phase 2 auth flow blocks on MCE approval email.
+- [Phase 01-foundations]: 2026-04-20 — Azure AD app 'Wiiwho Client' registered (Plan 01-04). Client ID 60cbce02-072b-4963-833d-edb6f5badc2a (non-secret per D-18), tenant consumers (D-15). MCE form submitted 2026-04-20; review queue running (expected 2026-04-21 to 2026-04-27). Phase 2 auth execute blocks on approval email. docs/azure-app-registration.md is the maintainer reference.
 
 ### Pending Todos
 
@@ -87,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T00:28:11.416Z
-Stopped at: Completed 01-01-PLAN.md (client-mod scaffold + MODID lock)
+Last session: 2026-04-21T00:41:46.806Z
+Stopped at: Completed 01-04-PLAN.md (Azure AD app registered + MCE form submitted)
 Resume file: None

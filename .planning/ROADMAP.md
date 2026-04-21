@@ -40,7 +40,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 01-01-PLAN.md — client-mod scaffold from nea89o template, MODID collision check, ModidTest (MOD-01, MOD-03)
   - [ ] 01-02-PLAN.md — Trivial Mixin + `./gradlew runClient` DevAuth verification on Windows (MOD-02, MOD-04)
   - [x] 01-03-PLAN.md — Electron launcher scaffold, Tailwind v4 + shadcn, runtime-verified security, full IPC surface stubs (LAUN-01, LAUN-02, LAUN-06)
-  - [ ] 01-04-PLAN.md — Azure AD app registration + Minecraft API form submission (phase success criterion 2)
+  - [x] 01-04-PLAN.md — Azure AD app registration + Minecraft API form submission (phase success criterion 2)
 
 ### Phase 2: Microsoft Authentication
 **Goal**: User can log in with a real Microsoft account from inside the launcher, see their Minecraft username + UUID, persist securely, and log out cleanly — against live Microsoft endpoints.
