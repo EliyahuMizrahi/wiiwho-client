@@ -218,7 +218,7 @@ describe('DeviceCodeModal', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('Generate new code fires store.login', () => {
+  it('Generate new code fires store.login (after cancel to clear concurrent-login guard)', async () => {
     useAuthStore.setState({
       state: 'logging-in',
       deviceCode: {
@@ -232,6 +232,13 @@ describe('DeviceCodeModal', () => {
     fireEvent.click(
       screen.getByRole('button', { name: /generate new code/i })
     )
-    expect(authApi.login).toHaveBeenCalled()
+    // handleGenerateNew is async: cancel (awaits logout) → then login.
+    // Use waitFor to let both awaited calls resolve.
+    await waitFor(() => {
+      expect(authApi.logout).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(authApi.login).toHaveBeenCalled()
+    })
   })
 })

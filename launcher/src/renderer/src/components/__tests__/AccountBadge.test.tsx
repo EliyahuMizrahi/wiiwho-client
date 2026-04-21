@@ -15,7 +15,34 @@ import {
   cleanup,
   waitFor
 } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
+
+// Radix DropdownMenu + jsdom gotcha: Radix listens for `pointerdown` to open
+// the menu, but fireEvent.click in jsdom does not synthesize the pointer
+// event sequence Radix needs. @testing-library/user-event v14 DOES emit the
+// full pointer sequence, so we use it for any interaction that needs to
+// trigger Radix's open/close logic. fireEvent remains fine for non-Radix
+// interactions (the <img onError> test, for example).
+//
+// jsdom also doesn't implement hasPointerCapture / scrollIntoView that some
+// Radix code paths call — stub them globally to no-op so the click handler
+// doesn't throw before Radix's state transition runs. Cast via `unknown` to
+// satisfy TS's strict narrowing when the host lib types disagree with jsdom.
+const elProto = Element.prototype as unknown as {
+  hasPointerCapture?: (id: number) => boolean
+  releasePointerCapture?: (id: number) => void
+  scrollIntoView?: (arg?: boolean | ScrollIntoViewOptions) => void
+}
+if (!elProto.hasPointerCapture) {
+  elProto.hasPointerCapture = () => false
+}
+if (!elProto.releasePointerCapture) {
+  elProto.releasePointerCapture = () => {}
+}
+if (!elProto.scrollIntoView) {
+  elProto.scrollIntoView = () => {}
+}
 
 type AuthAPI = {
   status: ReturnType<typeof vi.fn>
@@ -78,9 +105,10 @@ describe('AccountBadge', () => {
     ).toBeInTheDocument()
   })
 
-  it('click on trigger opens dropdown with username, uuid, and Log out', () => {
+  it('click on trigger opens dropdown with username, uuid, and Log out', async () => {
+    const user = userEvent.setup()
     render(<AccountBadge />)
-    fireEvent.click(
+    await user.click(
       screen.getByRole('button', { name: /account menu for alice/i })
     )
     // Radix dropdown portals content — queries still find it
@@ -92,11 +120,12 @@ describe('AccountBadge', () => {
   })
 
   it('Log out click calls auth:logout via store', async () => {
+    const user = userEvent.setup()
     render(<AccountBadge />)
-    fireEvent.click(
+    await user.click(
       screen.getByRole('button', { name: /account menu for alice/i })
     )
-    fireEvent.click(screen.getByRole('menuitem', { name: /log out/i }))
+    await user.click(screen.getByRole('menuitem', { name: /log out/i }))
     await waitFor(() => {
       expect(authApi.logout).toHaveBeenCalled()
     })
