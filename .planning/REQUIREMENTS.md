@@ -9,12 +9,12 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 
 ### Launcher
 
-- [ ] **LAUN-01**: User can open the WiiWho launcher as a packaged desktop app (Electron)
-- [ ] **LAUN-02**: Launcher renders a React UI with a visible "Play" button as the primary action
+- [x] **LAUN-01**: User can open the WiiWho launcher as a packaged desktop app (Electron)
+- [x] **LAUN-02**: Launcher renders a React UI with a visible "Play" button as the primary action
 - [ ] **LAUN-03**: User can adjust allocated RAM (JVM heap) via a slider before launch, within a sane min/max range
 - [ ] **LAUN-04**: User's RAM setting persists across launcher restarts
 - [ ] **LAUN-05**: When a launched game process crashes, the launcher surfaces the crash log in a viewer inside the launcher UI (no hunting through files)
-- [ ] **LAUN-06**: Launcher follows Electron security best practices (contextIsolation on, nodeIntegration off, sandbox, preload bridge for IPC)
+- [x] **LAUN-06**: Launcher follows Electron security best practices (contextIsolation on, nodeIntegration off, sandbox, preload bridge for IPC)
 
 ### Authentication
 
@@ -158,12 +158,12 @@ Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LAUN-01 | Phase 1 | Pending |
-| LAUN-02 | Phase 1 | Pending |
+| LAUN-01 | Phase 1 | Complete |
+| LAUN-02 | Phase 1 | Complete |
 | LAUN-03 | Phase 3 | Pending |
 | LAUN-04 | Phase 3 | Pending |
 | LAUN-05 | Phase 3 | Pending |
-| LAUN-06 | Phase 1 | Pending |
+| LAUN-06 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |

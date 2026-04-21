@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 01-00-PLAN.md (wave-0 policy docs + docs-check)
-last_updated: "2026-04-21T00:20:10.261Z"
+stopped_at: Completed 01-03-PLAN.md (launcher scaffold + runtime-verified security)
+last_updated: "2026-04-21T00:23:14.135Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01 P00 | 2 | 2 tasks | 6 files |
+| Phase 01 P03 | 12 min | 2 tasks | 27 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - [Phase 01]: scripts/check-docs.mjs is zero-dep Node 22 ESM — runnable with just 'node scripts/check-docs.mjs' before any pnpm install, so Wave 0 docs-check is the single repo-wide invariant every later plan can rely on without bootstrapping
 - [Phase 01-foundations]: 2026-04-20 — MODID collision check: CurseForge and Modrinth both clean. Approved MODID wiiwho. Display name Wiiwho (only first W capitalized — user preference applied project-wide).
 - [Phase 01-foundations]: 2026-04-20 — Launcher runtime verification (LAUN-01, LAUN-02, LAUN-06): owner ran pnpm --filter ./launcher dev on Windows; all 6 checks passed. Window ~1000x650 non-resizable, title 'Wiiwho Client', dark bg; cyan Play button logs stub payload on click; window.wiiwho.__debug.securityAudit() returned allTrue: true; typeof window.process and typeof window.require both 'undefined'; Object.keys(window.wiiwho) === ['auth','game','settings','logs','__debug']. Display name corrected from WiiWho → Wiiwho project-wide per owner preference.
+- [Phase 01-foundations]: Runtime security verification pattern established: setAuditedPrefs() captures the exact webPreferences object passed to BrowserWindow, then __security:audit IPC returns the captured runtime state. Config-vs-runtime drift is observable (not assumed). Pattern reusable for future 'prove config matches runtime' checks.
+- [Phase 01-foundations]: Named-Channel IPC surface locked at v0.1 scope: 5 top-level preload keys (auth, game, settings, logs, __debug), 13 channels total. Phase 2 fills auth.* handler bodies; Phase 3 fills game.*/settings.*/logs.*. Neither adds channels. Pitfall 5 (dead Play button) enforced by dependency absence — banned libs grep-checked out of launcher/package.json.
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-20T23:32:20.072Z
-Stopped at: Completed 01-00-PLAN.md (wave-0 policy docs + docs-check)
+Last session: 2026-04-21T00:23:00.679Z
+Stopped at: Completed 01-03-PLAN.md (launcher scaffold + runtime-verified security)
 Resume file: None
