@@ -51,7 +51,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Refresh token is stored in the OS keychain via Electron `safeStorage` (verified: no token-looking strings anywhere in `%APPDATA%/WiiWho` or `~/Library/Application Support/WiiWho` filesystem contents); 7-day refresh test succeeds without re-prompting
   3. Common XSTS error codes (`2148916233`, `2148916235`, `2148916236`, `2148916237`, `2148916238`) each surface a plain-English message, not a raw code
   4. User can click "Log out" and return to the login screen; re-login works
-**Plans**: TBD
+**Plans**: 7 plans
+  - [ ] 02-00-PLAN.md — Install deps (@azure/msal-node, prismarine-auth, electron-log), add shadcn Dialog+DropdownMenu, vitest config for dual main/renderer envs, MANUAL-QA-auth.md skeleton (infrastructure)
+  - [ ] 02-01-PLAN.md — xstsErrors.ts code-based XSTS error mapper + redact.ts electron-log hook for JWT/token scrubbing (AUTH-03 foundation)
+  - [ ] 02-02-PLAN.md — safeStorageCache.ts prismarine-auth cache factory (encrypt+atomic-write) + authStore.ts non-secret D-16 pointer file (AUTH-04)
+  - [ ] 02-03-PLAN.md — AuthManager orchestrator (login/cancel/silent-refresh/logout) + IPC handler bodies + main bootstrap (redactor install, silent refresh gate) (AUTH-01, AUTH-02, AUTH-05, AUTH-06)
+  - [ ] 02-04-PLAN.md — Zustand auth store + LoginScreen + LoadingScreen + ErrorBanner + App.tsx state-switch + font-bold→font-semibold migration (AUTH-01, AUTH-03, AUTH-05)
+  - [ ] 02-05-PLAN.md — DeviceCodeModal + AccountBadge + useSkinHead hook + onDeviceCode subscription wiring (AUTH-01, AUTH-05, AUTH-06)
+  - [ ] 02-06-PLAN.md — Live-endpoint manual QA checkpoint: 6-test walkthrough + MCE approval gate + sign-off commit (all 6 AUTH reqs)
 **UI hint**: yes
 
 ### Phase 3: Vanilla Launch, JRE Bundling & Packaging
@@ -120,7 +127,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundations | 0/5 | Not started | - |
-| 2. Microsoft Authentication | 0/TBD | Not started | - |
+| 2. Microsoft Authentication | 0/7 | Not started | - |
 | 3. Vanilla Launch, JRE Bundling & Packaging | 0/TBD | Not started | - |
 | 4. Forge Integration, HUD Framework & HUDs | 0/TBD | Not started | - |
 | 5. Cosmetics Pipeline (Placeholder Cape) | 0/TBD | Not started | - |
