@@ -25,10 +25,7 @@ import { randomUUID } from 'node:crypto'
 const handlers = new Map<string, (...args: unknown[]) => unknown>()
 vi.mock('electron', () => ({
   ipcMain: {
-    handle: (
-      channel: string,
-      handler: (...args: unknown[]) => unknown
-    ): void => {
+    handle: (channel: string, handler: (...args: unknown[]) => unknown): void => {
       handlers.set(channel, handler)
     }
   }
@@ -80,9 +77,7 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
 
   it('Test 3: settings:set({ramMb: 3072}) merges, clamps, persists, returns {ok:true, settings}', async () => {
     await register()
-    const res = (await handlers
-      .get('settings:set')
-      ?.({} as unknown, { ramMb: 3072 })) as {
+    const res = (await handlers.get('settings:set')?.({} as unknown, { ramMb: 3072 })) as {
       ok: boolean
       settings: { version: 1; ramMb: number; firstRunSeen: boolean }
     }
@@ -100,9 +95,7 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
 
   it('Test 4: settings:set({ramMb: 99999}) clamps to 4096 before persisting', async () => {
     await register()
-    const res = (await handlers
-      .get('settings:set')
-      ?.({} as unknown, { ramMb: 99999 })) as {
+    const res = (await handlers.get('settings:set')?.({} as unknown, { ramMb: 99999 })) as {
       ok: boolean
       settings: { ramMb: number }
     }
@@ -115,9 +108,7 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
     await handlers.get('settings:set')?.({} as unknown, { ramMb: 3584 })
 
     // Patch ONLY firstRunSeen.
-    const res = (await handlers
-      .get('settings:set')
-      ?.({} as unknown, { firstRunSeen: true })) as {
+    const res = (await handlers.get('settings:set')?.({} as unknown, { firstRunSeen: true })) as {
       ok: boolean
       settings: { version: 1; ramMb: number; firstRunSeen: boolean }
     }
@@ -131,9 +122,9 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
   it('Test 6: settings:set({ramMb: "not a number"}) ignores garbage, keeps current ramMb', async () => {
     await register()
     // Fresh state → current ramMb is DEFAULTS.ramMb (2048).
-    const res = (await handlers
-      .get('settings:set')
-      ?.({} as unknown, { ramMb: 'not a number' })) as {
+    const res = (await handlers.get('settings:set')?.({} as unknown, {
+      ramMb: 'not a number'
+    })) as {
       ok: boolean
       settings: { ramMb: number; firstRunSeen: boolean }
     }
@@ -156,9 +147,7 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
 
   it('Test 8: settings:set with undefined/null patch is tolerated (defensive)', async () => {
     await register()
-    const res1 = (await handlers
-      .get('settings:set')
-      ?.({} as unknown, undefined)) as {
+    const res1 = (await handlers.get('settings:set')?.({} as unknown, undefined)) as {
       ok: boolean
       settings: { version: 1; ramMb: number; firstRunSeen: boolean }
     }

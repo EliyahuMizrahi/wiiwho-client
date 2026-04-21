@@ -190,14 +190,9 @@ function setHappyPathDefaults(): void {
   })
   mocks.libraries.ensureClientJar.mockResolvedValue(undefined)
   mocks.libraries.ensureLibraries.mockResolvedValue(undefined)
-  mocks.libraries.resolveClasspath.mockReturnValue([
-    '/fake/lib.jar',
-    '/fake/client.jar'
-  ])
+  mocks.libraries.resolveClasspath.mockReturnValue(['/fake/lib.jar', '/fake/client.jar'])
   mocks.assets.ensureAssets.mockResolvedValue(undefined)
-  mocks.natives.ensureNatives.mockResolvedValue(
-    '/fake/gameDir/versions/1.8.9/natives'
-  )
+  mocks.natives.ensureNatives.mockResolvedValue('/fake/gameDir/versions/1.8.9/natives')
   mocks.args.buildArgv.mockReturnValue([
     '-Xmx2048M',
     '-cp',
@@ -270,7 +265,7 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
       callOrder.push('ensureNatives')
       return '/fake/natives'
     })
-    mocks.args.buildArgv.mockImplementation((..._args: unknown[]) => {
+    mocks.args.buildArgv.mockImplementation(() => {
       callOrder.push('buildArgv')
       return ['-Xmx2048M']
     })
@@ -303,16 +298,10 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
 
     await mocks.handlers.get('game:play')?.()
 
-    const statuses = (
-      eventsFor('game:status-changed') as Array<{ state: string }>
-    ).map((s) => s.state)
-    const expectedOrder = [
-      'downloading',
-      'verifying',
-      'starting',
-      'playing',
-      'idle'
-    ]
+    const statuses = (eventsFor('game:status-changed') as Array<{ state: string }>).map(
+      (s) => s.state
+    )
+    const expectedOrder = ['downloading', 'verifying', 'starting', 'playing', 'idle']
     // The orchestrator must fire each phase label in order. Non-contiguous
     // substring match tolerates additional same-state pushes (benign).
     let idx = 0
@@ -327,11 +316,7 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
       async (
         _resolved: unknown,
         _gameDir: unknown,
-        progress?: (e: {
-          bytesDone: number
-          bytesTotal: number
-          currentFile: string
-        }) => void
+        progress?: (e: { bytesDone: number; bytesTotal: number; currentFile: string }) => void
       ) => {
         progress?.({ bytesDone: 50, bytesTotal: 100, currentFile: 'lib.jar' })
         progress?.({ bytesDone: 100, bytesTotal: 100, currentFile: 'lib.jar' })
@@ -383,9 +368,9 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
     await mocks.handlers.get('game:play')?.()
 
     expect(winMock!.minimize).toHaveBeenCalledTimes(1)
-    const playingEvents = (
-      eventsFor('game:status-changed') as Array<{ state: string }>
-    ).filter((e) => e.state === 'playing')
+    const playingEvents = (eventsFor('game:status-changed') as Array<{ state: string }>).filter(
+      (e) => e.state === 'playing'
+    )
     expect(playingEvents.length).toBeGreaterThanOrEqual(1)
   })
 
@@ -398,18 +383,16 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
       exitCode: number | null
     }>
     expect(exited).toContainEqual({ exitCode: 0 })
-    const statuses = (
-      eventsFor('game:status-changed') as Array<{ state: string }>
-    ).map((s) => s.state)
+    const statuses = (eventsFor('game:status-changed') as Array<{ state: string }>).map(
+      (s) => s.state
+    )
     expect(statuses[statuses.length - 1]).toBe('idle')
     expect(eventsFor('game:crashed').length).toBe(0)
   })
 
   it('Test 7: non-zero exit + crash file → sanitizeCrashReport(body) → game:crashed pushed', async () => {
     mocks.spawn.spawnGame.mockResolvedValue({ exitCode: 1 })
-    mocks.crashReport.watchForCrashReport.mockResolvedValue(
-      'crash-2026-04-21_15.00.00-client.txt'
-    )
+    mocks.crashReport.watchForCrashReport.mockResolvedValue('crash-2026-04-21_15.00.00-client.txt')
     mocks.crashReport.readCrashReport.mockResolvedValue(
       'raw crash body with token ey.fakeTokenBody123 inside'
     )
@@ -444,21 +427,11 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
   it('Test 9: game:cancel aborts the in-flight AbortController → signal propagated into fetchAndCacheManifest', async () => {
     let capturedSignal: AbortSignal | undefined
     mocks.manifest.fetchAndCacheManifest.mockImplementation(
-      async (
-        _v: unknown,
-        _g: unknown,
-        _f: unknown,
-        signal?: AbortSignal
-      ) => {
+      async (_v: unknown, _g: unknown, _f: unknown, signal?: AbortSignal) => {
         capturedSignal = signal
         return new Promise((resolve, reject) => {
-          signal?.addEventListener('abort', () =>
-            reject(new Error('AbortError: cancelled'))
-          )
-          setTimeout(
-            () => resolve({ path: 'p', sha1: 's', manifest: {} }),
-            5000
-          )
+          signal?.addEventListener('abort', () => reject(new Error('AbortError: cancelled')))
+          setTimeout(() => resolve({ path: 'p', sha1: 's', manifest: {} }), 5000)
         })
       }
     )
@@ -471,26 +444,20 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
 
     expect(capturedSignal).toBeDefined()
     expect(capturedSignal!.aborted).toBe(true)
-    const statuses = (
-      eventsFor('game:status-changed') as Array<{ state: string }>
-    ).map((s) => s.state)
+    const statuses = (eventsFor('game:status-changed') as Array<{ state: string }>).map(
+      (s) => s.state
+    )
     expect(statuses[statuses.length - 1]).toBe('idle')
   })
 
   it('Test 10: game:play while already running returns {ok:false, reason:"already-running"}', async () => {
-    type ResolveFn = (v: {
-      path: string
-      sha1: string
-      manifest: unknown
-    }) => void
+    type ResolveFn = (v: { path: string; sha1: string; manifest: unknown }) => void
     let resolveFetch: ResolveFn | null = null
     mocks.manifest.fetchAndCacheManifest.mockImplementation(
       () =>
-        new Promise<{ path: string; sha1: string; manifest: unknown }>(
-          (resolve) => {
-            resolveFetch = resolve as ResolveFn
-          }
-        )
+        new Promise<{ path: string; sha1: string; manifest: unknown }>((resolve) => {
+          resolveFetch = resolve as ResolveFn
+        })
     )
 
     const firstP = mocks.handlers.get('game:play')?.()
@@ -504,7 +471,6 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
     expect(secondResult.reason).toBe('already-running')
 
     expect(mocks.settings.readSettings).toHaveBeenCalledTimes(1)
-
     ;(resolveFetch as ResolveFn | null)?.({
       path: 'p',
       sha1: 's',
@@ -514,9 +480,7 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
   })
 
   it('Test 11: getMinecraftToken throws → returns error and status returns to idle', async () => {
-    mocks.authManager.getMinecraftToken.mockRejectedValue(
-      new Error('Not logged in.')
-    )
+    mocks.authManager.getMinecraftToken.mockRejectedValue(new Error('Not logged in.'))
 
     const result = (await mocks.handlers.get('game:play')?.()) as {
       ok: boolean
@@ -525,20 +489,17 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
     expect(result.ok).toBe(false)
     expect(result.error).toMatch(/Not logged in/i)
 
-    const statuses = (
-      eventsFor('game:status-changed') as Array<{ state: string }>
-    ).map((s) => s.state)
+    const statuses = (eventsFor('game:status-changed') as Array<{ state: string }>).map(
+      (s) => s.state
+    )
     expect(statuses[statuses.length - 1]).toBe('idle')
     expect(mocks.manifest.fetchAndCacheManifest).not.toHaveBeenCalled()
   })
 
   it('Test 12 (COMP-05 regression): game:crashed payload is SANITIZED — no raw token value reaches renderer', async () => {
     mocks.spawn.spawnGame.mockResolvedValue({ exitCode: 1 })
-    mocks.crashReport.watchForCrashReport.mockResolvedValue(
-      'crash-abc-client.txt'
-    )
-    const rawCrash =
-      'Exception in thread\n--accessToken ey.fakeTokenBody123 rest of body'
+    mocks.crashReport.watchForCrashReport.mockResolvedValue('crash-abc-client.txt')
+    const rawCrash = 'Exception in thread\n--accessToken ey.fakeTokenBody123 rest of body'
     mocks.crashReport.readCrashReport.mockResolvedValue(rawCrash)
 
     await mocks.handlers.get('game:play')?.()
@@ -549,8 +510,6 @@ describe('ipc/game.ts orchestrator (Plan 03-10)', () => {
     expect(crashed.length).toBe(1)
     expect(crashed[0].sanitizedBody).not.toContain('ey.fakeTokenBody123')
     expect(mocks.redact.sanitizeCrashReport).toHaveBeenCalledWith(rawCrash)
-    expect(mocks.redact.sanitizeCrashReport.mock.results[0].value).toBe(
-      crashed[0].sanitizedBody
-    )
+    expect(mocks.redact.sanitizeCrashReport.mock.results[0].value).toBe(crashed[0].sanitizedBody)
   })
 })

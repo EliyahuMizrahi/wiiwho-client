@@ -31,34 +31,21 @@ import { readSettings } from '../settings/store'
 import { getAuthManager } from '../auth/AuthManager'
 import { sanitizeCrashReport } from '../auth/redact'
 import { fetchAndCacheManifest, resolveVersion } from '../launch/manifest'
-import {
-  ensureClientJar,
-  ensureLibraries,
-  resolveClasspath
-} from '../launch/libraries'
+import { ensureClientJar, ensureLibraries, resolveClasspath } from '../launch/libraries'
 import { ensureAssets } from '../launch/assets'
 import { ensureNatives } from '../launch/natives'
 import { buildArgv } from '../launch/args'
 import { spawnGame } from '../launch/spawn'
 import { LogParser } from '../monitor/logParser'
 import { watchForCrashReport, readCrashReport } from '../monitor/crashReport'
-import {
-  resolveJavaBinary,
-  resolveGameDir,
-  resolveCrashReportsDir
-} from '../paths'
+import { resolveJavaBinary, resolveGameDir, resolveCrashReportsDir } from '../paths'
 
 /**
  * Phase label we track internally. Matches the game:status-changed payload
  * states plus 'idle' as the resting state. The renderer store (stores/game.ts)
  * maps 'starting'/'launching' onto the same UI label — we emit 'starting' here.
  */
-type Phase =
-  | 'idle'
-  | 'downloading'
-  | 'verifying'
-  | 'starting'
-  | 'playing'
+type Phase = 'idle' | 'downloading' | 'verifying' | 'starting' | 'playing'
 
 type GetWin = () => BrowserWindow | null
 
@@ -175,8 +162,7 @@ export function registerGameHandlers(getWin: GetWin): void {
           const w = getWin()
           if (w) {
             const maybe = w as unknown as { isDestroyed?: () => boolean }
-            const destroyed =
-              typeof maybe.isDestroyed === 'function' ? maybe.isDestroyed() : false
+            const destroyed = typeof maybe.isDestroyed === 'function' ? maybe.isDestroyed() : false
             if (!destroyed) w.minimize()
           }
         }

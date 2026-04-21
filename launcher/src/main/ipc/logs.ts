@@ -28,27 +28,24 @@ import { readCrashReport, listCrashReports } from '../monitor/crashReport'
 import { resolveCrashReportsDir } from '../paths'
 
 export function registerLogsHandlers(): void {
-  ipcMain.handle(
-    'logs:read-crash',
-    async (_event, opts?: { crashId?: string }) => {
-      const dir = resolveCrashReportsDir()
-      let filename: string | null = opts?.crashId ?? null
-      if (!filename) {
-        const list = await listCrashReports(dir)
-        filename = list[0] ?? null
-      }
-      if (!filename) return { sanitizedBody: '' }
-      try {
-        const raw = await readCrashReport(dir, filename)
-        // D-21: single-sanitizer invariant — this is THE redaction point
-        // for the renderer-bound crash body.
-        return { sanitizedBody: sanitizeCrashReport(raw) }
-      } catch (err) {
-        log.warn('[logs] read-crash failed', err)
-        return { sanitizedBody: '' }
-      }
+  ipcMain.handle('logs:read-crash', async (_event, opts?: { crashId?: string }) => {
+    const dir = resolveCrashReportsDir()
+    let filename: string | null = opts?.crashId ?? null
+    if (!filename) {
+      const list = await listCrashReports(dir)
+      filename = list[0] ?? null
     }
-  )
+    if (!filename) return { sanitizedBody: '' }
+    try {
+      const raw = await readCrashReport(dir, filename)
+      // D-21: single-sanitizer invariant — this is THE redaction point
+      // for the renderer-bound crash body.
+      return { sanitizedBody: sanitizeCrashReport(raw) }
+    } catch (err) {
+      log.warn('[logs] read-crash failed', err)
+      return { sanitizedBody: '' }
+    }
+  })
 
   ipcMain.handle(
     'logs:open-crash-folder',

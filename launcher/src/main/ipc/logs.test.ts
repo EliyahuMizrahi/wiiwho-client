@@ -105,10 +105,9 @@ describe('ipc/logs.ts — logs:* handlers (Plan 03-10)', () => {
     await register()
     await writeFixture('crash-2026-04-21_15.04.22-client.txt', 'plain body')
 
-    const r = (await mocks.handlers.get('logs:read-crash')?.(
-      {} as unknown,
-      { crashId: 'crash-2026-04-21_15.04.22-client.txt' }
-    )) as { sanitizedBody: string }
+    const r = (await mocks.handlers.get('logs:read-crash')?.({} as unknown, {
+      crashId: 'crash-2026-04-21_15.04.22-client.txt'
+    })) as { sanitizedBody: string }
 
     expect(r.sanitizedBody).toBe('plain body')
   })
@@ -119,10 +118,9 @@ describe('ipc/logs.ts — logs:* handlers (Plan 03-10)', () => {
     await writeFixture('crash-2026-04-20_10.00.00-client.txt', 'older body')
     await writeFixture('crash-2026-04-21_15.04.22-client.txt', 'newer body')
 
-    const r = (await mocks.handlers.get('logs:read-crash')?.(
-      {} as unknown,
-      undefined
-    )) as { sanitizedBody: string }
+    const r = (await mocks.handlers.get('logs:read-crash')?.({} as unknown, undefined)) as {
+      sanitizedBody: string
+    }
 
     expect(r.sanitizedBody).toBe('newer body')
   })
@@ -130,10 +128,9 @@ describe('ipc/logs.ts — logs:* handlers (Plan 03-10)', () => {
   it('Test 3: logs:read-crash when no crashes exist returns {sanitizedBody: ""} (never throws)', async () => {
     await register()
     // Fresh empty temp dir; no files in it.
-    const r = (await mocks.handlers.get('logs:read-crash')?.(
-      {} as unknown,
-      undefined
-    )) as { sanitizedBody: string }
+    const r = (await mocks.handlers.get('logs:read-crash')?.({} as unknown, undefined)) as {
+      sanitizedBody: string
+    }
 
     expect(r.sanitizedBody).toBe('')
   })
@@ -146,10 +143,9 @@ describe('ipc/logs.ts — logs:* handlers (Plan 03-10)', () => {
     expect(fixtureBody).toContain('ey.fakeTokenBody123')
     await writeFixture('crash-2026-04-21_15.04.22-client.txt', fixtureBody)
 
-    const r = (await mocks.handlers.get('logs:read-crash')?.(
-      {} as unknown,
-      { crashId: 'crash-2026-04-21_15.04.22-client.txt' }
-    )) as { sanitizedBody: string }
+    const r = (await mocks.handlers.get('logs:read-crash')?.({} as unknown, {
+      crashId: 'crash-2026-04-21_15.04.22-client.txt'
+    })) as { sanitizedBody: string }
 
     expect(r.sanitizedBody).not.toContain('ey.fakeTokenBody123')
     // Redacted markers from auth/redact.ts patterns should be present.
@@ -158,10 +154,9 @@ describe('ipc/logs.ts — logs:* handlers (Plan 03-10)', () => {
 
   it('Test 5: logs:open-crash-folder with crashId reveals that file via shell.showItemInFolder', async () => {
     await register()
-    await mocks.handlers.get('logs:open-crash-folder')?.(
-      {} as unknown,
-      { crashId: 'crash-abc-client.txt' }
-    )
+    await mocks.handlers.get('logs:open-crash-folder')?.({} as unknown, {
+      crashId: 'crash-abc-client.txt'
+    })
     expect(mocks.shell.showItemInFolder).toHaveBeenCalledTimes(1)
     const arg = mocks.shell.showItemInFolder.mock.calls[0]?.[0] as string
     expect(arg).toBe(path.join(crashDir, 'crash-abc-client.txt'))
@@ -180,9 +175,9 @@ describe('ipc/logs.ts — logs:* handlers (Plan 03-10)', () => {
     await writeFixture('crash-2026-04-20_10.00.00-client.txt', 'a')
     await writeFixture('crash-2026-04-21_15.04.22-client.txt', 'b')
 
-    const r = (await mocks.handlers.get('logs:list-crashes')?.(
-      {} as unknown
-    )) as { crashes: Array<{ crashId: string }> }
+    const r = (await mocks.handlers.get('logs:list-crashes')?.({} as unknown)) as {
+      crashes: Array<{ crashId: string }>
+    }
 
     // Verify the main-side module's real newest-first ordering is preserved.
     const expected = await crashReportModule.listCrashReports(crashDir)

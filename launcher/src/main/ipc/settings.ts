@@ -36,8 +36,7 @@ function mergePatch(
   return {
     version: 1,
     ramMb: typeof p.ramMb === 'number' ? p.ramMb : current.ramMb,
-    firstRunSeen:
-      typeof p.firstRunSeen === 'boolean' ? p.firstRunSeen : current.firstRunSeen
+    firstRunSeen: typeof p.firstRunSeen === 'boolean' ? p.firstRunSeen : current.firstRunSeen
   }
 }
 
@@ -46,16 +45,13 @@ export function registerSettingsHandlers(): void {
     return await readSettings()
   })
 
-  ipcMain.handle(
-    'settings:set',
-    async (_event, patch: Partial<SettingsV1> | null | undefined) => {
-      const current = await readSettings()
-      const merged = mergePatch(current, patch)
-      await writeSettings(merged) // writeSettings re-clamps ramMb.
-      const fresh = await readSettings()
-      return { ok: true, settings: fresh }
-    }
-  )
+  ipcMain.handle('settings:set', async (_event, patch: Partial<SettingsV1> | null | undefined) => {
+    const current = await readSettings()
+    const merged = mergePatch(current, patch)
+    await writeSettings(merged) // writeSettings re-clamps ramMb.
+    const fresh = await readSettings()
+    return { ok: true, settings: fresh }
+  })
 
   // NOTE: logs:read-crash used to be registered here as a Phase 1 stub.
   // Plan 03-10 moved the real handler into ipc/logs.ts. Do NOT re-add a
