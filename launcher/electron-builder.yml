@@ -1,7 +1,17 @@
-appId: com.electron.app
-productName: launcher
+# Source: electron-builder 26.x docs (electron.build/configuration) — verified 2026-04-21
+# Plan: 03-11-windows-packaging; RESEARCH.md §electron-builder Config Fragment
+# Decisions: D-22 (Universal DMG), D-23 (NSIS per-user %LOCALAPPDATA%/Programs/Wiiwho/),
+#            D-25 (JRE extraResources per arch)
+# Open Q §1: x64 Temurin ships in BOTH mac slots (Rosetta 2 on arm64)
+appId: club.wiiwho.launcher
+productName: Wiiwho Client
+copyright: Copyright (c) 2026 Wiiwho Client
+
 directories:
   buildResources: build
+  output: dist
+
+# Exclude dev-only files from the asar.
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -9,35 +19,75 @@ files:
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!{vitest.config.ts,**/*.test.ts,**/*.test.tsx}'
+
+# JRE + mod jar must unpack to real filesystem (Java can't exec from inside asar).
 asarUnpack:
   - resources/**
-win:
-  executableName: launcher
-nsis:
-  artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
-  createDesktopShortcut: always
-mac:
-  entitlementsInherit: build/entitlements.mac.plist
-  extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-  notarize: false
-dmg:
-  artifactName: ${name}-${version}.${ext}
-linux:
-  target:
-    - AppImage
-    - snap
-    - deb
-  maintainer: electronjs.org
-  category: Utility
-appImage:
-  artifactName: ${name}-${version}.${ext}
+
+# Phase 3 does NOT sign or notarize (PROJECT.md deferred).
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
+
+# ---- Windows NSIS target (PKG-01 / D-23) ----
+win:
+  target:
+    - target: nsis
+      arch: x64
+  executableName: Wiiwho
+  icon: resources/icon.png
+  extraResources:
+    - from: resources/jre/win-x64
+      to: jre/win-x64
+    - from: resources/mod
+      to: mod
+
+nsis:
+  artifactName: Wiiwho Client Setup.exe
+  oneClick: false
+  allowElevation: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: Wiiwho Client
+  uninstallDisplayName: Wiiwho Client
+  # Claude's Discretion (Phase 3 CONTEXT): keep %APPDATA%/Wiiwho/ on uninstall (less destructive).
+  deleteAppDataOnUninstall: false
+
+# ---- macOS DMG target (PKG-02 / D-22) ----
+mac:
+  target:
+    - target: dmg
+      arch: universal
+  category: public.app-category.games
+  icon: resources/icon.png
+  # identity: null + notarize: false leave the app ad-hoc-signed only.
+  # PKG-02 accepts unsigned for v0.1; right-click-Open workaround ships in DMG.
+  identity: null
+  notarize: false
+  # Both JRE slots bundled regardless of arch — runtime picks the right subdir.
+  # Open Q §1: mac-arm64 slot holds the x64 Temurin JRE (Rosetta 2 executes it).
+  extraResources:
+    - from: resources/jre/mac-arm64
+      to: jre/mac-arm64
+    - from: resources/jre/mac-x64
+      to: jre/mac-x64
+    - from: resources/mod
+      to: mod
+
+dmg:
+  artifactName: Wiiwho.dmg
+  title: Wiiwho Client
+  contents:
+    - x: 140
+      y: 180
+      type: file
+      path: Wiiwho.app
+    - x: 400
+      y: 180
+      type: link
+      path: /Applications
+    - x: 270
+      y: 330
+      type: file
+      path: build/README-macOS.txt
