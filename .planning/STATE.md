@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 03-08-renderer-game-and-crash-PLAN.md
-last_updated: "2026-04-21T09:14:16.843Z"
+stopped_at: Completed 03-04-natives-and-args (Wave 2 parallel — 19/19 tests green, Open Q §3 resolved)
+last_updated: "2026-04-21T09:17:31.831Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 25
-  completed_plans: 17
+  completed_plans: 19
   percent: 0
 ---
 
@@ -69,6 +69,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P02 | 10min | 2 tasks | 5 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P06 | 12min | 2 tasks | 4 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P08 | 15min | 3 tasks | 6 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P04 | 8 | 2 tasks | 4 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P03 | 10 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -111,6 +113,10 @@ Recent decisions affecting current work:
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-06: MAIN_MENU_PATTERN uses loose [.*?/INFO]: prefix per RESEARCH verbatim — matches Sound Library Loader path AND any silent-fallback variants. 30s fallback timer fires onMainMenu({reason:timeout}) so launcher never hangs on undetected boot. Crash watch uses String(filename) not typeof-narrow (TS2339 workaround); missing crashDir resolves null so orchestrator can pair with ring-buffer-tail fallback. readCrashReport returns RAW UTF-8 — single-sanitizer invariant (D-21) enforced at IPC boundary.
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-08: D-21 invariant enforced by TWO tests — runtime identity (writeText arg === <pre>.textContent) + source-grep regression guard (no scrub/sanitize/redact imports in CrashViewer.tsx). Belt-and-suspenders pairing — either alone could be defeated by a clever future edit.
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-08: useGameStore keeps IPC unsubs + exitFallbackTimer as module-level state (outside Zustand reactive state) to avoid stale Timeout references on strict-mode double-mount. Local GameAPIExtensions type augment in game.ts (deletable when Plan 03-09's wiiwho.d.ts update lands) lets this plan compile standalone.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Open Q §3 RESOLVED: @xmcl/installer does NOT auto-extract LWJGL natives — natives.ts owns the gap via yauzl (transitive dep)
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: args.ts hardcodes VANILLA_MAIN_CLASS / VANILLA_ASSET_INDEX / MSA_USER_TYPE — pins Pitfall 2 + 8 + LCH-06 at type level, not runtime parse
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Phase 4 seam: LaunchInputs.forgeTweaks?: string[] accepted by buildArgv but deliberately ignored in Phase 3 (Test 12 pins inertness)
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-03: ensureClientJar hand-rolled over fetch + createHash('sha1'); @xmcl/installer 6.1.2 has no installMinecraftJar helper (plan's referenced name). Keeps 'SHA1 mismatch' error string in our code so Plan 03-10 orchestrator can pattern-match for D-14 retry UX without scraping third-party errors. ensureLibraries races a reject-on-abort Promise against installLibraries because LibraryOptions doesn't type abortSignal. ensureAssets delegates to installAssets with same cast pattern.
 
 ### Pending Todos
 
@@ -122,6 +128,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:14:14.925Z
-Stopped at: Completed 03-08-renderer-game-and-crash-PLAN.md
+Last session: 2026-04-21T09:17:02.872Z
+Stopped at: Completed 03-04-natives-and-args (Wave 2 parallel — 19/19 tests green, Open Q §3 resolved)
 Resume file: None

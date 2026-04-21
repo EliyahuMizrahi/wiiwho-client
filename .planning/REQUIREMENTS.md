@@ -32,7 +32,7 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 - [x] **LCH-03**: Downloaded jars and libraries are cached locally and reused on subsequent launches (no redundant downloads)
 - [ ] **LCH-04**: Launcher injects the WiiWho Forge mod into the classpath / mods directory before launch
 - [x] **LCH-05**: Launcher spawns the bundled Java 8 JVM with the correct classpath, tweakClass chain, user-selected heap size, auth tokens, and game args; Minecraft 1.8.9 window opens to the main menu
-- [ ] **LCH-06**: User reaches the Minecraft main menu logged in with their real Microsoft account (no offline mode)
+- [x] **LCH-06**: User reaches the Minecraft main menu logged in with their real Microsoft account (no offline mode)
 - [x] **LCH-07**: Launcher captures the JVM process stdout/stderr and displays relevant lines during launch for troubleshooting
 
 ### JRE Bundling
@@ -175,7 +175,7 @@ Which phases cover which requirements.
 | LCH-03 | Phase 3 | Complete |
 | LCH-04 | Phase 4 | Pending |
 | LCH-05 | Phase 3 | Complete |
-| LCH-06 | Phase 3 | Pending |
+| LCH-06 | Phase 3 | Complete |
 | LCH-07 | Phase 3 | Complete |
 | JRE-01 | Phase 3 | Pending |
 | JRE-02 | Phase 3 | Pending |

@@ -75,8 +75,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 03-00-phase-infrastructure-PLAN.md — Install @xmcl/core + @xmcl/installer + execa + p-queue; add shadcn Sheet/Slider/Tooltip; create fixtures; gitignore resources/
   - [x] 03-01-paths-and-redaction-PLAN.md — paths.ts (JRE-03 resolver) + redact.ts D-20 extension with sanitizeCrashReport export (COMP-05)
   - [x] 03-02-settings-store-PLAN.md — settings/store.ts schema v1 + ipc/settings.ts backed by store (LAUN-03, LAUN-04)
-  - [ ] 03-03-manifest-libraries-assets-PLAN.md — launch/{manifest,libraries,assets}.ts @xmcl/installer wrappers (LCH-01, LCH-02, LCH-03, SC5)
-  - [ ] 03-04-natives-and-args-PLAN.md — launch/natives.ts + launch/args.ts canonical vanilla 1.8.9 argv (LCH-05, LCH-06, Pitfalls 2+8)
+  - [x] 03-03-manifest-libraries-assets-PLAN.md — launch/{manifest,libraries,assets}.ts @xmcl/installer wrappers (LCH-01, LCH-02, LCH-03, SC5)
+  - [x] 03-04-natives-and-args-PLAN.md — launch/natives.ts + launch/args.ts canonical vanilla 1.8.9 argv (LCH-05, LCH-06, Pitfalls 2+8)
   - [x] 03-05-spawn-e2e-PLAN.md — launch/spawn.ts execa wrapper + e2e dummy-java integration (LCH-05, LCH-07, JRE-03)
   - [x] 03-06-log-parser-crash-watch-PLAN.md — monitor/logParser + crashReport (LCH-05, LCH-07, LAUN-05, D-16, D-17)
   - [ ] 03-07-renderer-settings-PLAN.md — stores/settings + RamSlider + SettingsDrawer (LAUN-03, LAUN-04, D-01, D-02, D-04, D-05, D-07)
