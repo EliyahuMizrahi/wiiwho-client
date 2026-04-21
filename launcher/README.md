@@ -1,4 +1,4 @@
-# WiiWho Client — Launcher
+# Wiiwho Client — Launcher
 
 Electron + TypeScript + React. Scaffolded from `@quick-start/electron`
 (RESEARCH.md §Launcher Scaffold Playbook).

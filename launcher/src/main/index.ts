@@ -26,7 +26,7 @@ function createWindow(): void {
     fullscreenable: false,
     show: false,
     autoHideMenuBar: true,
-    title: 'WiiWho Client',
+    title: 'Wiiwho Client',
     webPreferences
   })
 

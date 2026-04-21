@@ -1,5 +1,5 @@
 /**
- * The WiiWho preload bridge contract.
+ * The Wiiwho preload bridge contract.
  *
  * Phase 2 fills the `auth.*` handler bodies; Phase 3 fills `game.*`, `settings.*`,
  * and `logs.*`. Neither phase adds new top-level keys or new channels.

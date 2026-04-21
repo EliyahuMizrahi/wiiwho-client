@@ -31,7 +31,7 @@ function App(): React.JSX.Element {
 
   return (
     <div className="h-screen w-screen bg-neutral-900 flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold text-[#16e0ee] mb-8">WiiWho Client</h1>
+      <h1 className="text-4xl font-bold text-[#16e0ee] mb-8">Wiiwho Client</h1>
       <Button
         size="lg"
         className="bg-[#16e0ee] hover:bg-[#14c9d6] text-neutral-950 text-xl px-12 py-6"

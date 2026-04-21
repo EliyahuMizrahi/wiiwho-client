@@ -1,9 +1,9 @@
 {
   "name": "wiiwho-launcher",
   "version": "0.1.0",
-  "description": "WiiWho Client launcher (Electron).",
+  "description": "Wiiwho Client launcher (Electron).",
   "main": "./out/main/index.js",
-  "author": "WiiWho Client",
+  "author": "Wiiwho Client",
   "homepage": "https://github.com/wiiwho-client",
   "private": true,
   "scripts": {
