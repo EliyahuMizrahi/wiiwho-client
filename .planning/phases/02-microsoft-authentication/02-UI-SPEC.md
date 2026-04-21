@@ -1,11 +1,12 @@
 ---
 phase: 2
 slug: microsoft-authentication
-status: draft
+status: approved
 shadcn_initialized: true
 preset: new-york / neutral / css-variables (detected from launcher/components.json)
 created: 2026-04-21
 revised: 2026-04-21
+reviewed_at: 2026-04-21
 ---
 
 # Phase 2 — UI Design Contract
