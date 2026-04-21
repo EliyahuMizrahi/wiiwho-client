@@ -57,7 +57,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 02-02-PLAN.md — safeStorageCache.ts prismarine-auth cache factory (encrypt+atomic-write) + authStore.ts non-secret D-16 pointer file (AUTH-04)
   - [x] 02-03-PLAN.md — AuthManager orchestrator (login/cancel/silent-refresh/logout) + IPC handler bodies + main bootstrap (redactor install, silent refresh gate) (AUTH-01, AUTH-02, AUTH-05, AUTH-06)
   - [x] 02-04-PLAN.md — Zustand auth store + LoginScreen + LoadingScreen + ErrorBanner + App.tsx state-switch + font-bold→font-semibold migration (AUTH-01, AUTH-03, AUTH-05)
-  - [ ] 02-05-PLAN.md — DeviceCodeModal + AccountBadge + useSkinHead hook + onDeviceCode subscription wiring (AUTH-01, AUTH-05, AUTH-06)
+  - [x] 02-05-PLAN.md — DeviceCodeModal + AccountBadge + useSkinHead hook + onDeviceCode subscription wiring (AUTH-01, AUTH-05, AUTH-06)
   - [ ] 02-06-PLAN.md — Live-endpoint manual QA checkpoint: 6-test walkthrough + MCE approval gate + sign-off commit (all 6 AUTH reqs)
 **UI hint**: yes
 
