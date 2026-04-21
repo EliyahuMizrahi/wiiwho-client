@@ -39,8 +39,8 @@ export const DEFAULTS: SettingsV1 = {
  */
 export function clampRam(r: number): number {
   if (!Number.isFinite(r)) return DEFAULTS.ramMb
-  const bounded = Math.max(1024, Math.min(4096, r))
-  return Math.round(bounded / 512) * 512
+  const clamped = Math.max(1024, Math.min(4096, r))
+  return Math.round(clamped / 512) * 512
 }
 
 /**

@@ -47,8 +47,17 @@ export interface WiiWhoAPI {
     ) => () => void
   }
   settings: {
-    get: () => Promise<Record<string, unknown>>
-    set: (patch: Record<string, unknown>) => Promise<{ ok: boolean }>
+    get: () => Promise<{
+      version: 1
+      ramMb: number
+      firstRunSeen: boolean
+    }>
+    set: (
+      patch: Partial<{ ramMb: number; firstRunSeen: boolean }>
+    ) => Promise<{
+      ok: boolean
+      settings: { version: 1; ramMb: number; firstRunSeen: boolean }
+    }>
   }
   logs: {
     readCrash: (opts?: {
