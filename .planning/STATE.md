@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-04-21T03:37:56.445Z"
+stopped_at: Completed 02-00-PLAN.md
+last_updated: "2026-04-21T03:39:14.026Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 12
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundations P02 | 45 min | 2 tasks | 4 files |
 | Phase 02-microsoft-authentication P01 | 5min | 2 tasks | 4 files |
 | Phase 02 P02 | 5min | 2 tasks | 4 files |
+| Phase 02-microsoft-authentication P00 | 8min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,7 @@ Recent decisions affecting current work:
 - [Phase 02-microsoft-authentication]: Plan 02-01: Rule 1 regex fix — broadened refresh_token/access_token patterns to match JSON-quoted form (research regex missed "refresh_token":"val" shape). Also ordered MC_ACCESS_PATTERN before JWT_PATTERN so nested accessToken JWT bodies redact to the cleaner "accessToken": "[REDACTED]" envelope.
 - [Phase 02-microsoft-authentication]: Plan 02-01: AuthManager / future auth IPC handlers must call installRedactor() once at app.whenReady() before any log.* calls. Enforced as a convention; redactor is idempotent so multiple calls are safe.
 - [Phase 02]: Plan 02-02: Option B chosen for token storage — non-secret auth.bin pointer + prismarine-auth encrypted per-cache-name files under userData/auth/<username>/*.bin. AUTH-04 structurally enforced (safeStorage fail-closed; pointer regex-rejects /token|secret|refresh/i keys at write boundary). 24 tests pass.
+- [Phase 02-microsoft-authentication]: Plan 02-00: shadcn components manually inlined from new-york-v4 registry JSON (pnpm workspace hoist-pattern diff breaks npx shadcn add CLI); vitest 4 environmentMatchGlobs wrapped in 'as any' cast (runtime-works/types-removed gap)
 
 ### Pending Todos
 
@@ -96,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T03:37:56.441Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-04-21T03:39:14.022Z
+Stopped at: Completed 02-00-PLAN.md
 Resume file: None
