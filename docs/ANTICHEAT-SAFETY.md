@@ -10,7 +10,7 @@
 
 | Feature | What it reads / writes | Hypixel verdict (+ source link) | BlocksMC verdict | Reviewer | Date |
 |---------|------------------------|--------------------------------|------------------|----------|------|
-| Project MODID: `wiiwho` | Forge handshake announces this string | PASS — generic, non-feature-descriptive; not on any known Hypixel blacklist. [Hypixel Allowed Mods](https://support.hypixel.net/hc/en-us/articles/6472550754962) | PASS — BlocksMC does not publish a MODID blacklist; short generic ID is lowest-risk | _owner_ | 2026-04-20 |
+| Project MODID: `wiiwho` | Forge handshake announces this string. Collision-check 2026-04-20: Modrinth (`https://modrinth.com/mods?q=wiiwho`) automated — 0 results. CurseForge (`https://www.curseforge.com/minecraft/search?search=wiiwho`) manual browser check — 0 exact-name/slug matches. Display name is `Wiiwho` (only first W capitalized). | PASS — generic, non-feature-descriptive; not on any known Hypixel blacklist. [Hypixel Allowed Mods](https://support.hypixel.net/hc/en-us/articles/6472550754962) | PASS — BlocksMC does not publish a MODID blacklist; short generic ID is lowest-risk | _owner_ (approved wiiwho 2026-04-20 in 01-01 checkpoint) | 2026-04-20 |
 | (future features added here, one row per feature, before that feature's PR merges) | | | | | |
 
 ## Alt-Account Play Tests

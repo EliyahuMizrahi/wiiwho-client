@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "club.wiiwho.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "mixins.wiiwho.refmap.json",
+  "minVersion": "0.7.11",
+  "client": [],
+  "injectors": { "defaultRequire": 1 }
+}
