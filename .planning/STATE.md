@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Release Hardening
 status: executing
 stopped_at: "CHECKPOINT: 03-12-macos-dmg-PLAN.md awaiting Mac build machine (PKG-02 + JRE-02 deferred, not complete)"
-last_updated: "2026-04-21T10:23:02.025Z"
+last_updated: "2026-04-21T10:32:05.073Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 
 ## Current Position
 
-Phase: 03 (vanilla-launch-jre-bundling-packaging) — EXECUTING
-Plan: 6 of 13
+Phase: 4
+Plan: Not started
 Status: Ready to execute
 Last activity: 2026-04-21
 
