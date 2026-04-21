@@ -1,21 +1,31 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+type HookFn = (m: { data: unknown[] }) => { data: unknown[] }
+
 // Capture the pushed hook so we can drive it with synthetic messages.
-const pushedHooks: Array<(m: { data: unknown[] }) => { data: unknown[] }> = []
+const pushedHooks: HookFn[] = []
 
 vi.mock('electron-log/main', () => ({
   default: {
     hooks: {
-      push: (h: (m: { data: unknown[] }) => { data: unknown[] }) => {
+      push: (h: HookFn) => {
         pushedHooks.push(h)
       }
     }
   }
 }))
 
-import { installRedactor, __test__ } from '../redact'
+// Dynamic import so each `beforeEach` below can reset the module-level `installed`
+// flag in redact.ts via vi.resetModules(). The static top-level import would cache
+// the module and make idempotency + re-registration tests impossible to isolate.
+async function loadRedact(): Promise<typeof import('../redact')> {
+  return await import('../redact')
+}
 
-const { scrub } = __test__
+// Eager-load once so `scrub` is available to the pure-function describe block
+// without triggering any hook registration yet (scrub is synchronous + stateless).
+const mod = await import('../redact')
+const { scrub } = mod.__test__
 
 describe('scrub (pure regex pipeline)', () => {
   it('redacts a real-looking JWT', () => {
@@ -60,8 +70,14 @@ describe('scrub (pure regex pipeline)', () => {
 })
 
 describe('installRedactor', () => {
-  beforeEach(() => {
+  let installRedactor: typeof mod.installRedactor
+
+  beforeEach(async () => {
+    // Reset module state so each test observes a fresh `installed = false` flag.
     pushedHooks.length = 0
+    vi.resetModules()
+    const fresh = await loadRedact()
+    installRedactor = fresh.installRedactor
   })
 
   it('registers exactly one hook on electron-log.hooks', () => {
