@@ -92,17 +92,44 @@ describe('mapAuthError', () => {
       expect(r.helpUrl).toMatch(/minecraft\.net/)
     })
 
-    const networkCodes = ['ENOTFOUND', 'ECONNREFUSED', 'ETIMEDOUT', 'EAI_AGAIN']
-    networkCodes.forEach((code) => {
-      it(`${code} → network error view with null helpUrl`, () => {
-        const e = new Error('fetch failed') as NodeJS.ErrnoException
-        e.code = code
-        const r = mapAuthError(e)
-        expect(r.helpUrl).toBeNull()
-        expect(r.message).toBe(
-          "Can't reach Microsoft — check your internet connection."
-        )
-      })
+    it('ENOTFOUND → network error view with null helpUrl', () => {
+      const e = new Error('fetch failed') as NodeJS.ErrnoException
+      e.code = 'ENOTFOUND'
+      const r = mapAuthError(e)
+      expect(r.helpUrl).toBeNull()
+      expect(r.message).toBe(
+        "Can't reach Microsoft — check your internet connection."
+      )
+    })
+
+    it('ECONNREFUSED → network error view with null helpUrl', () => {
+      const e = new Error('fetch failed') as NodeJS.ErrnoException
+      e.code = 'ECONNREFUSED'
+      const r = mapAuthError(e)
+      expect(r.helpUrl).toBeNull()
+      expect(r.message).toBe(
+        "Can't reach Microsoft — check your internet connection."
+      )
+    })
+
+    it('ETIMEDOUT → network error view with null helpUrl', () => {
+      const e = new Error('fetch failed') as NodeJS.ErrnoException
+      e.code = 'ETIMEDOUT'
+      const r = mapAuthError(e)
+      expect(r.helpUrl).toBeNull()
+      expect(r.message).toBe(
+        "Can't reach Microsoft — check your internet connection."
+      )
+    })
+
+    it('EAI_AGAIN → network error view with null helpUrl', () => {
+      const e = new Error('fetch failed') as NodeJS.ErrnoException
+      e.code = 'EAI_AGAIN'
+      const r = mapAuthError(e)
+      expect(r.helpUrl).toBeNull()
+      expect(r.message).toBe(
+        "Can't reach Microsoft — check your internet connection."
+      )
     })
 
     it('bare "fetch failed" message (no code) → network error view', () => {
