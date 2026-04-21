@@ -28,7 +28,8 @@ import {
   rmSync,
   readdirSync,
   renameSync,
-  statSync
+  statSync,
+  cpSync
 } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
@@ -137,8 +138,17 @@ function runCmd(cmd, args, opts = {}) {
 
 function extractTarGz(archivePath, destDir) {
   mkdirSync(destDir, { recursive: true })
-  // `tar` is available on Windows 10+, macOS, and Linux.
-  runCmd('tar', ['-xzf', archivePath, '-C', destDir])
+  // `tar` is available on Windows 10+ (bsdtar, built-in), macOS (bsdtar), and Linux (GNU tar).
+  // On Windows we explicitly call the system bsdtar because Git Bash's $PATH tends to
+  // resolve `tar` to MSYS GNU tar, which parses `C:\...` as `host:path` (rsh-style)
+  // and fails with "Cannot connect to C". bsdtar handles drive letters correctly.
+  if (process.platform === 'win32') {
+    const sysTar = `${process.env.SystemRoot || 'C:\\Windows'}\\System32\\tar.exe`
+    const tarCmd = existsSync(sysTar) ? sysTar : 'tar'
+    runCmd(tarCmd, ['-xzf', archivePath, '-C', destDir])
+  } else {
+    runCmd('tar', ['-xzf', archivePath, '-C', destDir])
+  }
 }
 
 function extractZip(archivePath, destDir) {
@@ -180,13 +190,48 @@ function flattenExtraction(tempDir, finalDir, expectedInnerName) {
   moveDir(innerPath, finalDir)
 }
 
+function sleepSync(ms) {
+  // Windows AV scanners sometimes hold file handles open briefly after extraction.
+  // A short busy-wait before rename avoids EPERM without pulling in async complexity.
+  const end = Date.now() + ms
+  while (Date.now() < end) {
+    // spin
+  }
+}
+
 function moveDir(src, dest) {
   // Ensure dest parent exists; remove any stale final dir.
   mkdirSync(dirname(dest), { recursive: true })
   if (existsSync(dest)) {
     rmSync(dest, { recursive: true, force: true })
   }
-  renameSync(src, dest)
+  // Try fast rename first with up to 3 retries (Windows AV + indexer race).
+  let lastErr
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      renameSync(src, dest)
+      return
+    } catch (e) {
+      lastErr = e
+      if (e?.code === 'EPERM' || e?.code === 'EBUSY' || e?.code === 'EACCES') {
+        sleepSync(500)
+        continue
+      }
+      throw e
+    }
+  }
+  // Fallback: recursive copy + remove source. Slower but bullet-proof against AV locks
+  // and cross-volume moves. cpSync is Node 16.7+ (we're on 22+).
+  log(
+    `moveDir: rename failed after retries (${lastErr?.code || 'unknown'}); falling back to cpSync + rm`
+  )
+  cpSync(src, dest, { recursive: true })
+  try {
+    rmSync(src, { recursive: true, force: true })
+  } catch (e) {
+    // Non-fatal — the cache dir gets rm'd at next run and is gitignored.
+    log(`moveDir: post-copy rm of ${src} failed (${e?.code}); will retry next run`)
+  }
 }
 
 function isPopulated(slotDir, marker) {

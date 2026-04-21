@@ -31,4 +31,6 @@ Thumbs.db
 launcher/resources/jre/
 # Phase 3: Wiiwho mod jar built from client-mod at build time — NEVER commit.
 launcher/resources/mod/
+# Phase 3: prefetch-jre.mjs download cache (Temurin tarballs + temp extraction dirs).
+launcher/resources/.jre-cache/
 
