@@ -72,12 +72,12 @@ describe('paths.ts', () => {
     Object.defineProperty(process, 'platform', { value: 'darwin', configurable: true })
     Object.defineProperty(process, 'arch', { value: 'x64', configurable: true })
     const { resolveJavaBinary } = await import('./paths')
-    const p = resolveJavaBinary()
-    expect(p.replace(/\\/g, '/')).toContain('Contents/Home/bin/java')
+    const p = resolveJavaBinary().replace(/\\/g, '/')
+    expect(p).toContain('Contents/Home/bin/java')
     expect(p).toMatch(/\/java$/)
     // JRE-03 invariant
-    expect(p.replace(/\\/g, '/')).toContain('resources/jre/')
-    expect(p.replace(/\\/g, '/')).toContain('mac-x64')
+    expect(p).toContain('resources/jre/')
+    expect(p).toContain('mac-x64')
   })
 
   it('resolveJavaBinary throws on linux / unsupported platforms', async () => {
