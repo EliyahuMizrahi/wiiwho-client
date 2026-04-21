@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 03-04-natives-and-args (Wave 2 parallel — 19/19 tests green, Open Q §3 resolved)
-last_updated: "2026-04-21T09:17:31.831Z"
+stopped_at: Completed 03-03-manifest-libraries-assets-PLAN.md
+last_updated: "2026-04-21T09:17:49.763Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
@@ -117,6 +117,8 @@ Recent decisions affecting current work:
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: args.ts hardcodes VANILLA_MAIN_CLASS / VANILLA_ASSET_INDEX / MSA_USER_TYPE — pins Pitfall 2 + 8 + LCH-06 at type level, not runtime parse
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Phase 4 seam: LaunchInputs.forgeTweaks?: string[] accepted by buildArgv but deliberately ignored in Phase 3 (Test 12 pins inertness)
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-03: ensureClientJar hand-rolled over fetch + createHash('sha1'); @xmcl/installer 6.1.2 has no installMinecraftJar helper (plan's referenced name). Keeps 'SHA1 mismatch' error string in our code so Plan 03-10 orchestrator can pattern-match for D-14 retry UX without scraping third-party errors. ensureLibraries races a reject-on-abort Promise against installLibraries because LibraryOptions doesn't type abortSignal. ensureAssets delegates to installAssets with same cast pattern.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-03: Natives extraction OWNED BY PLAN 03-04. installLibraries downloads classifier jars (e.g. lwjgl-platform-natives-windows.jar) to libraries/ but does NOT unzip into versions/<id>/natives/. Plan 03-04's natives.ts must iterate ResolvedVersion.libraries where isNative===true, unzip honouring extract.exclude (typically META-INF/), hand directory to args.ts for -Djava.library.path.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-03: SC5 regression asserted via synthetic payload with locally-computed SHA1, NOT the real 3870888... client.jar SHA1 — would require shipping 8 MB of Mojang bytes (violates docs/mojang-asset-policy.md). Contract tested: on-disk SHA1 == advertised SHA1 after ensureClientJar, which is preserved regardless of which value stands in for 'advertised'. On SHA1 mismatch the temp file (.jar.tmp) is NEVER renamed to the final path — integration Test D proves no silently-wrong cache survives.
 
 ### Pending Todos
 
@@ -128,6 +130,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:17:02.872Z
-Stopped at: Completed 03-04-natives-and-args (Wave 2 parallel — 19/19 tests green, Open Q §3 resolved)
+Last session: 2026-04-21T09:17:49.760Z
+Stopped at: Completed 03-03-manifest-libraries-assets-PLAN.md
 Resume file: None
