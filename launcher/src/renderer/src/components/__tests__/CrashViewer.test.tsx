@@ -52,7 +52,13 @@ describe('CrashViewer', () => {
     render(
       <CrashViewer
         sanitizedBody={overrides.sanitizedBody ?? 'stack trace body'}
-        crashId={overrides.crashId ?? 'crash-2026-04-21_15.04.22-client'}
+        // Use explicit 'in' check so a test passing `crashId: null` actually
+        // forwards null (?? would coalesce null to the default string).
+        crashId={
+          'crashId' in overrides
+            ? (overrides.crashId as string | null)
+            : 'crash-2026-04-21_15.04.22-client'
+        }
         onClose={overrides.onClose ?? onClose}
         onPlayAgain={overrides.onPlayAgain ?? onPlayAgain}
         onOpenCrashFolder={overrides.onOpenCrashFolder ?? onOpenCrashFolder}
