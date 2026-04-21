@@ -39,7 +39,7 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 
 - [ ] **JRE-01**: Launcher installer for Windows includes an Eclipse Temurin Java 8 JRE, no user-side Java install required
 - [ ] **JRE-02**: Launcher installer for macOS includes an Eclipse Temurin Java 8 JRE, no user-side Java install required
-- [ ] **JRE-03**: On launch, launcher spawns the bundled JRE (not any system-installed Java) via a known resource path
+- [x] **JRE-03**: On launch, launcher spawns the bundled JRE (not any system-installed Java) via a known resource path
 
 ### Mod Loader (Forge)
 
@@ -80,7 +80,7 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 - [ ] **COMP-02**: Before release, a throwaway Microsoft account plays ≥2 hours on Hypixel with all WiiWho features enabled and is not flagged, banned, or warned by Watchdog
 - [ ] **COMP-03**: Before release, the same alt-account test is repeated on BlocksMC (≥1 hour) with no flag/ban/warning
 - [x] **COMP-04**: WiiWho does not redistribute any Minecraft asset; launcher downloads the vanilla jar and libraries directly from Mojang at runtime
-- [ ] **COMP-05**: Crash logs shown in the launcher and any logs written to disk have the user's Microsoft access token, refresh token, and username redacted (no PII leak via crash-sharing)
+- [x] **COMP-05**: Crash logs shown in the launcher and any logs written to disk have the user's Microsoft access token, refresh token, and username redacted (no PII leak via crash-sharing)
 
 ## v2 Requirements
 
@@ -179,7 +179,7 @@ Which phases cover which requirements.
 | LCH-07 | Phase 3 | Pending |
 | JRE-01 | Phase 3 | Pending |
 | JRE-02 | Phase 3 | Pending |
-| JRE-03 | Phase 3 | Pending |
+| JRE-03 | Phase 3 | Complete |
 | MOD-01 | Phase 1 | Complete |
 | MOD-02 | Phase 1 | Complete |
 | MOD-03 | Phase 1 | Complete |
@@ -202,7 +202,7 @@ Which phases cover which requirements.
 | COMP-02 | Phase 4 | Pending |
 | COMP-03 | Phase 4 | Pending |
 | COMP-04 | Phase 1 | Complete |
-| COMP-05 | Phase 3 | Pending |
+| COMP-05 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 45 total

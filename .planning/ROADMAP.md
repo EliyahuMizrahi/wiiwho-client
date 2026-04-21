@@ -71,7 +71,20 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. When the game process exits non-zero, the launcher displays the crash report inside the launcher UI with access tokens, JWTs, and Windows usernames redacted — verified by triggering a crash containing a known fake token and confirming the token is stripped before display *and* before copy-to-clipboard
   4. Running `electron-builder` on Windows produces an NSIS installer; running on macOS produces a DMG/ZIP — both bundle the Eclipse Temurin 8 JRE and the initial WiiWho mod jar; the bundled JRE (not any system Java) is the one that spawns
   5. All downloaded 1.8.9 libraries and the vanilla client jar are SHA1-verified against the Mojang `client.json` manifest; corrupting a cached jar and relaunching causes re-download, not a silent launch with broken files
-**Plans**: TBD
+**Plans**: 13 plans
+  - [ ] 03-00-phase-infrastructure-PLAN.md — Install @xmcl/core + @xmcl/installer + execa + p-queue; add shadcn Sheet/Slider/Tooltip; create fixtures; gitignore resources/
+  - [x] 03-01-paths-and-redaction-PLAN.md — paths.ts (JRE-03 resolver) + redact.ts D-20 extension with sanitizeCrashReport export (COMP-05)
+  - [ ] 03-02-settings-store-PLAN.md — settings/store.ts schema v1 + ipc/settings.ts backed by store (LAUN-03, LAUN-04)
+  - [ ] 03-03-manifest-libraries-assets-PLAN.md — launch/{manifest,libraries,assets}.ts @xmcl/installer wrappers (LCH-01, LCH-02, LCH-03, SC5)
+  - [ ] 03-04-natives-and-args-PLAN.md — launch/natives.ts + launch/args.ts canonical vanilla 1.8.9 argv (LCH-05, LCH-06, Pitfalls 2+8)
+  - [ ] 03-05-spawn-e2e-PLAN.md — launch/spawn.ts execa wrapper + e2e dummy-java integration (LCH-05, LCH-07, JRE-03)
+  - [ ] 03-06-log-parser-crash-watch-PLAN.md — monitor/logParser + crashReport (LCH-05, LCH-07, LAUN-05, D-16, D-17)
+  - [ ] 03-07-renderer-settings-PLAN.md — stores/settings + RamSlider + SettingsDrawer (LAUN-03, LAUN-04, D-01, D-02, D-04, D-05, D-07)
+  - [ ] 03-08-renderer-game-and-crash-PLAN.md — stores/game + PlayButton + CrashViewer (LCH-05, LCH-07, LAUN-05, COMP-05 D-21)
+  - [ ] 03-09-preload-auth-surface-PLAN.md — preload bridge extension (game.onLog/onExited/onCrashed + logs.openCrashFolder/listCrashReports) + AuthManager.getMinecraftToken (LCH-06)
+  - [ ] 03-10-orchestrator-logs-app-PLAN.md — ipc/game orchestrator + ipc/logs + App.tsx wiring (LCH-01/02/03/05/06/07, LAUN-05, COMP-05)
+  - [ ] 03-11-windows-packaging-PLAN.md — electron-builder.yml + prefetch-jre + build-mod + Windows NSIS smoke (JRE-01, JRE-03, PKG-01)
+  - [ ] 03-12-macos-dmg-PLAN.md — macOS Universal DMG smoke (autonomous: false — requires Mac access) (JRE-02, PKG-02)
 **UI hint**: yes
 
 ### Phase 4: Forge Integration, HUD Framework & HUDs

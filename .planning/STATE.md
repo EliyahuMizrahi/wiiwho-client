@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Phase 3 context gathered
-last_updated: "2026-04-21T07:41:47.868Z"
+stopped_at: Completed 03-01-paths-and-redaction (parallel Wave 1)
+last_updated: "2026-04-21T09:01:06.943Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 12
-  completed_plans: 11
+  total_plans: 25
+  completed_plans: 12
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20)
 
 **Core value:** A single-click path from "open launcher" to "in a 1.8.9 game that runs faster than Optifine and has the HUD I want" — all without tripping PvP server anticheats.
-**Current focus:** Phase 02 — microsoft-authentication
+**Current focus:** Phase 03 — vanilla-launch-jre-bundling-packaging
 
 ## Current Position
 
-Phase: 02 (microsoft-authentication) — EXECUTING
-Plan: 5 of 7
+Phase: 03 (vanilla-launch-jre-bundling-packaging) — EXECUTING
+Plan: 2 of 13
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -63,6 +63,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-microsoft-authentication P03 | 6min | 2 tasks | 6 files |
 | Phase 02-microsoft-authentication P04 | 7min | 3 tasks | 8 files |
 | Phase 02-microsoft-authentication P05 | 8min | 3 tasks | 10 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P01 | 5m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,8 @@ Recent decisions affecting current work:
 - [Phase 02-microsoft-authentication]: Plan 02-04: vitest 4 + RTL 16 renderer-test patterns locked — (1) @vitest-environment jsdom docblock at top of every renderer-side test file (config-level environmentMatchGlobs cast to 'any' was runtime-unreliable in vitest 4); (2) afterEach(cleanup) in every describe block of component tests (vitest 4 + RTL 16 does NOT auto-cleanup; without it 9/11 component tests fail with 'Found multiple elements'). Both patterns are now the established idiom for this launcher and any future renderer-side tests must follow them.
 - [Phase 02-microsoft-authentication]: Plan 02-05: DeviceCodeModal + AccountBadge ship all D-06/D-07/D-13/D-14/D-15 UI-SPEC contract; AUTH-01 + AUTH-05 + AUTH-06 complete. Device-code UI is code (text-2xl font-mono tracking-[0.15em] + aria-live) + Copy/Open-in-browser/Stop signing in + countdown + expired retry. AccountBadge is mc-heads.net 32x32 skin head + username (truncate max-w-[120px]) + chevron + dropdown with full UUID + instant Log out (no confirm). Generate new code calls cancelLogin-then-login to bypass Plan 04's concurrent-login guard (auto-fix Rule 1). Radix DropdownMenu+jsdom needs userEvent.setup()+Element.prototype pointer-capture stubs (auto-fix Rule 3). cancelLogin optimistic set is redundant-but-safe with __CANCELLED__ sentinel short-circuit — zero observable divergence, eliminates 100ms modal-flash on cancel.
 - [Phase 02-microsoft-authentication]: Plan 02-05: Radix-in-jsdom testing pattern locked — userEvent.setup() + async user.click for any Radix primitive that uses pointer capture (DropdownMenu, Popover, ContextMenu, Select, Tooltip). fireEvent.click remains correct for non-Radix Buttons and for <img onError>. Element.prototype.hasPointerCapture / releasePointerCapture / scrollIntoView stubs via structural cast (as unknown as {...}) at the top of any test file that imports Radix primitives. window.open(url,_blank,noopener) is the correct renderer-side external-url path in Electron 41 with sandbox+contextIsolation — system browser is the default handler, confirmed during manual QA.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-01: paths.ts exports 7 platform-branched resolvers (Data/Settings/Game/CrashReports/Jre/JavaBinary/ModJar); JRE-03 + Pitfall 7 (javaw.exe) enforced by test
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-01: redact.ts adds 6 D-20 patterns + sanitizeCrashReport export — single scrub() pipeline drives both electron-log hook AND crash viewer (D-21)
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T07:41:47.864Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-vanilla-launch-jre-bundling-packaging/03-CONTEXT.md
+Last session: 2026-04-21T09:00:56.336Z
+Stopped at: Completed 03-01-paths-and-redaction (parallel Wave 1)
+Resume file: None
