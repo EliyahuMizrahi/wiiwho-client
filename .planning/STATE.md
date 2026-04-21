@@ -4,7 +4,7 @@ milestone: v0.1
 milestone_name: Release Hardening
 status: executing
 stopped_at: Completed 01-00-PLAN.md (wave-0 policy docs + docs-check)
-last_updated: "2026-04-21T00:18:31.574Z"
+last_updated: "2026-04-21T00:20:10.261Z"
 last_activity: 2026-04-20
 progress:
   total_phases: 7
@@ -69,6 +69,7 @@ Recent decisions affecting current work:
 - [Phase 01]: Policy docs reproduced verbatim from 01-RESEARCH.md §Three Policy Doc Templates — no deviations from the research templates (they were designed specifically to satisfy the greppable check-docs.mjs contracts)
 - [Phase 01]: scripts/check-docs.mjs is zero-dep Node 22 ESM — runnable with just 'node scripts/check-docs.mjs' before any pnpm install, so Wave 0 docs-check is the single repo-wide invariant every later plan can rely on without bootstrapping
 - [Phase 01-foundations]: 2026-04-20 — MODID collision check: CurseForge and Modrinth both clean. Approved MODID wiiwho. Display name Wiiwho (only first W capitalized — user preference applied project-wide).
+- [Phase 01-foundations]: 2026-04-20 — Launcher runtime verification (LAUN-01, LAUN-02, LAUN-06): owner ran pnpm --filter ./launcher dev on Windows; all 6 checks passed. Window ~1000x650 non-resizable, title 'Wiiwho Client', dark bg; cyan Play button logs stub payload on click; window.wiiwho.__debug.securityAudit() returned allTrue: true; typeof window.process and typeof window.require both 'undefined'; Object.keys(window.wiiwho) === ['auth','game','settings','logs','__debug']. Display name corrected from WiiWho → Wiiwho project-wide per owner preference.
 
 ### Pending Todos
 
