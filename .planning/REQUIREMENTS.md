@@ -43,9 +43,9 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 
 ### Mod Loader (Forge)
 
-- [ ] **MOD-01**: Project contains a Forge 1.8.9 mod scaffold using the modern community toolchain (`gg.essential.loom` + Gradle 7.6 + dual JDK17-host/Java8-target)
+- [x] **MOD-01**: Project contains a Forge 1.8.9 mod scaffold using the modern community toolchain (`gg.essential.loom` + Gradle 7.6 + dual JDK17-host/Java8-target)
 - [ ] **MOD-02**: Running `./gradlew runClient` launches a dev Minecraft 1.8.9 with the WiiWho mod loaded and a real Microsoft login (via DevAuth) for anticheat testing
-- [ ] **MOD-03**: Mod has a generic, non-feature-descriptive MODID (to avoid Hypixel Forge-handshake blacklisting)
+- [x] **MOD-03**: Mod has a generic, non-feature-descriptive MODID (to avoid Hypixel Forge-handshake blacklisting)
 - [ ] **MOD-04**: Mod includes a Mixin bootstrap pinned to the version compatible with Forge 1.8.9 + LaunchWrapper (Mixin 0.7.11-SNAPSHOT)
 - [ ] **MOD-05**: Mod builds a releaseable jar via `./gradlew build`, which the launcher then injects at launch time
 - [ ] **MOD-06**: Mod provides a reusable HUD framework (base class + registration + toggle + render-order handling) that any HUD feature can extend
@@ -180,9 +180,9 @@ Which phases cover which requirements.
 | JRE-01 | Phase 3 | Pending |
 | JRE-02 | Phase 3 | Pending |
 | JRE-03 | Phase 3 | Pending |
-| MOD-01 | Phase 1 | Pending |
+| MOD-01 | Phase 1 | Complete |
 | MOD-02 | Phase 1 | Pending |
-| MOD-03 | Phase 1 | Pending |
+| MOD-03 | Phase 1 | Complete |
 | MOD-04 | Phase 1 | Pending |
 | MOD-05 | Phase 4 | Pending |
 | MOD-06 | Phase 4 | Pending |

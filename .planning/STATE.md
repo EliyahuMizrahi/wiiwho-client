@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 01-03-PLAN.md (launcher scaffold + runtime-verified security)
-last_updated: "2026-04-21T00:23:14.135Z"
-last_activity: 2026-04-20
+stopped_at: Completed 01-01-PLAN.md (client-mod scaffold + MODID lock)
+last_updated: "2026-04-21T00:28:11.420Z"
+last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 01 (foundations) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
-Last activity: 2026-04-20
+Last activity: 2026-04-21
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01 P00 | 2 | 2 tasks | 6 files |
 | Phase 01 P03 | 12 min | 2 tasks | 27 files |
+| Phase 01-foundations P01 | 30min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,7 @@ Recent decisions affecting current work:
 - [Phase 01-foundations]: 2026-04-20 — Launcher runtime verification (LAUN-01, LAUN-02, LAUN-06): owner ran pnpm --filter ./launcher dev on Windows; all 6 checks passed. Window ~1000x650 non-resizable, title 'Wiiwho Client', dark bg; cyan Play button logs stub payload on click; window.wiiwho.__debug.securityAudit() returned allTrue: true; typeof window.process and typeof window.require both 'undefined'; Object.keys(window.wiiwho) === ['auth','game','settings','logs','__debug']. Display name corrected from WiiWho → Wiiwho project-wide per owner preference.
 - [Phase 01-foundations]: Runtime security verification pattern established: setAuditedPrefs() captures the exact webPreferences object passed to BrowserWindow, then __security:audit IPC returns the captured runtime state. Config-vs-runtime drift is observable (not assumed). Pattern reusable for future 'prove config matches runtime' checks.
 - [Phase 01-foundations]: Named-Channel IPC surface locked at v0.1 scope: 5 top-level preload keys (auth, game, settings, logs, __debug), 13 channels total. Phase 2 fills auth.* handler bodies; Phase 3 fills game.*/settings.*/logs.*. Neither adds channels. Pitfall 5 (dead Play button) enforced by dependency absence — banned libs grep-checked out of launcher/package.json.
+- [Phase 01-foundations]: 2026-04-20 — Display name locked as 'Wiiwho' (only first W capitalized) — applied project-wide via ModidTest.displayNameIsWiiwho assertion; MODID lowercase 'wiiwho' and package club.wiiwho unchanged
 
 ### Pending Todos
 
@@ -84,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T00:23:00.679Z
-Stopped at: Completed 01-03-PLAN.md (launcher scaffold + runtime-verified security)
+Last session: 2026-04-21T00:28:11.416Z
+Stopped at: Completed 01-01-PLAN.md (client-mod scaffold + MODID lock)
 Resume file: None
