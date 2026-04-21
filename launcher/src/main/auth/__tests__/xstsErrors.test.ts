@@ -92,6 +92,25 @@ describe('mapAuthError', () => {
       expect(r.helpUrl).toMatch(/minecraft\.net/)
     })
 
+    it('Mojang 403 "Invalid app registration" → pending-MCE-approval message', () => {
+      const r = mapAuthError(
+        new Error(
+          '403 Forbidden {\n  "path" : "/authentication/login_with_xbox",\n  "errorMessage" : "Invalid app registration, see https://aka.ms/AppRegInfo for more information"\n}'
+        )
+      )
+      expect(r.code).toBeNull()
+      expect(r.message).toBe(
+        'Waiting on Microsoft approval for Minecraft access. Try again after the approval email arrives.'
+      )
+      expect(r.helpUrl).toBe('https://aka.ms/AppRegInfo')
+    })
+
+    it('aka.ms/AppRegInfo URL alone (case-insensitive) → pending-MCE-approval message', () => {
+      const r = mapAuthError(new Error('some error mentioning AKA.MS/AppRegInfo in text'))
+      expect(r.message).toMatch(/Waiting on Microsoft approval/i)
+      expect(r.helpUrl).toBe('https://aka.ms/AppRegInfo')
+    })
+
     it('ENOTFOUND → network error view with null helpUrl', () => {
       const e = new Error('fetch failed') as NodeJS.ErrnoException
       e.code = 'ENOTFOUND'

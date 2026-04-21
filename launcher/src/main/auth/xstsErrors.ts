@@ -69,6 +69,20 @@ export function mapAuthError(err: unknown): AuthErrorView {
     }
   }
 
+  // Mojang rejects login_with_xbox with 403 + "Invalid app registration" while
+  // the Azure client ID is awaiting MCE (Minecraft API) approval. The body
+  // Mojang emits always includes the canonical `aka.ms/AppRegInfo` link.
+  // Happens pre-approval even when the upstream XBL/XSTS chain succeeds — so
+  // mapping must live AFTER the XSTS switch and the NO_MC_PROFILE branch.
+  if (/invalid app registration/i.test(raw) || /aka\.ms\/AppRegInfo/i.test(raw)) {
+    return {
+      code: null,
+      message:
+        'Waiting on Microsoft approval for Minecraft access. Try again after the approval email arrives.',
+      helpUrl: 'https://aka.ms/AppRegInfo'
+    }
+  }
+
   if (isNetworkError(err)) {
     return {
       code: null,

@@ -113,6 +113,13 @@ export class AuthManager {
         verificationUri: string
         expiresIn: number
       }
+      // MSAL Node (observed in @azure/msal-node 2.16.3) invokes this callback
+      // with an empty object when /devicecode returns an error body — it
+      // destructures missing snake_case fields and passes the result through
+      // before the polling loop throws. Skip the send so the renderer never
+      // mounts a modal with undefined fields; the subsequent login() rejection
+      // still surfaces an ErrorBanner via the normal error path.
+      if (!r.userCode || !r.verificationUri) return
       win.webContents.send('auth:device-code', {
         userCode: r.userCode,
         verificationUri: r.verificationUri,
