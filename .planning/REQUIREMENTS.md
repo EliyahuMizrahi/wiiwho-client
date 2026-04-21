@@ -21,7 +21,7 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 - [ ] **AUTH-01**: User can log in with a Microsoft account via MSAL device code flow from inside the launcher
 - [ ] **AUTH-02**: Launcher completes the full Microsoft → Xbox Live → XSTS → Minecraft access token chain and validates game ownership
 - [x] **AUTH-03**: Launcher translates common XSTS/auth error codes into readable messages (e.g. "no Xbox account", "under-18 without parental linkage", "banned from Xbox Live")
-- [ ] **AUTH-04**: User's refresh token is stored in the OS keychain (Electron safeStorage), never in plaintext JSON
+- [x] **AUTH-04**: User's refresh token is stored in the OS keychain (Electron safeStorage), never in plaintext JSON
 - [ ] **AUTH-05**: User's Minecraft username + UUID are displayed in the launcher after login
 - [ ] **AUTH-06**: User can log out, which clears the stored refresh token and returns to the login screen
 
@@ -167,7 +167,7 @@ Which phases cover which requirements.
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Complete |
-| AUTH-04 | Phase 2 | Pending |
+| AUTH-04 | Phase 2 | Complete |
 | AUTH-05 | Phase 2 | Pending |
 | AUTH-06 | Phase 2 | Pending |
 | LCH-01 | Phase 3 | Pending |
