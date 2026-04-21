@@ -71,7 +71,7 @@ app.whenReady().then(() => {
   })
 
   registerAuthHandlers(() => mainWindowRef)
-  registerGameHandlers()
+  registerGameHandlers(() => mainWindowRef)
   registerSettingsHandlers()
   registerSecurityHandlers()
 
