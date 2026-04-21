@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 03-06-log-parser-crash-watch-PLAN.md
-last_updated: "2026-04-21T09:11:13.064Z"
+stopped_at: Completed 03-08-renderer-game-and-crash-PLAN.md
+last_updated: "2026-04-21T09:14:16.843Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 25
-  completed_plans: 16
+  completed_plans: 17
   percent: 0
 ---
 
@@ -68,6 +68,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-vanilla-launch-jre-bundling-packaging P05-spawn-e2e | 12min | 2 tasks | 3 files |
 | Phase 03 P02 | 10min | 2 tasks | 5 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P06 | 12min | 2 tasks | 4 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P08 | 15min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,8 @@ Recent decisions affecting current work:
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: spawn.ts: execa 9.x wrapper; JRE-03 invariant enforced inline (belt-and-braces); non-zero exit returned via {exitCode}, not thrown; _JAVA_OPTIONS=undefined to block env heap-override
 - [Phase 03]: Settings persistence: plain JSON + atomic temp+rename at <userData>/settings.json. Clamp ramMb to [1024,4096] in 512 MiB steps at BOTH IPC and store layers (defense in depth). Unknown schema version → DEFAULTS; partial-invalid field → per-field fallback preserving valid siblings. wiiwho.d.ts tightened from Record<string,unknown> to SettingsV1 in Plan 03-02 (non-breaking; unblocks Plans 03-07/03-10).
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-06: MAIN_MENU_PATTERN uses loose [.*?/INFO]: prefix per RESEARCH verbatim — matches Sound Library Loader path AND any silent-fallback variants. 30s fallback timer fires onMainMenu({reason:timeout}) so launcher never hangs on undetected boot. Crash watch uses String(filename) not typeof-narrow (TS2339 workaround); missing crashDir resolves null so orchestrator can pair with ring-buffer-tail fallback. readCrashReport returns RAW UTF-8 — single-sanitizer invariant (D-21) enforced at IPC boundary.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-08: D-21 invariant enforced by TWO tests — runtime identity (writeText arg === <pre>.textContent) + source-grep regression guard (no scrub/sanitize/redact imports in CrashViewer.tsx). Belt-and-suspenders pairing — either alone could be defeated by a clever future edit.
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-08: useGameStore keeps IPC unsubs + exitFallbackTimer as module-level state (outside Zustand reactive state) to avoid stale Timeout references on strict-mode double-mount. Local GameAPIExtensions type augment in game.ts (deletable when Plan 03-09's wiiwho.d.ts update lands) lets this plan compile standalone.
 
 ### Pending Todos
 
@@ -119,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:11:13.061Z
-Stopped at: Completed 03-06-log-parser-crash-watch-PLAN.md
+Last session: 2026-04-21T09:14:14.925Z
+Stopped at: Completed 03-08-renderer-game-and-crash-PLAN.md
 Resume file: None
