@@ -17,6 +17,13 @@ const mockWin = {
 
 // Mock Authflow. Each test sets mockAuthflow to a factory that returns
 // the behavior the test wants.
+//
+// Plan 03-09 note: Phase 2's tests only used { profile }. Phase 3 adds
+// getMinecraftToken() which reads both `token` and `profile` from the
+// same getMinecraftJavaToken result. The factory return is widened to
+// optionally include `token` — existing Phase 2 tests that don't supply
+// it still work (AuthManager.loginWithDeviceCode / trySilentRefresh only
+// read `profile`).
 type MockAuthflowFactory = (args: {
   codeCallback?: (resp: {
     userCode: string
@@ -25,6 +32,7 @@ type MockAuthflowFactory = (args: {
   }) => void
 }) => {
   getMinecraftJavaToken: (opts: unknown) => Promise<{
+    token?: string
     profile: { id: string; name: string } | null
   }>
 }
@@ -306,3 +314,158 @@ describe('AuthManager.getStatus + singleton', () => {
     expect(getAuthManager()).toBe(getAuthManager())
   })
 })
+
+// ============================================================================
+// Phase 3 Plan 03-09 — AuthManager.getMinecraftToken()
+//
+// Phase 2 ↔ Phase 3 seam (LCH-06). Returns { accessToken, username, uuid } —
+// the fields Plan 03-10's orchestrator hands to args.ts → spawnGame. Reuses
+// the same trySilentRefresh code path (Authflow without codeCallback), but
+// returns the `token` field that trySilentRefresh discards.
+// ============================================================================
+
+describe('AuthManager.getMinecraftToken', () => {
+  it('happy path: logged-in returns {accessToken, username, uuid} from cached profile', async () => {
+    // Seed authStore so Authflow path is reached.
+    await fs.writeFile(
+      path.join(tmpUserData, 'auth.bin'),
+      JSON.stringify({
+        version: 1,
+        activeAccountId: 'uuid32',
+        accounts: [
+          { id: 'uuid32', username: 'TestUser', lastUsed: '2026-04-21T00:00:00Z' }
+        ]
+      })
+    )
+    mockAuthflow = () => ({
+      getMinecraftJavaToken: async () => ({
+        token: 'opaque-mc-token-abc123',
+        profile: { id: 'uuid32', name: 'TestUser' }
+      })
+    })
+
+    const res = await getAuthManager().getMinecraftToken()
+    expect(res.accessToken).toBe('opaque-mc-token-abc123')
+    expect(res.accessToken.length).toBeGreaterThan(0)
+    expect(res.username).toBe('TestUser')
+    expect(res.uuid).toBe('uuid32')
+  })
+
+  it('logged-out (no authStore) throws — orchestrator maps to "please log in again"', async () => {
+    // No auth.bin seeded; default store has activeAccountId=null, accounts=[].
+    await expect(getAuthManager().getMinecraftToken()).rejects.toThrow(/not logged in/i)
+  })
+
+  it('refreshes silently: no codeCallback is invoked (no device-code emission)', async () => {
+    await fs.writeFile(
+      path.join(tmpUserData, 'auth.bin'),
+      JSON.stringify({
+        version: 1,
+        activeAccountId: 'uuid32',
+        accounts: [
+          { id: 'uuid32', username: 'TestUser', lastUsed: '2026-04-21T00:00:00Z' }
+        ]
+      })
+    )
+    let capturedCallback:
+      | ((resp: { userCode: string; verificationUri: string; expiresIn: number }) => void)
+      | undefined
+    mockAuthflow = ({ codeCallback }) => {
+      capturedCallback = codeCallback
+      return {
+        getMinecraftJavaToken: async () => ({
+          token: 'tok',
+          profile: { id: 'uuid32', name: 'TestUser' }
+        })
+      }
+    }
+
+    await getAuthManager().getMinecraftToken()
+    // Silent-refresh contract: no codeCallback was passed to Authflow.
+    expect(capturedCallback).toBeUndefined()
+    // And no device-code push event went to the renderer.
+    expect(sendCalls).toHaveLength(0)
+  })
+
+  it('log-redaction: the raw token never appears as a substring in AuthManager source lines that call log.*', async () => {
+    // Structural regression guard — make sure AuthManager never passes the
+    // raw accessToken into an electron-log call. We do the static-source
+    // check instead of monkey-patching `log` because the redactor would
+    // scrub it at runtime anyway; what we actually care about is that the
+    // raw token value is never handed to a log method in the first place
+    // (defense in depth on top of redact.ts).
+    const src = await fs.readFile(
+      path.resolve(__dirname, '..', 'AuthManager.ts'),
+      'utf8'
+    )
+    // Must not log the token directly. Regex catches common shapes:
+    //   log.info(... token ...)
+    //   log.debug(... accessToken ...)
+    //   log.warn(... result.token ...)
+    // We allow comments that mention `token` for documentation; the check
+    // is that no `log.<level>(...)` call text contains `token` or
+    // `accessToken`.
+    const logCalls = src.match(/log\.(info|warn|error|debug|verbose|silly)\([^)]*\)/g) || []
+    for (const call of logCalls) {
+      expect(call).not.toMatch(/\btoken\b|\baccessToken\b/i)
+    }
+  })
+
+  it('two sequential calls both succeed and return identical tokens (prismarine-auth caches)', async () => {
+    await fs.writeFile(
+      path.join(tmpUserData, 'auth.bin'),
+      JSON.stringify({
+        version: 1,
+        activeAccountId: 'uuid32',
+        accounts: [
+          { id: 'uuid32', username: 'TestUser', lastUsed: '2026-04-21T00:00:00Z' }
+        ]
+      })
+    )
+    // prismarine-auth caches internally; our fake returns the same value
+    // on every call to simulate that behavior.
+    mockAuthflow = () => ({
+      getMinecraftJavaToken: async () => ({
+        token: 'stable-cached-mc-token',
+        profile: { id: 'uuid32', name: 'TestUser' }
+      })
+    })
+
+    const mgr = getAuthManager()
+    const a = await mgr.getMinecraftToken()
+    const b = await mgr.getMinecraftToken()
+    expect(a.accessToken).toBe(b.accessToken)
+    expect(a.username).toBe(b.username)
+    expect(a.uuid).toBe(b.uuid)
+  })
+
+  it('profile missing on result → throws "Minecraft profile missing — re-login required"', async () => {
+    await fs.writeFile(
+      path.join(tmpUserData, 'auth.bin'),
+      JSON.stringify({
+        version: 1,
+        activeAccountId: 'uuid32',
+        accounts: [
+          { id: 'uuid32', username: 'TestUser', lastUsed: '2026-04-21T00:00:00Z' }
+        ]
+      })
+    )
+    mockAuthflow = () => ({
+      getMinecraftJavaToken: async () => ({
+        token: 'tok',
+        profile: null
+      })
+    })
+    await expect(getAuthManager().getMinecraftToken()).rejects.toThrow(
+      /profile missing/i
+    )
+  })
+
+  it('safeStorage unavailable → throws keychain error', async () => {
+    encryptionAvailable = false
+    await expect(getAuthManager().getMinecraftToken()).rejects.toThrow(
+      /keychain/i
+    )
+  })
+})
+
