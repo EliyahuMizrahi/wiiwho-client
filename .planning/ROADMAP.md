@@ -72,7 +72,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Running `electron-builder` on Windows produces an NSIS installer; running on macOS produces a DMG/ZIP — both bundle the Eclipse Temurin 8 JRE and the initial WiiWho mod jar; the bundled JRE (not any system Java) is the one that spawns
   5. All downloaded 1.8.9 libraries and the vanilla client jar are SHA1-verified against the Mojang `client.json` manifest; corrupting a cached jar and relaunching causes re-download, not a silent launch with broken files
 **Plans**: 13 plans
-  - [ ] 03-00-phase-infrastructure-PLAN.md — Install @xmcl/core + @xmcl/installer + execa + p-queue; add shadcn Sheet/Slider/Tooltip; create fixtures; gitignore resources/
+  - [x] 03-00-phase-infrastructure-PLAN.md — Install @xmcl/core + @xmcl/installer + execa + p-queue; add shadcn Sheet/Slider/Tooltip; create fixtures; gitignore resources/
   - [x] 03-01-paths-and-redaction-PLAN.md — paths.ts (JRE-03 resolver) + redact.ts D-20 extension with sanitizeCrashReport export (COMP-05)
   - [ ] 03-02-settings-store-PLAN.md — settings/store.ts schema v1 + ipc/settings.ts backed by store (LAUN-03, LAUN-04)
   - [ ] 03-03-manifest-libraries-assets-PLAN.md — launch/{manifest,libraries,assets}.ts @xmcl/installer wrappers (LCH-01, LCH-02, LCH-03, SC5)

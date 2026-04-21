@@ -11,9 +11,9 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 
 - [x] **LAUN-01**: User can open the WiiWho launcher as a packaged desktop app (Electron)
 - [x] **LAUN-02**: Launcher renders a React UI with a visible "Play" button as the primary action
-- [ ] **LAUN-03**: User can adjust allocated RAM (JVM heap) via a slider before launch, within a sane min/max range
+- [x] **LAUN-03**: User can adjust allocated RAM (JVM heap) via a slider before launch, within a sane min/max range
 - [ ] **LAUN-04**: User's RAM setting persists across launcher restarts
-- [ ] **LAUN-05**: When a launched game process crashes, the launcher surfaces the crash log in a viewer inside the launcher UI (no hunting through files)
+- [x] **LAUN-05**: When a launched game process crashes, the launcher surfaces the crash log in a viewer inside the launcher UI (no hunting through files)
 - [x] **LAUN-06**: Launcher follows Electron security best practices (contextIsolation on, nodeIntegration off, sandbox, preload bridge for IPC)
 
 ### Authentication
@@ -27,13 +27,13 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 
 ### Launch Flow
 
-- [ ] **LCH-01**: On first launch, launcher downloads vanilla Minecraft 1.8.9 client jar from the Mojang version manifest and verifies its SHA1 against the manifest
-- [ ] **LCH-02**: Launcher downloads and verifies all 1.8.9 libraries and the asset index against the Mojang manifest
-- [ ] **LCH-03**: Downloaded jars and libraries are cached locally and reused on subsequent launches (no redundant downloads)
+- [x] **LCH-01**: On first launch, launcher downloads vanilla Minecraft 1.8.9 client jar from the Mojang version manifest and verifies its SHA1 against the manifest
+- [x] **LCH-02**: Launcher downloads and verifies all 1.8.9 libraries and the asset index against the Mojang manifest
+- [x] **LCH-03**: Downloaded jars and libraries are cached locally and reused on subsequent launches (no redundant downloads)
 - [ ] **LCH-04**: Launcher injects the WiiWho Forge mod into the classpath / mods directory before launch
-- [ ] **LCH-05**: Launcher spawns the bundled Java 8 JVM with the correct classpath, tweakClass chain, user-selected heap size, auth tokens, and game args; Minecraft 1.8.9 window opens to the main menu
+- [x] **LCH-05**: Launcher spawns the bundled Java 8 JVM with the correct classpath, tweakClass chain, user-selected heap size, auth tokens, and game args; Minecraft 1.8.9 window opens to the main menu
 - [ ] **LCH-06**: User reaches the Minecraft main menu logged in with their real Microsoft account (no offline mode)
-- [ ] **LCH-07**: Launcher captures the JVM process stdout/stderr and displays relevant lines during launch for troubleshooting
+- [x] **LCH-07**: Launcher captures the JVM process stdout/stderr and displays relevant lines during launch for troubleshooting
 
 ### JRE Bundling
 
@@ -160,9 +160,9 @@ Which phases cover which requirements.
 |-------------|-------|--------|
 | LAUN-01 | Phase 1 | Complete |
 | LAUN-02 | Phase 1 | Complete |
-| LAUN-03 | Phase 3 | Pending |
+| LAUN-03 | Phase 3 | Complete |
 | LAUN-04 | Phase 3 | Pending |
-| LAUN-05 | Phase 3 | Pending |
+| LAUN-05 | Phase 3 | Complete |
 | LAUN-06 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Complete |
 | AUTH-02 | Phase 2 | Complete |
@@ -170,13 +170,13 @@ Which phases cover which requirements.
 | AUTH-04 | Phase 2 | Complete |
 | AUTH-05 | Phase 2 | Complete |
 | AUTH-06 | Phase 2 | Complete |
-| LCH-01 | Phase 3 | Pending |
-| LCH-02 | Phase 3 | Pending |
-| LCH-03 | Phase 3 | Pending |
+| LCH-01 | Phase 3 | Complete |
+| LCH-02 | Phase 3 | Complete |
+| LCH-03 | Phase 3 | Complete |
 | LCH-04 | Phase 4 | Pending |
-| LCH-05 | Phase 3 | Pending |
+| LCH-05 | Phase 3 | Complete |
 | LCH-06 | Phase 3 | Pending |
-| LCH-07 | Phase 3 | Pending |
+| LCH-07 | Phase 3 | Complete |
 | JRE-01 | Phase 3 | Pending |
 | JRE-02 | Phase 3 | Pending |
 | JRE-03 | Phase 3 | Complete |

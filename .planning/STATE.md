@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 03-01-paths-and-redaction (parallel Wave 1)
-last_updated: "2026-04-21T09:01:06.943Z"
+stopped_at: Completed 03-00-phase-infrastructure-PLAN.md
+last_updated: "2026-04-21T09:02:00.342Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 25
-  completed_plans: 12
+  completed_plans: 13
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 03 (vanilla-launch-jre-bundling-packaging) — EXECUTING
-Plan: 2 of 13
+Plan: 3 of 13
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -64,6 +64,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-microsoft-authentication P04 | 7min | 3 tasks | 8 files |
 | Phase 02-microsoft-authentication P05 | 8min | 3 tasks | 10 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P01 | 5m | 2 tasks | 4 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P00 | 6 min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,7 @@ Recent decisions affecting current work:
 - [Phase 02-microsoft-authentication]: Plan 02-05: Radix-in-jsdom testing pattern locked — userEvent.setup() + async user.click for any Radix primitive that uses pointer capture (DropdownMenu, Popover, ContextMenu, Select, Tooltip). fireEvent.click remains correct for non-Radix Buttons and for <img onError>. Element.prototype.hasPointerCapture / releasePointerCapture / scrollIntoView stubs via structural cast (as unknown as {...}) at the top of any test file that imports Radix primitives. window.open(url,_blank,noopener) is the correct renderer-side external-url path in Electron 41 with sandbox+contextIsolation — system browser is the default handler, confirmed during manual QA.
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-01: paths.ts exports 7 platform-branched resolvers (Data/Settings/Game/CrashReports/Jre/JavaBinary/ModJar); JRE-03 + Pitfall 7 (javaw.exe) enforced by test
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-01: redact.ts adds 6 D-20 patterns + sanitizeCrashReport export — single scrub() pipeline drives both electron-log hook AND crash viewer (D-21)
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-00: p-queue resolved to 9.1.2 (plan specified ^8.x; 9.x has semver-compatible add/concurrency/onIdle/onEmpty API for library-download concurrency-ceiling use). Shadcn Sheet/Slider/Tooltip land from new-york-v4 registry verbatim — registry JSONs already use unified radix-ui import convention matching existing dialog.tsx, zero import rewrites. Fixtures co-located under __fixtures__/ adjacent to consuming module (launch/__fixtures__ for manifest, monitor/__fixtures__ for boot log + crash report). Gitignore rules at repo-root .gitignore (not launcher/.gitignore) so JRE/mod resource dirs are blocked regardless of which cwd scripts run from. Wave-1 parallel executor observation: typecheck:node transiently errors from 03-01's RED-phase paths.test.ts until 03-01's GREEN commit lands — out of 03-00 scope per deviation Rule scope boundary.
 
 ### Pending Todos
 
@@ -111,6 +113,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:00:56.336Z
-Stopped at: Completed 03-01-paths-and-redaction (parallel Wave 1)
+Last session: 2026-04-21T09:02:00.339Z
+Stopped at: Completed 03-00-phase-infrastructure-PLAN.md
 Resume file: None
