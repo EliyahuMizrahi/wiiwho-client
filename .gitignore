@@ -26,3 +26,9 @@ Thumbs.db
 
 # Local GSD helper scripts
 .planning/scripts/
+
+# Phase 3: Temurin/Azul JRE binaries fetched at build time — NEVER commit.
+launcher/resources/jre/
+# Phase 3: Wiiwho mod jar built from client-mod at build time — NEVER commit.
+launcher/resources/mod/
+

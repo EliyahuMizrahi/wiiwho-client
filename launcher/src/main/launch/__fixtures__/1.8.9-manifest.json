@@ -1,0 +1,65 @@
+{
+  "id": "1.8.9",
+  "type": "release",
+  "mainClass": "net.minecraft.client.main.Main",
+  "minimumLauncherVersion": 14,
+  "minecraftArguments": "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userProperties ${user_properties} --userType ${user_type}",
+  "assetIndex": {
+    "id": "1.8",
+    "sha1": "f6ad102bcaa53b1a58358f16e376d548d44933ec",
+    "size": 78494,
+    "totalSize": 114885064,
+    "url": "https://launchermeta.mojang.com/v1/packages/f6ad102bcaa53b1a58358f16e376d548d44933ec/1.8.json"
+  },
+  "javaVersion": { "component": "jre-legacy", "majorVersion": 8 },
+  "downloads": {
+    "client": {
+      "sha1": "3870888a6c3d349d3771a3e9d16c9bf5e076b908",
+      "size": 8461484,
+      "url": "https://launcher.mojang.com/v1/objects/3870888a6c3d349d3771a3e9d16c9bf5e076b908/client.jar"
+    }
+  },
+  "libraries": [
+    {
+      "name": "org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209",
+      "downloads": {
+        "classifiers": {
+          "natives-osx": {
+            "sha1": "bcab850f8f487c3f4c4dbabde778bb82bd1a40ed",
+            "size": 426822,
+            "url": "https://libraries.minecraft.net/org/lwjgl/lwjgl/lwjgl-platform/2.9.4-nightly-20150209/lwjgl-platform-2.9.4-nightly-20150209-natives-osx.jar"
+          },
+          "natives-windows": {
+            "sha1": "b84d5102b9dbfabfeb5e43c7e2828d98a7fc80e0",
+            "size": 613748,
+            "url": "https://libraries.minecraft.net/org/lwjgl/lwjgl/lwjgl-platform/2.9.4-nightly-20150209/lwjgl-platform-2.9.4-nightly-20150209-natives-windows.jar"
+          }
+        }
+      },
+      "extract": { "exclude": ["META-INF/"] },
+      "natives": { "osx": "natives-osx", "windows": "natives-windows" },
+      "rules": [{ "action": "allow" }]
+    },
+    {
+      "name": "com.paulscode:codecjorbis:20101023",
+      "downloads": {
+        "artifact": {
+          "sha1": "c293f4b13eb2e9cfd6d0a0e339afc96a02cfa2f2",
+          "size": 99298,
+          "url": "https://libraries.minecraft.net/com/paulscode/codecjorbis/20101023/codecjorbis-20101023.jar"
+        }
+      }
+    },
+    {
+      "_comment": "Fixture: library with INTENTIONALLY-BAD SHA1 for re-download-on-corruption test (SC5).",
+      "name": "fixture.bad:bad-sha1:1.0",
+      "downloads": {
+        "artifact": {
+          "sha1": "0000000000000000000000000000000000000000",
+          "size": 123,
+          "url": "https://fixture.example.com/bad-sha1.jar"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+---- Minecraft Crash Report ----
+// I let you down. Sorry :(
+
+Time: 4/21/26 3:04 PM
+Description: Unexpected error
+
+java.lang.NullPointerException: Cannot invoke "net.minecraft.client.entity.EntityPlayerSP.getName()" because the return value of "net.minecraft.client.Minecraft.getPlayer()" is null
+    at net.minecraft.client.Minecraft.runTick(Minecraft.java:1657)
+
+-- System Details --
+Details:
+    Minecraft Version: 1.8.9
+    Operating System: Windows 11 (amd64) version 10.0
+    Java Version: 1.8.0_482, Temurin
+    Launched Version: 1.8.9
+    Launched command: javaw -Xmx2048M -Xms2048M -XX:+UseG1GC -cp "C:\Users\Alice\AppData\Roaming\Wiiwho\game\libraries\...;C:\Users\Alice\AppData\Roaming\Wiiwho\game\versions\1.8.9\1.8.9.jar" net.minecraft.client.main.Main --username Wiiwho --accessToken ey.fakeTokenBody123.secretsig --userType msa
+    Game files at: /Users/bob/Library/Application Support/Wiiwho/game
+    User home: %USERNAME% and also $USER and $HOME references
