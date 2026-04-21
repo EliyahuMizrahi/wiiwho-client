@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed 03-09-preload-auth-surface-PLAN.md
-last_updated: "2026-04-21T09:27:34.001Z"
+stopped_at: Completed 03-10-orchestrator-logs-app-PLAN.md
+last_updated: "2026-04-21T09:48:25.864Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 25
-  completed_plans: 21
+  completed_plans: 22
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 03 (vanilla-launch-jre-bundling-packaging) — EXECUTING
-Plan: 4 of 13
+Plan: 5 of 13
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -73,6 +73,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-vanilla-launch-jre-bundling-packaging P03 | 10 min | 3 tasks | 7 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P07 | 11min | 3 tasks | 6 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P09 | ~3m | 2 tasks | 4 files |
+| Phase 03-vanilla-launch-jre-bundling-packaging P10 | 17min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,9 @@ Recent decisions affecting current work:
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: Plan 03-07: useSettingsStore mirrors main-side clamp via readSetResponse defensive parse (boundary-cast survives Phase-1 stub wiiwho.d.ts shape until 03-09 narrows). RamSlider component-scoped TooltipProvider avoids forcing upstream provider. SettingsDrawer fully controlled (open+onOpenChange); all three D-02 gestures flow through onOpenChange. Test-harness gaps: ResizeObserver jsdom stub added to pointer-capture trio (required for Radix Slider under jsdom 25). Shadcn Slider does NOT forward aria-label to Thumb — accessible-name test uses visible <label htmlFor> + root aria-label via [data-slot='slider'] querySelector. Radix Tooltip duplicates content (visible portal + sr-only announcer) — use findAllByText. Escape-dismiss test needs userEvent + dialog.focus (DismissableLayer registers in useEffect; handler only fires when layer is topmost after registration cycle flushes).
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-09 D-11 extension: new IPC surface members (game.onLog/onExited/onCrashed, logs.openCrashFolder/listCrashReports) live UNDER existing top-level keys. Channel count 13→18; 5 top-level keys unchanged.
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-09 LCH-06 seam: AuthManager.getMinecraftToken() returns {accessToken, username, uuid}. Reuses silent-refresh Authflow (no codeCallback); throws on logged-out/missing-profile/unavailable-keychain. Raw token never enters log pipeline (static-source guard on top of redact.ts).
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Orchestrator emits 'downloading' BEFORE fetchAndCacheManifest runs so Cancel covers the manifest fetch too (D-13 widened)
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Dropped 'failed' phase emit from main orchestrator — renderer's 6s fallback timer is the single trigger (avoids race)
+- [Phase 03-vanilla-launch-jre-bundling-packaging]: Established vi.hoisted() mock-bag pattern for all TypeScript vitest tests with vi.mock() factories
 
 ### Pending Todos
 
@@ -135,6 +139,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:27:15.282Z
-Stopped at: Completed 03-09-preload-auth-surface-PLAN.md
+Last session: 2026-04-21T09:48:25.861Z
+Stopped at: Completed 03-10-orchestrator-logs-app-PLAN.md
 Resume file: None
