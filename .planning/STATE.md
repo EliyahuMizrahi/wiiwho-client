@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-04-21T02:19:32.750Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-21T03:37:56.445Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 12
+  completed_plans: 7
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20)
 
 **Core value:** A single-click path from "open launcher" to "in a 1.8.9 game that runs faster than Optifine and has the HUD I want" — all without tripping PvP server anticheats.
-**Current focus:** Phase 01 — foundations
+**Current focus:** Phase 02 — microsoft-authentication
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
+Phase: 02 (microsoft-authentication) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -57,6 +57,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundations P01 | 30min | 2 tasks | 16 files |
 | Phase 01-foundations P04 | 2 min | 2 tasks | 2 files |
 | Phase 01-foundations P02 | 45 min | 2 tasks | 4 files |
+| Phase 02-microsoft-authentication P01 | 5min | 2 tasks | 4 files |
+| Phase 02 P02 | 5min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -80,6 +82,9 @@ Recent decisions affecting current work:
 - [Phase 01-foundations]: 2026-04-20 — Azure AD app registered (Plan 01-04 Task 1). Application (client) ID: `60cbce02-072b-4963-833d-edb6f5badc2a`. Tenant ID displayed in portal: `91755ebc-8602-4281-970c-7be9bdfc35d7` (recorded as-displayed; Phase 2 uses `/consumers` authority string regardless per D-15). Audience: Personal Microsoft accounts only (consumers). Redirect URI: `https://login.microsoftonline.com/common/oauth2/nativeclient`. Public client flows: enabled. API permissions: User.Read (default — `XboxLive.signin` requested at runtime via OAuth scope, NOT in portal). Owner contact: `eliyahu6666@outlook.com`. Associated website: `https://github.com/EliyahuMizrahi/wiiwho-client`. MCE form submitted: 2026-04-20 via https://aka.ms/mce-reviewappid (MCE review form submitted). Microsoft review queue expected: 1-7 days (2026-04-21 to 2026-04-27). Client ID is non-secret per D-18 (public client / device code flow — no client secret exists). Phase 2 auth flow blocks on MCE approval email.
 - [Phase 01-foundations]: 2026-04-20 — Azure AD app 'Wiiwho Client' registered (Plan 01-04). Client ID 60cbce02-072b-4963-833d-edb6f5badc2a (non-secret per D-18), tenant consumers (D-15). MCE form submitted 2026-04-20; review queue running (expected 2026-04-21 to 2026-04-27). Phase 2 auth execute blocks on approval email. docs/azure-app-registration.md is the maintainer reference.
 - [Phase 01-foundations]: 2026-04-20 — Plan 01-02 Task 2 verified end-to-end on Windows. `./gradlew runClient` logs in via DevAuth browser OAuth (redirect to 127.0.0.1:3000, NOT device-code flow), launches Minecraft 1.8.9 with real MS username "Wiiwho", `[Wiiwho] Mixin hello - Minecraft.startGame hooked` fires (em-dash mojibake'd to CP1252 byte 0x97 in log — line presence is what matters), 4 mods load (mcp, FML, Forge, wiiwho). BONUS: connected to geo.minemen.club NA Practice lobby (runs Vanicheat/custom anticheat) and chatted publicly as Wiiwho (`Wiiwho: yo`, `Wiiwho: wsg gang`) without being kicked — `@Inject HEAD Minecraft.startGame` hook validated anticheat-safe on a real PvP server. DevAuth token cache persisted at `%USERPROFILE%\.devauth\microsoft_accounts.json`. Full MS OAuth chain (oauth→xbl→xsts→session) proven viable for Phase 2 MSAL implementation.
+- [Phase 02-microsoft-authentication]: Plan 02-01: Rule 1 regex fix — broadened refresh_token/access_token patterns to match JSON-quoted form (research regex missed "refresh_token":"val" shape). Also ordered MC_ACCESS_PATTERN before JWT_PATTERN so nested accessToken JWT bodies redact to the cleaner "accessToken": "[REDACTED]" envelope.
+- [Phase 02-microsoft-authentication]: Plan 02-01: AuthManager / future auth IPC handlers must call installRedactor() once at app.whenReady() before any log.* calls. Enforced as a convention; redactor is idempotent so multiple calls are safe.
+- [Phase 02]: Plan 02-02: Option B chosen for token storage — non-secret auth.bin pointer + prismarine-auth encrypted per-cache-name files under userData/auth/<username>/*.bin. AUTH-04 structurally enforced (safeStorage fail-closed; pointer regex-rejects /token|secret|refresh/i keys at write boundary). 24 tests pass.
 
 ### Pending Todos
 
@@ -91,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T02:19:32.739Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-microsoft-authentication/02-UI-SPEC.md
+Last session: 2026-04-21T03:37:56.441Z
+Stopped at: Completed 02-02-PLAN.md
+Resume file: None

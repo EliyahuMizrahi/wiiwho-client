@@ -53,8 +53,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User can click "Log out" and return to the login screen; re-login works
 **Plans**: 7 plans
   - [ ] 02-00-PLAN.md — Install deps (@azure/msal-node, prismarine-auth, electron-log), add shadcn Dialog+DropdownMenu, vitest config for dual main/renderer envs, MANUAL-QA-auth.md skeleton (infrastructure)
-  - [ ] 02-01-PLAN.md — xstsErrors.ts code-based XSTS error mapper + redact.ts electron-log hook for JWT/token scrubbing (AUTH-03 foundation)
-  - [ ] 02-02-PLAN.md — safeStorageCache.ts prismarine-auth cache factory (encrypt+atomic-write) + authStore.ts non-secret D-16 pointer file (AUTH-04)
+  - [x] 02-01-PLAN.md — xstsErrors.ts code-based XSTS error mapper + redact.ts electron-log hook for JWT/token scrubbing (AUTH-03 foundation)
+  - [x] 02-02-PLAN.md — safeStorageCache.ts prismarine-auth cache factory (encrypt+atomic-write) + authStore.ts non-secret D-16 pointer file (AUTH-04)
   - [ ] 02-03-PLAN.md — AuthManager orchestrator (login/cancel/silent-refresh/logout) + IPC handler bodies + main bootstrap (redactor install, silent refresh gate) (AUTH-01, AUTH-02, AUTH-05, AUTH-06)
   - [ ] 02-04-PLAN.md — Zustand auth store + LoginScreen + LoadingScreen + ErrorBanner + App.tsx state-switch + font-bold→font-semibold migration (AUTH-01, AUTH-03, AUTH-05)
   - [ ] 02-05-PLAN.md — DeviceCodeModal + AccountBadge + useSkinHead hook + onDeviceCode subscription wiring (AUTH-01, AUTH-05, AUTH-06)
