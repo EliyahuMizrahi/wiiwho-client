@@ -79,7 +79,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 03-04-natives-and-args-PLAN.md — launch/natives.ts + launch/args.ts canonical vanilla 1.8.9 argv (LCH-05, LCH-06, Pitfalls 2+8)
   - [x] 03-05-spawn-e2e-PLAN.md — launch/spawn.ts execa wrapper + e2e dummy-java integration (LCH-05, LCH-07, JRE-03)
   - [x] 03-06-log-parser-crash-watch-PLAN.md — monitor/logParser + crashReport (LCH-05, LCH-07, LAUN-05, D-16, D-17)
-  - [ ] 03-07-renderer-settings-PLAN.md — stores/settings + RamSlider + SettingsDrawer (LAUN-03, LAUN-04, D-01, D-02, D-04, D-05, D-07)
+  - [x] 03-07-renderer-settings-PLAN.md — stores/settings + RamSlider + SettingsDrawer (LAUN-03, LAUN-04, D-01, D-02, D-04, D-05, D-07)
   - [x] 03-08-renderer-game-and-crash-PLAN.md — stores/game + PlayButton + CrashViewer (LCH-05, LCH-07, LAUN-05, COMP-05 D-21)
   - [ ] 03-09-preload-auth-surface-PLAN.md — preload bridge extension (game.onLog/onExited/onCrashed + logs.openCrashFolder/listCrashReports) + AuthManager.getMinecraftToken (LCH-06)
   - [ ] 03-10-orchestrator-logs-app-PLAN.md — ipc/game orchestrator + ipc/logs + App.tsx wiring (LCH-01/02/03/05/06/07, LAUN-05, COMP-05)
