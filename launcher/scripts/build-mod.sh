@@ -21,6 +21,20 @@ echo "[build-mod] mod dir:     $MOD_DIR"
 echo "[build-mod] version:     $MOD_VERSION"
 echo "[build-mod] dest:        $JAR_DEST"
 
+# Skip if the destination jar already exists and is newer than the mod source.
+# Matches prefetch-jre.mjs's skip-if-populated pattern — keeps Windows users
+# without JDK 17 unblocked when a prior build already staged the jar.
+# Force rebuild with:  WIIWHO_FORCE_BUILD_MOD=1 pnpm --filter ./launcher run build-mod
+if [[ -f "$JAR_DEST" && "${WIIWHO_FORCE_BUILD_MOD:-}" != "1" ]]; then
+  NEWEST_SRC=$(find "$MOD_DIR/src" "$MOD_DIR/build.gradle.kts" "$MOD_DIR/settings.gradle.kts" -type f -newer "$JAR_DEST" 2>/dev/null | head -1 || true)
+  if [[ -z "$NEWEST_SRC" ]]; then
+    echo "[build-mod] SKIP: $JAR_DEST already exists and no mod source is newer"
+    echo "[build-mod]       (set WIIWHO_FORCE_BUILD_MOD=1 to force rebuild)"
+    exit 0
+  fi
+  echo "[build-mod] source changed since last build ($NEWEST_SRC); rebuilding"
+fi
+
 cd "$MOD_DIR"
 
 # Heal CRLF line endings on gradlew if Git autocrlf mangled them on clone.
