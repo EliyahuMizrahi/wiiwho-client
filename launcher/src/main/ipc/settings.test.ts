@@ -142,16 +142,16 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
     expect(res.settings.firstRunSeen).toBe(false)
   })
 
-  it('Test 7: logs:read-crash stub is NOT modified (Plan 03-10 owns that)', async () => {
-    // Static source check — guards against accidental edits to the stub body.
+  it('Test 7: logs:read-crash is NO LONGER registered by settings.ts (Plan 03-10 moved it to ipc/logs.ts)', async () => {
+    // Static source check — confirm the stub handler has been deleted from this file.
     const src = readFileSync(path.join(__dirname, 'settings.ts'), 'utf8')
-    expect(src).toMatch(/logs:read-crash/)
-    expect(src).toMatch(/sanitizedBody:\s*['"]{2}/)
+    // No ipcMain.handle call for logs:read-crash should remain in settings.ts.
+    expect(src).not.toMatch(/ipcMain\.handle\(\s*['"]logs:read-crash['"]/)
 
-    // Runtime check — the handler still registers and returns the stub payload.
+    // Runtime check — after registerSettingsHandlers(), no handler is bound
+    // to the 'logs:read-crash' channel (it's owned by ipc/logs.ts now).
     await register()
-    const r = await handlers.get('logs:read-crash')?.({} as unknown)
-    expect(r).toEqual({ sanitizedBody: '' })
+    expect(handlers.has('logs:read-crash')).toBe(false)
   })
 
   it('Test 8: settings:set with undefined/null patch is tolerated (defensive)', async () => {

@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerAuthHandlers } from './ipc/auth'
 import { registerGameHandlers } from './ipc/game'
 import { registerSettingsHandlers } from './ipc/settings'
+import { registerLogsHandlers } from './ipc/logs'
 import { registerSecurityHandlers, setAuditedPrefs } from './ipc/security'
 import { installRedactor } from './auth/redact'
 import { getAuthManager } from './auth/AuthManager'
@@ -73,6 +74,7 @@ app.whenReady().then(() => {
   registerAuthHandlers(() => mainWindowRef)
   registerGameHandlers(() => mainWindowRef)
   registerSettingsHandlers()
+  registerLogsHandlers()
   registerSecurityHandlers()
 
   createWindow()

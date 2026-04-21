@@ -6,12 +6,14 @@
  *   settings.get() → Promise<SettingsV1>
  *   settings.set(patch) → Promise<{ ok: boolean, settings: SettingsV1 }>
  *
- * logs:read-crash remains a stub here — Plan 03-10 replaces its body with
- * the sanitizeCrashReport-backed implementation. DO NOT TOUCH that handler
- * in this plan.
+ * logs:read-crash USED to live here as a Phase 1 stub. Plan 03-10 moves
+ * the real handler into ipc/logs.ts (sanitizeCrashReport-backed) so the
+ * settings module owns `settings:*` exclusively and logs.ts owns `logs:*`.
+ * See ipc/logs.ts for the replacement.
  *
  * Sources:
  *   .planning/phases/03-vanilla-launch-jre-bundling-packaging/03-02-settings-store-PLAN.md
+ *   .planning/phases/03-vanilla-launch-jre-bundling-packaging/03-10-orchestrator-logs-app-PLAN.md
  * Requirements: LAUN-03 (RAM clamp), LAUN-04 (persists across restarts).
  */
 
@@ -55,12 +57,10 @@ export function registerSettingsHandlers(): void {
     }
   )
 
-  // Phase 1 stub — leave untouched. Plan 03-10 replaces this body with the
-  // sanitizeCrashReport-backed implementation.
-  ipcMain.handle('logs:read-crash', async () => {
-    console.log('[wiiwho] logs:read-crash (stub)')
-    return { sanitizedBody: '' }
-  })
+  // NOTE: logs:read-crash used to be registered here as a Phase 1 stub.
+  // Plan 03-10 moved the real handler into ipc/logs.ts. Do NOT re-add a
+  // handler here — duplicate ipcMain.handle calls for the same channel
+  // throw at registration time.
 }
 
 /**
