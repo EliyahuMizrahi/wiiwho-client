@@ -17,12 +17,12 @@ A single-click path from "open launcher" to "in a 1.8.9 game that runs faster th
 - [x] Bundled Java 8 JRE (no user-side install required) for Windows — validated in Phase 3; macOS pending PKG-02 human verification (requires Mac build machine)
 - [x] RAM allocation control in launcher (JVM heap slider) — validated in Phase 3 (LAUN-03, LAUN-04)
 - [x] Crash log viewer — validated in Phase 3 (LAUN-05, COMP-05); redaction pipeline pinned via D-21 single-sanitizer invariant
-- [x] Vanilla-side of one-click launch — validated in Phase 3 (launcher downloads/verifies vanilla 1.8.9 jar, spawns bundled JVM, reaches main menu sentinel). Forge injection deferred to Phase 4.
+- [x] Vanilla-side of one-click launch — validated in Phase 3 (launcher downloads/verifies vanilla 1.8.9 jar, spawns bundled JVM, reaches main menu sentinel). Forge injection deferred to Phase 5.
 - [x] Windows packaging via electron-builder (NSIS) — configuration validated in Phase 3 (PKG-01); final `.exe` pending Windows Developer Mode toggle (environmental, not code)
 
 ### Active
 
-- [ ] One-click launch flow — full path with Forge mod injected (vanilla-side done Phase 3; Forge injection is Phase 4)
+- [ ] One-click launch flow — full path with Forge mod injected (vanilla-side done Phase 3; Forge injection is Phase 5)
 - [ ] macOS packaging via electron-builder (DMG) — config complete in Phase 3; awaiting Mac build machine
 - [ ] Forge 1.8.9 mod as the in-game module (MCP mappings, Mixin for patches Forge events can't cover)
 - [ ] FPS counter HUD mod — togglable, anticheat-safe

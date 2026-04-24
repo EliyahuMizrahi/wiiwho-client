@@ -2,7 +2,7 @@
 
 ## Overview
 
-Seven phases from "two greenfield toolchains" to "v0.1 shipped to a small group." Phase 1 validates the two highest-risk unknowns in parallel — the Forge 1.8.9 build system and the Electron security scaffold — while the Azure AD app registration (1-7 day Microsoft review queue) starts as an external dependency on day one. Phases 2-3 build the launcher end-to-end against a real Microsoft account and a real 1.8.9 game window. Phase 4 integrates Forge, establishes the HUD framework, and proves all three v0.1 HUDs are anticheat-safe on live servers. Phase 5 proves the cosmetics rendering path with a placeholder cape. Phase 6 is the only differentiator — beats-Optifine performance, gated behind a committed benchmark methodology. Phase 7 is the non-negotiable release gate.
+Eight phases from "two greenfield toolchains" to "v0.1 shipped to a small group." Phase 1 validates the two highest-risk unknowns in parallel — the Forge 1.8.9 build system and the Electron security scaffold — while the Azure AD app registration (1-7 day Microsoft review queue) starts as an external dependency on day one. Phases 2-3 build the launcher end-to-end against a real Microsoft account and a real 1.8.9 game window. Phase 4 transforms the functional launcher into a polished, themeable, animated experience with Spotify integration — no ads or social bloat. Phase 5 integrates Forge, establishes the HUD framework, and proves all three v0.1 HUDs are anticheat-safe on live servers. Phase 6 proves the cosmetics rendering path with a placeholder cape. Phase 7 is the only differentiator — beats-Optifine performance, gated behind a committed benchmark methodology. Phase 8 is the non-negotiable release gate.
 
 ## External Dependency
 
@@ -19,10 +19,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Foundations** - Legal/anticheat/brand policy baseline, Forge+Mixin mod scaffold, Electron launcher skeleton with locked-down IPC; Azure AD app submitted
 - [ ] **Phase 2: Microsoft Authentication** - Full MS → XBL → XSTS → Minecraft token chain with OS-keychain storage and translated error codes
 - [ ] **Phase 3: Vanilla Launch, JRE Bundling & Packaging** - Download/verify 1.8.9, spawn bundled Java 8 JVM, reach main menu with real MS account; RAM slider, crash viewer, Windows+macOS installers
-- [ ] **Phase 4: Forge Integration, HUD Framework & HUDs** - Forge + our mod injected on launch; HudModule framework; FPS/Keystrokes/CPS HUDs shipped anticheat-safe on Hypixel + BlocksMC
-- [ ] **Phase 5: Cosmetics Pipeline (Placeholder Cape)** - End-to-end cosmetic rendering proven with one baked-in cape keyed to our UUID
-- [ ] **Phase 6: Performance (Beats Optifine)** - Committed benchmark methodology, baseline measurement vs Optifine+Patcher, optimization passes hitting p95/p99 targets
-- [ ] **Phase 7: v0.1 Release Hardening** - Full looks-done-but-isn't verification gate; clean-machine install on Windows + macOS; small-group distribution
+- [ ] **Phase 4: Launcher UI Polish** - Themeable color schemes, smooth animations, redesigned main surface, Spotify launcher integration; no ads, no news, no social counters
+- [ ] **Phase 5: Forge Integration, HUD Framework & HUDs** - Forge + our mod injected on launch; HudModule framework; FPS/Keystrokes/CPS HUDs shipped anticheat-safe on Hypixel + BlocksMC
+- [ ] **Phase 6: Cosmetics Pipeline (Placeholder Cape)** - End-to-end cosmetic rendering proven with one baked-in cape keyed to our UUID
+- [ ] **Phase 7: Performance (Beats Optifine)** - Committed benchmark methodology, baseline measurement vs Optifine+Patcher, optimization passes hitting p95/p99 targets
+- [ ] **Phase 8: v0.1 Release Hardening** - Full looks-done-but-isn't verification gate; clean-machine install on Windows + macOS; small-group distribution
 
 ## Phase Details
 
@@ -87,9 +88,22 @@ Decimal phases appear between their surrounding integers in numeric order.
   - [x] 03-12-macos-dmg-PLAN.md — macOS Universal DMG smoke (autonomous: false — requires Mac access) (JRE-02, PKG-02)
 **UI hint**: yes
 
-### Phase 4: Forge Integration, HUD Framework & HUDs
-**Goal**: Forge 1.8.9 is installed by the launcher; our mod jar is injected from the packaged installer; the HudModule framework supports FPS, Keystrokes, and CPS HUDs in-game; every feature is verified anticheat-safe on live Hypixel + BlocksMC with a throwaway MS account.
-**Depends on**: Phase 3 (vanilla launch works end-to-end)
+### Phase 4: Launcher UI Polish
+**Goal**: Transform the functional v0.1 launcher (login → play → settings drawer) into a polished, themeable, animated experience that feels better than Lunar Client — minus the social/marketing bloat. User can pick their accent color (not locked to blue), every interaction has smooth motion, and Spotify is integrated as a launcher-side mini-player. No ads, no news feed, no concurrent-user counter, no friends list.
+**Depends on**: Phase 3 (a functional launcher UI exists to polish)
+**Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07
+**Success Criteria** (what must be TRUE):
+  1. User picks an accent color from at least 3 presets or enters a custom hex; choice applies across the launcher (buttons, focus rings, highlights) and persists across restarts. Dark/light mode toggle also persists.
+  2. All view transitions, modal open/close, button hovers, and loading states use consistent motion (documented timing curves + durations); no janky or instant state-swap remains for primary interactions.
+  3. Main launcher surface uses sidebar navigation with sections at minimum: Play, Settings, Account, Cosmetics (placeholder allowed). Primary CTA is Play. No ads, news feeds, online-user counts, friends list, or marketing content anywhere in the UI — verified against a written exclusion checklist.
+  4. User can connect a Spotify account via OAuth (Spotify Web API); when connected, launcher displays an embedded mini-player showing current song, album art, and play/pause/skip controls. Disconnection or offline state degrades gracefully (no crash, no error modal spam).
+  5. Design system is documented in code (design tokens for color, spacing, typography, motion) and in `docs/DESIGN-SYSTEM.md` with rationale and usage examples. If Figma MCP is configured, asset/icon provenance is documented in the same file.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 5: Forge Integration, HUD Framework & HUDs
+**Goal**: Forge 1.8.9 is installed by the launcher; our mod jar is injected from the packaged installer; the HudModule framework supports FPS, Keystrokes, and CPS HUDs in-game; every feature is verified anticheat-safe on live Hypixel + BlocksMC with a throwaway MS account. Optional stretch: Spotify in-game HUD (record + keybinds) if Phase 4's launcher Spotify flow is solid.
+**Depends on**: Phase 3 (vanilla launch works end-to-end); Phase 4 not a hard dependency (parallel-safe)
 **Requirements**: LCH-04, MOD-05, MOD-06, HUD-01, HUD-02, HUD-03, HUD-04, COMP-01, COMP-02, COMP-03
 **Success Criteria** (what must be TRUE):
   1. After clicking Play, the Minecraft log shows our mod loaded via Forge + Mixin (FMLTweaker + MixinTweaker both registered); `./gradlew build` produces the releasable mod jar that the launcher injects into `mods/`
@@ -100,9 +114,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 5: Cosmetics Pipeline (Placeholder Cape)
+### Phase 6: Cosmetics Pipeline (Placeholder Cape)
 **Goal**: Prove the cosmetics rendering pipeline end-to-end with one baked-in placeholder cape keyed to the user's Minecraft UUID — the art is a placeholder; the pipeline is real and ready for v0.3 backend integration.
-**Depends on**: Phase 4 (mod loads, Mixin framework active)
+**Depends on**: Phase 5 (mod loads, Mixin framework active)
 **Requirements**: COSM-01, COSM-02
 **Success Criteria** (what must be TRUE):
   1. One placeholder cape (original art or documented CC0, provenance recorded in `docs/asset-provenance.md`) is bundled inside the WiiWho mod jar as a client-side resource
@@ -111,9 +125,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Plans**: TBD
 
-### Phase 6: Performance (Beats Optifine)
+### Phase 7: Performance (Beats Optifine)
 **Goal**: Deliver the only v0.1 differentiator — measurably beat Optifine (and ideally Optifine+Patcher) on a published, reproducible benchmark. Methodology committed BEFORE any optimization.
-**Depends on**: Phase 5 (full mod stack, HUDs + cosmetics, in place so we measure against a realistic baseline)
+**Depends on**: Phase 6 (full mod stack, HUDs + cosmetics, in place so we measure against a realistic baseline)
 **Requirements**: PERF-01, PERF-02, PERF-03
 **Success Criteria** (what must be TRUE):
   1. `benchmarks/reference-scene.md` is committed to the repo BEFORE the first optimization PR: documents reference world seed + spawn coords + render distance + sunrise lock + windowed/fullscreen + Vsync state + 60s warmup + 120s sample window + machine profile template
@@ -122,9 +136,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Plans**: TBD
 
-### Phase 7: v0.1 Release Hardening
+### Phase 8: v0.1 Release Hardening
 **Goal**: Verify every critical and moderate pitfall before distribution. This is a gate, not polish.
-**Depends on**: Phase 6
+**Depends on**: Phase 7
 **Requirements**: PKG-03
 **Success Criteria** (what must be TRUE):
   1. Clean-machine install test passes on both Windows (no Java, no Node, no prior Minecraft) and macOS (no Java, no Node, right-click-Open workaround documented with screenshots) — user logs in with MS, launches 1.8.9, reaches main menu
@@ -135,14 +149,15 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundations | 0/5 | Not started | - |
 | 2. Microsoft Authentication | 0/7 | Not started | - |
 | 3. Vanilla Launch, JRE Bundling & Packaging | 0/TBD | Not started | - |
-| 4. Forge Integration, HUD Framework & HUDs | 0/TBD | Not started | - |
-| 5. Cosmetics Pipeline (Placeholder Cape) | 0/TBD | Not started | - |
-| 6. Performance (Beats Optifine) | 0/TBD | Not started | - |
-| 7. v0.1 Release Hardening | 0/TBD | Not started | - |
+| 4. Launcher UI Polish | 0/TBD | Not started | - |
+| 5. Forge Integration, HUD Framework & HUDs | 0/TBD | Not started | - |
+| 6. Cosmetics Pipeline (Placeholder Cape) | 0/TBD | Not started | - |
+| 7. Performance (Beats Optifine) | 0/TBD | Not started | - |
+| 8. v0.1 Release Hardening | 0/TBD | Not started | - |

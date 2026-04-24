@@ -32,7 +32,7 @@
 1. Before a feature PR merges, author adds a row to **Feature Review Log** with pending verdict.
 2. Owner reviews the feature against Hypixel's published allowed-mods policy and BlocksMC's (ask in community if no written policy exists for BlocksMC), fills in verdict, signs (name + date).
 3. If verdict is FAIL on either server, the feature is redesigned or dropped. No "maybe ship it" row.
-4. Before each release, owner adds an alt-account play test row under the relevant server (Phase 4 establishes the throwaway-account tooling).
+4. Before each release, owner adds an alt-account play test row under the relevant server (Phase 5 establishes the throwaway-account tooling).
 
 ## Red Lines (never permitted — from PITFALLS.md §2 and FEATURES.md anti-features)
 

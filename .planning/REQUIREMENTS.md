@@ -16,6 +16,16 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 - [x] **LAUN-05**: When a launched game process crashes, the launcher surfaces the crash log in a viewer inside the launcher UI (no hunting through files)
 - [x] **LAUN-06**: Launcher follows Electron security best practices (contextIsolation on, nodeIntegration off, sandbox, preload bridge for IPC)
 
+### Launcher UI (Polish)
+
+- [ ] **UI-01**: User can pick a primary accent color (at least 3 presets + custom hex input); selected color is applied across the launcher (buttons, focus rings, highlights, active states) and persists across restarts
+- [ ] **UI-02**: User can toggle between dark and light modes; selection persists across restarts
+- [ ] **UI-03**: View transitions, modal open/close, button hovers, and loading/progress states use consistent animations with documented timing curves and durations (no instant or janky state swaps for primary interactions)
+- [ ] **UI-04**: Main launcher surface uses sidebar navigation with sections at minimum: Play, Settings, Account, Cosmetics (placeholder acceptable). Primary CTA is Play.
+- [ ] **UI-05**: Launcher does NOT display: ads, news feeds, concurrent-user counts, friends lists, or marketing content. Verified against a written exclusion checklist in `docs/DESIGN-SYSTEM.md`.
+- [ ] **UI-06**: User can connect a Spotify account via OAuth (Spotify Web API). When connected, launcher displays an embedded mini-player (current song, album art, play/pause/skip). Disconnection/offline state degrades gracefully (no crash, no error modal spam).
+- [ ] **UI-07**: Design system is documented — design tokens (color, spacing, typography, motion) live in code; `docs/DESIGN-SYSTEM.md` captures rationale, usage examples, and (if Figma MCP is configured) asset/icon provenance.
+
 ### Authentication
 
 - [x] **AUTH-01**: User can log in with a Microsoft account via MSAL device code flow from inside the launcher
@@ -173,7 +183,7 @@ Which phases cover which requirements.
 | LCH-01 | Phase 3 | Complete |
 | LCH-02 | Phase 3 | Complete |
 | LCH-03 | Phase 3 | Complete |
-| LCH-04 | Phase 4 | Pending |
+| LCH-04 | Phase 5 | Pending |
 | LCH-05 | Phase 3 | Complete |
 | LCH-06 | Phase 3 | Complete |
 | LCH-07 | Phase 3 | Complete |
@@ -184,40 +194,48 @@ Which phases cover which requirements.
 | MOD-02 | Phase 1 | Complete |
 | MOD-03 | Phase 1 | Complete |
 | MOD-04 | Phase 1 | Complete |
-| MOD-05 | Phase 4 | Pending |
-| MOD-06 | Phase 4 | Pending |
-| HUD-01 | Phase 4 | Pending |
-| HUD-02 | Phase 4 | Pending |
-| HUD-03 | Phase 4 | Pending |
-| HUD-04 | Phase 4 | Pending |
-| PERF-01 | Phase 6 | Pending |
-| PERF-02 | Phase 6 | Pending |
-| PERF-03 | Phase 6 | Pending |
-| COSM-01 | Phase 5 | Pending |
-| COSM-02 | Phase 5 | Pending |
+| MOD-05 | Phase 5 | Pending |
+| MOD-06 | Phase 5 | Pending |
+| HUD-01 | Phase 5 | Pending |
+| HUD-02 | Phase 5 | Pending |
+| HUD-03 | Phase 5 | Pending |
+| HUD-04 | Phase 5 | Pending |
+| UI-01 | Phase 4 | Pending |
+| UI-02 | Phase 4 | Pending |
+| UI-03 | Phase 4 | Pending |
+| UI-04 | Phase 4 | Pending |
+| UI-05 | Phase 4 | Pending |
+| UI-06 | Phase 4 | Pending |
+| UI-07 | Phase 4 | Pending |
+| PERF-01 | Phase 7 | Pending |
+| PERF-02 | Phase 7 | Pending |
+| PERF-03 | Phase 7 | Pending |
+| COSM-01 | Phase 6 | Pending |
+| COSM-02 | Phase 6 | Pending |
 | PKG-01 | Phase 3 | Complete |
 | PKG-02 | Phase 3 | Pending |
-| PKG-03 | Phase 7 | Pending |
-| COMP-01 | Phase 4 | Pending |
-| COMP-02 | Phase 4 | Pending |
-| COMP-03 | Phase 4 | Pending |
+| PKG-03 | Phase 8 | Pending |
+| COMP-01 | Phase 5 | Pending |
+| COMP-02 | Phase 5 | Pending |
+| COMP-03 | Phase 5 | Pending |
 | COMP-04 | Phase 1 | Complete |
 | COMP-05 | Phase 3 | Complete |
 
 **Coverage:**
-- v1 requirements: 45 total
-- Mapped to phases: 45 (100%)
+- v1 requirements: 52 total
+- Mapped to phases: 52 (100%)
 - Unmapped: 0
 
 **Per-phase distribution:**
 - Phase 1 (Foundations): 8 requirements — COMP-04, MOD-01, MOD-02, MOD-03, MOD-04, LAUN-01, LAUN-02, LAUN-06
 - Phase 2 (Microsoft Auth): 6 requirements — AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
 - Phase 3 (Vanilla Launch, JRE, Packaging): 15 requirements — LCH-01, LCH-02, LCH-03, LCH-05, LCH-06, LCH-07, JRE-01, JRE-02, JRE-03, PKG-01, PKG-02, LAUN-03, LAUN-04, LAUN-05, COMP-05
-- Phase 4 (Forge Integration, HUD Framework, HUDs): 10 requirements — LCH-04, MOD-05, MOD-06, HUD-01, HUD-02, HUD-03, HUD-04, COMP-01, COMP-02, COMP-03
-- Phase 5 (Cosmetics Pipeline): 2 requirements — COSM-01, COSM-02
-- Phase 6 (Performance): 3 requirements — PERF-01, PERF-02, PERF-03
-- Phase 7 (Release Hardening): 1 requirement — PKG-03
+- Phase 4 (Launcher UI Polish): 7 requirements — UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07
+- Phase 5 (Forge Integration, HUD Framework, HUDs): 10 requirements — LCH-04, MOD-05, MOD-06, HUD-01, HUD-02, HUD-03, HUD-04, COMP-01, COMP-02, COMP-03
+- Phase 6 (Cosmetics Pipeline): 2 requirements — COSM-01, COSM-02
+- Phase 7 (Performance): 3 requirements — PERF-01, PERF-02, PERF-03
+- Phase 8 (Release Hardening): 1 requirement — PKG-03
 
 ---
 *Requirements defined: 2026-04-20*
-*Last updated: 2026-04-20 after roadmap creation (traceability table populated)*
+*Last updated: 2026-04-23 — inserted Phase 4 "Launcher UI Polish" (UI-01..07); renumbered Forge/HUDs→5, Cosmetics→6, Performance→7, Release Hardening→8*
