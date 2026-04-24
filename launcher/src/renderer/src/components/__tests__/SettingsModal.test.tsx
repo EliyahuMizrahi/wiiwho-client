@@ -163,10 +163,10 @@ describe('SettingsModal', () => {
     expect(screen.getByTestId('account-pane')).toBeDefined()
   })
 
-  it('openPane="appearance" renders stub (replaced by Plan 04-04)', () => {
+  it('openPane="appearance" renders AppearancePane content (testid "appearance-pane")', () => {
     useSettingsStore.setState({ modalOpen: true, openPane: 'appearance' } as never)
     render(<SettingsModal />)
-    expect(screen.getByTestId('appearance-pane-stub')).toBeDefined()
+    expect(screen.getByTestId('appearance-pane')).toBeDefined()
   })
 
   it('openPane="spotify" renders stub (replaced by Plan 04-06)', () => {

@@ -28,6 +28,7 @@ import { EASE_EMPHASIZED } from '../theme/motion'
 import { SettingsSubSidebar } from './SettingsPanes/SettingsSubSidebar'
 import { GeneralPane } from './SettingsPanes/GeneralPane'
 import { AccountPane } from './SettingsPanes/AccountPane'
+import { AppearancePane } from './SettingsPanes/AppearancePane'
 import { AboutPane } from './SettingsPanes/AboutPane'
 
 export function SettingsModal(): React.JSX.Element {
@@ -84,11 +85,7 @@ export function SettingsModal(): React.JSX.Element {
 
                     {openPane === 'general' && <GeneralPane />}
                     {openPane === 'account' && <AccountPane />}
-                    {openPane === 'appearance' && (
-                      <div data-testid="appearance-pane-stub" className="text-neutral-500">
-                        Appearance (Plan 04-04)
-                      </div>
-                    )}
+                    {openPane === 'appearance' && <AppearancePane />}
                     {openPane === 'spotify' && (
                       <div data-testid="spotify-pane-stub" className="text-neutral-500">
                         Spotify (Plan 04-06)
