@@ -65,13 +65,13 @@ describe('spotify/config — Wave 0 constants', () => {
   it('SPOTIFY_REDIRECT_PORTS contains the dashboard-registered ports', () => {
     // These MUST match what the owner registered in the Spotify dashboard.
     // Editing this list without editing the dashboard breaks OAuth.
-    expect(SPOTIFY_REDIRECT_PORTS).toContain(53682)
-    expect(SPOTIFY_REDIRECT_PORTS).toContain(53681)
-    expect(SPOTIFY_REDIRECT_PORTS).toContain(53683)
+    expect(SPOTIFY_REDIRECT_PORTS).toContain(35891)
+    expect(SPOTIFY_REDIRECT_PORTS).toContain(35892)
+    expect(SPOTIFY_REDIRECT_PORTS).toContain(35893)
   })
 
-  it('buildRedirectUri(53682) returns http://127.0.0.1:53682/callback exactly', () => {
-    expect(buildRedirectUri(53682)).toBe('http://127.0.0.1:53682/callback')
+  it('buildRedirectUri(35891) returns http://127.0.0.1:35891/callback exactly', () => {
+    expect(buildRedirectUri(35891)).toBe('http://127.0.0.1:35891/callback')
   })
 
   it('buildRedirectUri produces a valid loopback URI for every registered port', () => {

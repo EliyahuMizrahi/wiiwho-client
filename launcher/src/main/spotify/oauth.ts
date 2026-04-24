@@ -72,13 +72,21 @@ export interface OneShotServer {
   close: () => void
 }
 
+// Bind errors we treat as "this port is unavailable, try the next one":
+//   EADDRINUSE     — another process is listening on the port
+//   EACCES         — Windows reserved block (Hyper-V/WSL) or insufficient perms
+//   EADDRNOTAVAIL  — address can't be assigned (rare on loopback but defensive)
+const FALLBACK_BIND_ERRORS = new Set(['EADDRINUSE', 'EACCES', 'EADDRNOTAVAIL'])
+
 /**
  * Attempt to bind a fresh HTTP server on one of SPOTIFY_REDIRECT_PORTS, in
- * order. On EADDRINUSE for a given port, fall through to the next. If all
- * three are occupied, reject with a `PORTS_BUSY` error — the IPC handler
- * surfaces this to the renderer as a user-friendly "Port conflict" CTA.
+ * order. On any per-port bind error in FALLBACK_BIND_ERRORS, fall through to
+ * the next. If all three are unavailable, reject with a `PORTS_BUSY` error —
+ * the IPC handler surfaces this to the renderer as a user-friendly
+ * "Port conflict" CTA.
  */
 async function bindWithFallback(): Promise<{ server: Server; port: number }> {
+  const lastErrors: string[] = []
   for (const port of SPOTIFY_REDIRECT_PORTS) {
     const server = createServer()
     try {
@@ -102,13 +110,14 @@ async function bindWithFallback(): Promise<{ server: Server; port: number }> {
       // Close the half-dead server and try the next port.
       server.close()
       const err = e as NodeJS.ErrnoException
-      if (err.code === 'EADDRINUSE') continue
+      lastErrors.push(`${port}:${err.code ?? 'UNKNOWN'}`)
+      if (FALLBACK_BIND_ERRORS.has(err.code ?? '')) continue
       // Unexpected bind error — don't keep trying, surface it.
       throw err
     }
   }
   throw new Error(
-    `PORTS_BUSY: all Spotify OAuth redirect ports (${SPOTIFY_REDIRECT_PORTS.join(', ')}) are in use`
+    `PORTS_BUSY: all Spotify OAuth redirect ports unavailable (${lastErrors.join(', ')})`
   )
 }
 

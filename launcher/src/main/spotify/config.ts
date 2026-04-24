@@ -48,8 +48,17 @@ export const SPOTIFY_SCOPES = [
  *
  * Adding/removing ports here REQUIRES a matching dashboard edit — the
  * /authorize redirect_uri must exactly match a registered URI.
+ *
+ * Port choice rationale: Windows' Hyper-V / WSL dynamically reserves contiguous
+ * blocks in the 49152-65535 ephemeral range (observed: 53313-54255 on the
+ * owner's dev box as of 2026-04-24 via `netsh interface ipv4 show
+ * excludedportrange protocol=tcp`). An earlier pick of 53681-53683 fell inside
+ * that block and failed with EACCES. 35891-35893 sits in the 32768-49151
+ * registered-port range, outside any Windows-reserved block, and is not a
+ * default port for common dev servers (3000/5173/8080/8888/9000). If binding
+ * still fails on a user's box, their own excludedportrange will show why.
  */
-export const SPOTIFY_REDIRECT_PORTS = [53682, 53681, 53683] as const
+export const SPOTIFY_REDIRECT_PORTS = [35891, 35892, 35893] as const
 
 /** Redirect path component. Port is selected from SPOTIFY_REDIRECT_PORTS at runtime. */
 export const SPOTIFY_REDIRECT_PATH = '/callback'

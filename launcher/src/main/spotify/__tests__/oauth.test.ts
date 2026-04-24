@@ -21,7 +21,7 @@ vi.mock('electron', () => ({
 
 // Mock config with deterministic values — we pin three real but deliberately-odd
 // ports so we can occupy them in tests without colliding with the dashboard-
-// registered production ports (53682/53681/53683).
+// registered production ports (35891/35892/35893).
 vi.mock('../config', () => ({
   SPOTIFY_CLIENT_ID: 'test-client-id-AAAAAAAA',
   SPOTIFY_AUTH_URL: 'https://accounts.spotify.com/authorize',
