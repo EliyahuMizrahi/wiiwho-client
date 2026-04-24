@@ -13,7 +13,8 @@
  * round-trips whatever main returns.
  *
  * The component provides its own TooltipProvider so it can be dropped into
- * any parent (e.g. SettingsDrawer) without demanding tooltip setup upstream.
+ * any parent (e.g. the Phase 4 SettingsModal General pane) without
+ * demanding tooltip setup upstream.
  */
 
 import type { JSX } from 'react'

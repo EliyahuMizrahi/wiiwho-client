@@ -10,7 +10,10 @@
  *     otherwise                          → Home (Play-forward)
  *
  * Home overlays (always mounted beneath Home, above nothing):
- *   - Gear icon (top-right) → opens SettingsDrawer (Radix Sheet, D-01)
+ *   - Gear icon (top-right) → opens Settings modal via setModalOpen(true).
+ *     Plan 04-02 deleted the Phase 3 SettingsDrawer; Plan 04-03 adds the
+ *     replacement SettingsModal and Plan 04-07 relocates the gear into
+ *     the Sidebar and deletes this temporary top-right trigger.
  *
  * On mount we:
  *   - initializeAuth() (Phase 2)
@@ -38,7 +41,6 @@ import { LoginScreen } from './components/LoginScreen'
 import { LoadingScreen } from './components/LoadingScreen'
 import { AccountBadge } from './components/AccountBadge'
 import { PlayButton } from './components/PlayButton'
-import { SettingsDrawer } from './components/SettingsDrawer'
 import { CrashViewer } from './components/CrashViewer'
 
 // Renderer-side security assertions — fire on page load. If the launcher's
@@ -66,8 +68,8 @@ function App(): React.JSX.Element {
   const resetGame = useGameStore((s) => s.resetToIdle)
   const playGame = useGameStore((s) => s.play)
   const initSettings = useSettingsStore((s) => s.initialize)
+  const setModalOpen = useSettingsStore((s) => s.setModalOpen)
   const [loadingHeld, setLoadingHeld] = useState(true)
-  const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {
     void initializeAuth()
@@ -145,7 +147,7 @@ function App(): React.JSX.Element {
         <button
           type="button"
           aria-label="Open settings"
-          onClick={() => setSettingsOpen(true)}
+          onClick={() => setModalOpen(true)}
           className="text-neutral-400 hover:text-neutral-200 p-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16e0ee]"
         >
           <SettingsIcon className="size-5" aria-hidden="true" />
@@ -158,20 +160,13 @@ function App(): React.JSX.Element {
         <PlayButton />
         <p className="text-xs font-normal text-neutral-500 mt-8">v0.1.0-dev</p>
       </div>
-
-      <SettingsDrawer
-        open={settingsOpen}
-        onOpenChange={setSettingsOpen}
-        onOpenLogs={() => {
-          // D-07: Logs sub-view deferred in v0.1; clicking the Logs entry
-          // reveals the crash-reports/ folder in Explorer/Finder via the
-          // frozen logs:open-crash-folder channel.
-          void window.wiiwho.logs.openCrashFolder()
-        }}
-        onOpenCrashes={() => {
-          void window.wiiwho.logs.openCrashFolder()
-        }}
-      />
+      {/*
+        The Phase 3 SettingsDrawer was removed in Plan 04-02 Task 3.
+        Plan 04-03 mounts <SettingsModal /> here (Radix Dialog centered),
+        bound to useSettingsStore.modalOpen + openPane. Plan 04-07 also
+        replaces this entire Home chrome with a Sidebar + MainArea layout,
+        at which point the gear button above migrates into the Sidebar.
+      */}
     </div>
   )
 }

@@ -5,13 +5,16 @@
  *
  * Covers the Phase 3 state-routing extensions:
  *   - Home screen renders with gear + AccountBadge top-right and PlayButton centered (Test 1)
- *   - Gear click opens SettingsDrawer (Test 2)
- *   - Drawer ESC closes (Test 3)
  *   - phase.state='crashed' → CrashViewer full-page takeover (Test 4)
  *   - Crash Close → resetToIdle → back to Home (Test 5)
  *   - Crash Play again → useGameStore.play() → game.play IPC invoked (Test 6)
  *   - App mount calls useGameStore.subscribe() once (Test 7)
  *   - App mount calls useSettingsStore.initialize() once (Test 8)
+ *
+ * Plan 04-02 Task 3 removed former Tests 2 and 3 (SettingsDrawer
+ * open/close) because Phase 4 deletes SettingsDrawer; Plan 04-03 adds
+ * its replacement SettingsModal and Plan 04-03's own test file covers
+ * that open/close flow.
  *
  * Mock strategy: use `window.wiiwho.*` mocks for the preload surface the
  * stores reach for on mount (auth.status, auth.onDeviceCode, settings.get,
@@ -22,7 +25,6 @@
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/vitest'
 
 // ---- jsdom shims (Radix + Dialog + Sheet) ----------------------------------
@@ -247,38 +249,20 @@ describe('App.tsx (Plan 03-10 Task 3)', () => {
     expect(screen.getByText('v0.1.0-dev')).toBeInTheDocument()
   })
 
-  it('Test 2: clicking the gear icon opens SettingsDrawer', async () => {
+  it('Test 2: clicking the gear icon calls useSettingsStore.setModalOpen(true)', async () => {
+    // Phase 4 replacement for the old "opens SettingsDrawer" test. The
+    // drawer is gone (Plan 04-02); the gear now calls setModalOpen(true)
+    // which Plan 04-03's SettingsModal binds to. We assert the store
+    // state rather than the DOM to decouple from 04-03's modal shape.
     render(<App />)
     await skipLoadingHold()
 
-    const gear = screen.getByRole('button', { name: /open settings/i })
-    // userEvent synthesizes the full pointer sequence Radix needs; but here
-    // the trigger is a plain <button>, so fireEvent.click works.
-    fireEvent.click(gear)
+    // Pre-condition: modal starts closed.
+    expect(useSettingsStore.getState().modalOpen).toBe(false)
 
-    // Drawer body renders with an accessible dialog role.
-    expect(await screen.findByRole('dialog', { name: /settings/i })).toBeInTheDocument()
-  })
+    fireEvent.click(screen.getByRole('button', { name: /open settings/i }))
 
-  it('Test 3: ESC while drawer is open closes it', async () => {
-    vi.useRealTimers() // user-event + Radix timers need real clock for cleanup
-    render(<App />)
-    // Use a manual wait since timers are real for this test.
-    await new Promise((r) => setTimeout(r, 400))
-
-    const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: /open settings/i }))
-
-    const dialog = await screen.findByRole('dialog', { name: /settings/i })
-    dialog.focus()
-    await user.keyboard('{Escape}')
-
-    // After ESC, the drawer should unmount (Radix Sheet unmounts on close).
-    await vi.waitFor(() => {
-      expect(screen.queryByRole('dialog', { name: /settings/i })).not.toBeInTheDocument()
-    })
-    // Home is still rendered.
-    expect(screen.getByRole('button', { name: /^play$/i })).toBeInTheDocument()
+    expect(useSettingsStore.getState().modalOpen).toBe(true)
   })
 
   it('Test 4: phase=crashed → full-page CrashViewer takeover (D-18)', async () => {

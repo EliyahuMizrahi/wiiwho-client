@@ -28,12 +28,17 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { useAuthStore } from '../stores/auth'
+import { useSettingsStore } from '../stores/settings'
 import { useSkinHead } from '../hooks/useSkinHead'
 
 export function AccountBadge(): React.JSX.Element | null {
   const username = useAuthStore((s) => s.username)
   const uuid = useAuthStore((s) => s.uuid)
   const logout = useAuthStore((s) => s.logout)
+  // Plan 04-02 D-06, D-11 — "Account settings" menu item deep-links into
+  // the Settings modal's Account pane. setOpenPane is atomic (Pitfall 8):
+  // one store update sets openPane='account' AND modalOpen=true.
+  const setOpenPane = useSettingsStore((s) => s.setOpenPane)
   const skin = useSkinHead(uuid, username)
 
   if (!username || !uuid) return null
@@ -82,6 +87,13 @@ export function AccountBadge(): React.JSX.Element | null {
             {uuid}
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-neutral-800" />
+        <DropdownMenuItem
+          onClick={() => setOpenPane('account')}
+          className="text-sm font-normal cursor-pointer"
+        >
+          Account settings
+        </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-neutral-800" />
         <DropdownMenuItem
           onClick={() => void logout()}

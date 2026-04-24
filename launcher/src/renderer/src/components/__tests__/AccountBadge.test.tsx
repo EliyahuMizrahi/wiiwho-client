@@ -64,6 +64,7 @@ const authApi: AuthAPI = {
 
 import { AccountBadge } from '../AccountBadge'
 import { useAuthStore } from '../../stores/auth'
+import { useSettingsStore } from '../../stores/settings'
 import { __test__ as skinTest } from '../../hooks/useSkinHead'
 
 function setLoggedIn(opts: { username?: string; uuid?: string } = {}): void {
@@ -82,6 +83,12 @@ describe('AccountBadge', () => {
     skinTest.resetFailed()
     authApi.logout.mockReset().mockResolvedValue({ ok: true })
     setLoggedIn()
+    // Reset settings modal state between tests (Plan 04-02 Task 3 adds
+    // an "Account settings" deep-link that sets openPane + modalOpen).
+    useSettingsStore.setState({
+      modalOpen: false,
+      openPane: 'general'
+    } as never)
   })
 
   afterEach(() => {
@@ -157,5 +164,33 @@ describe('AccountBadge', () => {
     })
     const { container } = render(<AccountBadge />)
     expect(container.firstChild).toBeNull()
+  })
+
+  // --- Plan 04-02 Task 3: "Account settings" deep-link (D-06, D-11) -----
+
+  it('renders "Account settings" menu item in the dropdown', async () => {
+    const user = userEvent.setup()
+    render(<AccountBadge />)
+    await user.click(
+      screen.getByRole('button', { name: /account menu for alice/i })
+    )
+    expect(
+      await screen.findByRole('menuitem', { name: /account settings/i })
+    ).toBeInTheDocument()
+  })
+
+  it('clicking "Account settings" calls setOpenPane("account") and opens the modal', async () => {
+    const user = userEvent.setup()
+    render(<AccountBadge />)
+    await user.click(
+      screen.getByRole('button', { name: /account menu for alice/i })
+    )
+    await user.click(
+      await screen.findByRole('menuitem', { name: /account settings/i })
+    )
+    // Pitfall 8 — setOpenPane is atomic: it selects the pane AND opens
+    // the modal in a single store update. Both must be true after click.
+    expect(useSettingsStore.getState().openPane).toBe('account')
+    expect(useSettingsStore.getState().modalOpen).toBe(true)
   })
 })
