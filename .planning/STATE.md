@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed Phase 04 Plan 00 (infrastructure) — motion dep + fonts + Spotify config + 12 Nyquist stubs
-last_updated: "2026-04-24T05:35:46.676Z"
+stopped_at: Completed Phase 04 Plan 01 (tokens-and-settings) — full @theme catalog + v1→v2 settings migration + useMotionConfig hook
+last_updated: "2026-04-24T05:53:00.054Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 33
-  completed_plans: 25
+  completed_plans: 26
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 04 (launcher-ui-polish) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-04-24
 
@@ -77,6 +77,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-vanilla-launch-jre-bundling-packaging P11 | 23min | 3 tasks | 8 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P12 | 5min (CHECKPOINT) | 0 tasks | 1 files |
 | Phase 04-launcher-ui-polish P00 | ~45min | 4 tasks | 19 files |
+| Phase 04-launcher-ui-polish P01-tokens-and-settings | 12min | 3 tasks tasks | 17 files files |
 
 ## Accumulated Context
 
@@ -139,6 +140,11 @@ Recent decisions affecting current work:
 - [Phase 04-launcher-ui-polish]: Plan 04-00: JetBrains Mono actual upstream license is SIL OFL 1.1 (not Apache 2.0 as plan assumed). Both bundled fonts ship verbatim OFL 1.1.
 - [Phase 04-launcher-ui-polish]: Plan 04-00: Spotify post-2025-11-27 OAuth rules require exact-match redirect URI with explicit port (not wildcards, not bare loopback). Owner registered 3 loopback ports [53682 primary, 53681 fallback1, 53683 fallback2]. config.ts exports SPOTIFY_REDIRECT_PORTS + buildRedirectUri(port) helper — Plan 04-05 must consume these, NOT a single SPOTIFY_REDIRECT_URI constant.
 - [Phase 04-launcher-ui-polish]: Plan 04-00: SPOTIFY_CLIENT_ID (1829b668...8d06) committed as plaintext in config.ts — PKCE public client, non-secret (matches Phase 2 D-18 Azure AD pattern).
+- [Phase 04-launcher-ui-polish]: Plan 04-01: RESEARCH retuned D-13 illustrative Red/Yellow/Gray presets to WCAG-verified Crimson/Amber/Slate (#f87171 / #fbbf24 / #cbd5e1) against #111111 bg. Documented in presets.ts JSDoc header for Plan 04-07 forward-reference.
+- [Phase 04-launcher-ui-polish]: Plan 04-01: writeSettings signature flipped from full-object SettingsV1 to Partial<SettingsPatch>. Main store owns merge+validate (clampRam + validAccent hex regex + validReduceMotion enum); IPC handler collapses to a single call; renderer sends narrow patches like {theme:{accent:'#ec4899'}}.
+- [Phase 04-launcher-ui-polish]: Plan 04-01: --color-wiiwho-accent token REMOVED from global.css (replaced by --color-accent with :root runtime override). button.tsx still references the old token — legacy cleanup intentionally deferred to Plan 04-07's integration pass. Button accent styling is a temporary no-op until 04-07.
+- [Phase 04-launcher-ui-polish]: Plan 04-01: setAccent applies :root CSS var BEFORE awaiting IPC for instant UI feedback. On IPC failure the :root remains at new colour until next initialize — UI-01 prioritises perceived responsiveness; persisted authority wins on next launch.
+- [Phase 04-launcher-ui-polish]: Plan 04-01: v1→v2 settings migration is read-time + in-memory only. readSettings() does NOT rewrite the on-disk v1 file; the next writeSettings call persists v2 atomically. Keeps readSettings idempotent — no surprise disk writes from a read.
 
 ### Pending Todos
 
@@ -152,6 +158,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T05:35:46.672Z
-Stopped at: Completed Phase 04 Plan 00 (infrastructure) — motion dep + fonts + Spotify config + 12 Nyquist stubs
+Last session: 2026-04-24T05:53:00.049Z
+Stopped at: Completed Phase 04 Plan 01 (tokens-and-settings) — full @theme catalog + v1→v2 settings migration + useMotionConfig hook
 Resume file: None
