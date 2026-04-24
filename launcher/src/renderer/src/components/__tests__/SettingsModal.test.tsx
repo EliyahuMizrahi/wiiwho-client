@@ -169,10 +169,10 @@ describe('SettingsModal', () => {
     expect(screen.getByTestId('appearance-pane')).toBeDefined()
   })
 
-  it('openPane="spotify" renders stub (replaced by Plan 04-06)', () => {
+  it('openPane="spotify" renders SpotifyPane (testid "spotify-pane")', () => {
     useSettingsStore.setState({ modalOpen: true, openPane: 'spotify' } as never)
     render(<SettingsModal />)
-    expect(screen.getByTestId('spotify-pane-stub')).toBeDefined()
+    expect(screen.getByTestId('spotify-pane')).toBeDefined()
   })
 
   it('sr-only Dialog.Title "Settings" is rendered for a11y', () => {

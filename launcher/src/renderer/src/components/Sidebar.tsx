@@ -30,6 +30,7 @@ import { Play, Shirt, Settings as SettingsIcon } from 'lucide-react'
 import { useActiveSectionStore, type ActiveSection } from '../stores/activeSection'
 import { useSettingsStore } from '../stores/settings'
 import { SPRING_STANDARD } from '../theme/motion'
+import { SpotifyMiniPlayer } from './SpotifyMiniPlayer'
 
 interface NavItem {
   id: ActiveSection
@@ -107,14 +108,13 @@ export function Sidebar(): React.JSX.Element {
       {/* Divider */}
       <div className="border-t border-wiiwho-border" />
 
-      {/* Spotify mini-player slot — real component wires in Plan 04-06.
-          Placeholder keeps layout height stable and provides a stable
-          data-testid for Plan 04-06's integration test. */}
-      <div
-        data-testid="spotify-slot"
-        className="h-20 px-3 flex items-center text-xs text-neutral-500"
-      >
-        Spotify
+      {/* Spotify mini-player slot (Plan 04-06).
+          Wrapper preserves data-testid="spotify-slot" so Plan 04-02's Sidebar
+          tests still pass; the real SpotifyMiniPlayer renders all 6 visual
+          states (disconnected / connecting / connected-idle / connected-playing
+          / offline / no-premium) against useSpotifyStore. */}
+      <div data-testid="spotify-slot">
+        <SpotifyMiniPlayer />
       </div>
 
       {/* Settings gear — bottom pinned */}
