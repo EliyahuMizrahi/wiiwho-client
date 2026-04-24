@@ -98,7 +98,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Main launcher surface uses sidebar navigation with sections at minimum: Play, Settings, Account, Cosmetics (placeholder allowed). Primary CTA is Play. No ads, news feeds, online-user counts, friends list, or marketing content anywhere in the UI — verified against a written exclusion checklist.
   4. User can connect a Spotify account via OAuth (Spotify Web API); when connected, launcher displays an embedded mini-player showing current song, album art, and play/pause/skip controls. Disconnection or offline state degrades gracefully (no crash, no error modal spam).
   5. Design system is documented in code (design tokens for color, spacing, typography, motion) and in `docs/DESIGN-SYSTEM.md` with rationale and usage examples. If Figma MCP is configured, asset/icon provenance is documented in the same file.
-**Plans**: TBD
+**Plans**: 8 plans
+  - [ ] 04-00-infrastructure-PLAN.md — Wave 0: install motion@^12.38.0, bundle Inter + JetBrains Mono fonts, register Spotify dev app (redirect http://127.0.0.1/callback — CORRECTS D-31), create spotify/config.ts + 12 test stubs (all UI reqs — scaffolding)
+  - [ ] 04-01-tokens-and-settings-PLAN.md — Wave 1: global.css @theme full token catalog (8 accent presets, 3 durations, 2 CSS easings, layout, typography) + settings.json v1→v2 migration (theme slice) + useMotionConfig hook + runtime setAccent helper (UI-01, UI-03, UI-07)
+  - [ ] 04-02-sidebar-and-main-area-PLAN.md — Wave 2: Sidebar (220px, motion layoutId pill glide) + MainArea/Play (gradient stub + PlayButton + wordmark + version) + MainArea/Cosmetics (Coming soon) + AccountBadge dropdown extension (Account settings deep-link) + delete SettingsDrawer.tsx (UI-03, UI-04, UI-05)
+  - [ ] 04-03-settings-modal-chrome-PLAN.md — Wave 3: SettingsModal bottom-slide (Radix Dialog + motion forceMount per Pitfall 4) + SettingsSubSidebar (layoutId subnav pill) + GeneralPane (RamSlider migrated) + AccountPane + AboutPane (UI-03, UI-04, UI-05)
+  - [ ] 04-04-theme-picker-appearance-PLAN.md — Wave 3: ThemePicker (8 presets + hex input + EyeDropper feature-probe) + AppearancePane (ThemePicker + Reduce motion select, System/On/Off) + slot into SettingsModal (UI-01, UI-03, UI-07)
+  - [ ] 04-05-spotify-main-process-PLAN.md — Wave 4: spotify/{config,tokenStore,oauth,api,spotifyManager}.ts + ipc/spotify.ts + safeStorage-encrypted spotify.bin + redact.ts Bearer-token extension + preload 6th-key deliberate deviation (Pitfall 10) + wiiwho.d.ts spotify surface — includes 401 refresh-once / 429 Retry-After / 403 PREMIUM_REQUIRED handling (UI-06)
+  - [ ] 04-06-spotify-renderer-ui-PLAN.md — Wave 5: useSpotifyStore (5-state machine + premiumRequired flag) + SpotifyMiniPlayer (6 visual states incl. Connect CTA / Connecting / Idle / Playing / Offline / No-Premium + album-art crossfade + context menu) + SpotifyPane + slot into Sidebar + SettingsModal (UI-06)
+  - [ ] 04-07-integration-and-docs-PLAN.md — Wave 6: App.tsx rewrite (sidebar + main-area router + modal + AnimatePresence route swap) + main/index.ts wires Spotify handlers + docs/DESIGN-SYSTEM.md (all D-36 sections + UI-05 Exclusion checklist verbatim) + scripts/check-docs.mjs extension + antiBloat.test.tsx repo-wide grep + human smoke UAT checkpoint (all UI reqs — final gate)
 **UI hint**: yes
 
 ### Phase 5: Forge Integration, HUD Framework & HUDs
@@ -156,7 +164,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Foundations | 0/5 | Not started | - |
 | 2. Microsoft Authentication | 0/7 | Not started | - |
 | 3. Vanilla Launch, JRE Bundling & Packaging | 0/TBD | Not started | - |
-| 4. Launcher UI Polish | 0/TBD | Not started | - |
+| 4. Launcher UI Polish | 0/8 | Not started | - |
 | 5. Forge Integration, HUD Framework & HUDs | 0/TBD | Not started | - |
 | 6. Cosmetics Pipeline (Placeholder Cape) | 0/TBD | Not started | - |
 | 7. Performance (Beats Optifine) | 0/TBD | Not started | - |
