@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed Phase 04 Plan 02 (sidebar-and-main-area) — Sidebar + MainArea/Play + MainArea/Cosmetics + AccountBadge extension + SettingsDrawer removed
-last_updated: "2026-04-24T06:06:07.865Z"
+stopped_at: Completed Phase 04 Plan 03 (settings-modal-chrome) — SettingsModal bottom-slide + SettingsSubSidebar + 3/5 panes real (General/Account/About); Appearance + Spotify remain testid stubs for Plans 04-04 + 04-06
+last_updated: "2026-04-24T06:18:58.207Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 33
-  completed_plans: 27
+  completed_plans: 28
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 04 (launcher-ui-polish) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 Status: Ready to execute
 Last activity: 2026-04-24
 
@@ -79,6 +79,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04-launcher-ui-polish P00 | ~45min | 4 tasks | 19 files |
 | Phase 04-launcher-ui-polish P01-tokens-and-settings | 12min | 3 tasks tasks | 17 files files |
 | Phase 04-launcher-ui-polish P02-sidebar-and-main-area | 7 min | 3 tasks tasks | 15 files files |
+| Phase 04-launcher-ui-polish P03-settings-modal-chrome | 6 min | 3 tasks tasks | 10 files files |
 
 ## Accumulated Context
 
@@ -151,6 +152,10 @@ Recent decisions affecting current work:
 - [Phase 04-launcher-ui-polish]: Plan 04-02: Cosmetics empty state ships zero interactive elements (D-05) — enforced by querySelectorAll('button|input|a|select').length === 0 test. Prevents accidental 'Notify me' or 'Browse' stubs regressing the 'honest empty state' intent.
 - [Phase 04-launcher-ui-polish]: Plan 04-02 [Rule 3 Blocking deviation]: Plan said 'do NOT rewrite App.tsx' but also required deleting SettingsDrawer.tsx (which App.tsx imports) while keeping the test suite green. Resolved with minimum diff: dropped dangling import + <SettingsDrawer> JSX, re-routed gear click to useSettingsStore.setModalOpen(true). Full App.tsx Home-chrome rewrite still deferred to Plan 04-07 as intended. Tests 2 + 3 in App.test.tsx simplified/removed accordingly.
 - [Phase 04-launcher-ui-polish]: Plan 04-02: AccountBadge setOpenPane('account') call is atomic — single Zustand set writes openPane='account' AND modalOpen=true together (Pitfall 8 two-step race avoidance). Same atomicity is the contract Plan 04-03's SettingsModal binds to on mount.
+- [Phase 04-launcher-ui-polish]: Plan 04-03: SettingsModal uses checker-verified canonical nesting — Portal UNCONDITIONALLY mounted with forceMount; AnimatePresence lives INSIDE Portal; {open && (...)} guard lives INSIDE AnimatePresence wrapping Overlay + Content only. Guarding Portal with {open && ...} silently defeats forceMount at runtime (React unmounts subtree before AnimatePresence can run exit animations) — corrected from RESEARCH illustrative snippet.
+- [Phase 04-launcher-ui-polish]: Plan 04-03: Imported 'Dialog as DialogPrimitive' from unified radix-ui v1.4.3 (not @radix-ui/react-dialog) — consistent with Phase 2 components/ui/dialog.tsx and 2026 shadcn unified-Radix convention. All Dialog.Root/Portal/Overlay/Content/Close/Title primitives resolve with forceMount+asChild unchanged.
+- [Phase 04-launcher-ui-polish]: Plan 04-03: AccountPane renders FULL UUID (break-all + font-mono, no truncation) while AccountBadge dropdown continues 8-char truncation. Asymmetry is intentional per D-10: modal is deep-context copy-target surface for admin/support; dropdown is hover-reveal optimised for compactness. Sign out stays instant (D-15 preservation from Phase 2) — no confirm dialog; same useAuthStore.logout binding as dropdown.
+- [Phase 04-launcher-ui-polish]: Plan 04-03 [Rule 3 auto-fix]: Added ResizeObserver stub to SettingsModal.test.tsx — default openPane='general' now mounts RamSlider via GeneralPane, which triggers Radix Slider's ResizeObserver on mount. Same stub pattern as Phase 3 RamSlider.test.tsx. 7 tests moved from failing to passing.
 
 ### Pending Todos
 
@@ -164,6 +169,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T06:05:51.488Z
-Stopped at: Completed Phase 04 Plan 02 (sidebar-and-main-area) — Sidebar + MainArea/Play + MainArea/Cosmetics + AccountBadge extension + SettingsDrawer removed
+Last session: 2026-04-24T06:18:39.252Z
+Stopped at: Completed Phase 04 Plan 03 (settings-modal-chrome) — SettingsModal bottom-slide + SettingsSubSidebar + 3/5 panes real (General/Account/About); Appearance + Spotify remain testid stubs for Plans 04-04 + 04-06
 Resume file: None
