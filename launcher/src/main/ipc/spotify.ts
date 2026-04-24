@@ -14,13 +14,14 @@
  *   spotify:control:next       → manager.next()
  *   spotify:control:previous   → manager.previous()
  *   spotify:set-visibility     → manager.setVisibility(arg)
+ *   spotify:open-app           → shell.openExternal('spotify://')
  *
  * Push events:
  *   spotify:status-changed     ← forwarded from manager 'status-changed' event
  */
 
 import type { BrowserWindow } from 'electron'
-import { ipcMain } from 'electron'
+import { ipcMain, shell } from 'electron'
 import log from 'electron-log/main'
 import { getSpotifyManager } from '../spotify/spotifyManager'
 
@@ -43,6 +44,18 @@ export function registerSpotifyHandlers(
       return { ok: true }
     }
   )
+  ipcMain.handle('spotify:open-app', async () => {
+    // Hand the spotify:// URL to the OS. Going through shell.openExternal
+    // avoids Electron's default window.open handler, which would otherwise
+    // spawn a blank BrowserWindow alongside the Spotify app.
+    try {
+      await shell.openExternal('spotify://')
+      return { ok: true }
+    } catch (e) {
+      log.warn('[spotify] openExternal(spotify://) failed', e)
+      return { ok: false }
+    }
+  })
 
   // Forward manager status-changed events to the renderer. Null window is
   // a normal transient state (mac dock close/reopen) — swallow quietly.

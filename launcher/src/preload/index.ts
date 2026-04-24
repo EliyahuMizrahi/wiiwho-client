@@ -95,6 +95,7 @@ contextBridge.exposeInMainWorld('wiiwho', {
     },
     setVisibility: (v: 'focused' | 'backgrounded') =>
       ipcRenderer.invoke('spotify:set-visibility', v),
+    openApp: () => ipcRenderer.invoke('spotify:open-app'),
     onStatusChanged: (cb: (s: unknown) => void): Unsubscribe => {
       const h = (_: unknown, s: unknown): void => cb(s)
       ipcRenderer.on('spotify:status-changed', h)

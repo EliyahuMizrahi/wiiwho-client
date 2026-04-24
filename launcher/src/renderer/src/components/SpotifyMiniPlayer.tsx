@@ -273,15 +273,16 @@ function ContextMenuTrigger(props: ContextMenuTriggerProps): React.JSX.Element {
         <MoreVertical className="size-4" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-neutral-900 border-neutral-800">
-        <DropdownMenuItem asChild>
-          <a
-            href="spotify://"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cursor-pointer"
-          >
-            Open Spotify app
-          </a>
+        <DropdownMenuItem
+          onClick={() => {
+            // Going through the preload bridge → shell.openExternal avoids
+            // Electron's default window.open handler spawning a blank
+            // BrowserWindow alongside the Spotify app.
+            void window.wiiwho.spotify.openApp()
+          }}
+          className="cursor-pointer"
+        >
+          Open Spotify app
         </DropdownMenuItem>
         <DropdownMenuItem onClick={props.onDisconnect} className="cursor-pointer">
           Disconnect

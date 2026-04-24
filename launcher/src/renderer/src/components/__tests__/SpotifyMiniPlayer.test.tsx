@@ -70,8 +70,33 @@ const playMock = vi.fn().mockResolvedValue(undefined)
 const pauseMock = vi.fn().mockResolvedValue(undefined)
 const nextMock = vi.fn().mockResolvedValue(undefined)
 const previousMock = vi.fn().mockResolvedValue(undefined)
+const openAppMock = vi.fn().mockResolvedValue({ ok: true })
 
 beforeEach(() => {
+  // Minimum preload-bridge stub so the "Open Spotify app" onClick can call
+  // window.wiiwho.spotify.openApp() without throwing. Shape only matters for
+  // what the tests in this file touch.
+  ;(globalThis as unknown as { window: { wiiwho: unknown } }).window.wiiwho = {
+    auth: {},
+    game: {},
+    logs: {},
+    settings: {},
+    __debug: {},
+    spotify: {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      status: vi.fn(),
+      control: {
+        play: vi.fn(),
+        pause: vi.fn(),
+        next: vi.fn(),
+        previous: vi.fn()
+      },
+      setVisibility: vi.fn().mockResolvedValue({ ok: true }),
+      openApp: openAppMock,
+      onStatusChanged: vi.fn().mockReturnValue(() => {})
+    }
+  }
   useSpotifyStore.setState({
     state: 'disconnected',
     displayName: null,
@@ -219,7 +244,7 @@ describe('SpotifyMiniPlayer — no-premium overlay', () => {
 })
 
 describe('SpotifyMiniPlayer — context menu (D-33)', () => {
-  it('renders "Open Spotify app" anchor with href spotify:// AFTER trigger click (Radix Portal)', async () => {
+  it('"Open Spotify app" menu item calls window.wiiwho.spotify.openApp (NOT an anchor)', async () => {
     useSpotifyStore.setState({
       state: 'connected-playing',
       displayName: 'Owner',
@@ -230,13 +255,12 @@ describe('SpotifyMiniPlayer — context menu (D-33)', () => {
     render(<SpotifyMiniPlayer />)
     // Radix DropdownMenu content lives in a Portal — NOT in DOM until trigger click.
     await user.click(screen.getByRole('button', { name: /more options/i }))
-    // Radix's DropdownMenuItem asChild forwards role="menuitem" onto the <a>,
-    // so getByRole('link') won't find it. Query the menu item by text and
-    // assert it's an <a> with spotify:// href.
     const item = screen.getByRole('menuitem', { name: /open spotify app/i })
-    expect(item.tagName).toBe('A')
-    expect(item.getAttribute('href')).toBe('spotify://')
-    expect(item.getAttribute('rel')).toContain('noopener')
+    // Must NOT be an anchor — anchors with target="_blank" make Electron spawn
+    // a blank BrowserWindow alongside the OS-level spotify:// handler.
+    expect(item.tagName).not.toBe('A')
+    await user.click(item)
+    expect(openAppMock).toHaveBeenCalledTimes(1)
   })
 
   it('renders "Disconnect" menu item that calls store.disconnect() AFTER trigger click', async () => {

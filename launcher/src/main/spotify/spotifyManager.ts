@@ -144,6 +144,10 @@ export class SpotifyManager {
       if (saved) {
         this.tokens = saved
         this.emit('status-changed', this.status())
+        // Kick off a first poll + arm the interval so the renderer stops
+        // showing "Nothing playing" as soon as we know the live state.
+        void this.pollOnce()
+        this.startPolling()
       }
     } catch (e) {
       log.info('[spotify] restoreFromDisk failed quietly', e)
@@ -168,6 +172,10 @@ export class SpotifyManager {
       await writeSpotifyTokens(tokens)
       this.tokens = tokens
       this.emit('status-changed', this.status())
+      // Arm polling immediately + nudge a first poll so the renderer populates
+      // before the next tick of the interval (D-34 cadence).
+      void this.pollOnce()
+      this.startPolling()
       return { ok: true, displayName: me.displayName }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)

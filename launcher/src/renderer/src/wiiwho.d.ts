@@ -134,6 +134,8 @@ export interface WiiWhoAPI {
       previous: () => Promise<{ ok: boolean; premiumRequired?: boolean }>
     }
     setVisibility: (v: 'focused' | 'backgrounded') => Promise<{ ok: boolean }>
+    /** Open the native Spotify desktop app via the spotify:// URL scheme. */
+    openApp: () => Promise<{ ok: boolean }>
     onStatusChanged: (
       cb: (s: {
         connected: boolean

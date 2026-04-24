@@ -40,12 +40,19 @@ const managerMock = {
   restoreFromDisk: vi.fn()
 }
 
+const { openExternalMock } = vi.hoisted(() => ({
+  openExternalMock: vi.fn().mockResolvedValue(undefined)
+}))
+
 vi.mock('electron', () => ({
   BrowserWindow: class {},
   ipcMain: {
     handle: (channel: string, handler: Handler): void => {
       handlers.set(channel, handler)
     }
+  },
+  shell: {
+    openExternal: openExternalMock
   }
 }))
 
@@ -81,7 +88,8 @@ describe('Spotify IPC handlers', () => {
         'spotify:control:pause',
         'spotify:control:next',
         'spotify:control:previous',
-        'spotify:set-visibility'
+        'spotify:set-visibility',
+        'spotify:open-app'
       ].sort()
     )
   })
@@ -128,6 +136,13 @@ describe('Spotify IPC handlers', () => {
     expect(managerMock.setVisibility).toHaveBeenCalledWith('focused')
     await handlers.get('spotify:set-visibility')?.(null, 'backgrounded')
     expect(managerMock.setVisibility).toHaveBeenCalledWith('backgrounded')
+  })
+
+  it('spotify:open-app calls shell.openExternal("spotify://")', async () => {
+    openExternalMock.mockClear()
+    const r = await handlers.get('spotify:open-app')?.()
+    expect(openExternalMock).toHaveBeenCalledWith('spotify://')
+    expect(r).toEqual({ ok: true })
   })
 
   it('forwards manager "status-changed" events via webContents.send("spotify:status-changed")', () => {
