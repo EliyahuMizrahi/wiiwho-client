@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed Phase 04 Plan 03 (settings-modal-chrome) — SettingsModal bottom-slide + SettingsSubSidebar + 3/5 panes real (General/Account/About); Appearance + Spotify remain testid stubs for Plans 04-04 + 04-06
-last_updated: "2026-04-24T06:18:58.207Z"
+stopped_at: Completed Phase 04 Plan 04 (theme-picker-appearance) — ThemePicker (8 presets + hex input + EyeDropper D-14) + AppearancePane (ThemePicker + reduce-motion D-24 select) shipped; SettingsModal appearance-pane-stub swapped for <AppearancePane />; 470 passed + 6 todo
+last_updated: "2026-04-24T06:26:33.290Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 33
-  completed_plans: 28
+  completed_plans: 29
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 04 (launcher-ui-polish) — EXECUTING
-Plan: 5 of 8
+Plan: 6 of 8
 Status: Ready to execute
 Last activity: 2026-04-24
 
@@ -80,6 +80,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04-launcher-ui-polish P01-tokens-and-settings | 12min | 3 tasks tasks | 17 files files |
 | Phase 04-launcher-ui-polish P02-sidebar-and-main-area | 7 min | 3 tasks tasks | 15 files files |
 | Phase 04-launcher-ui-polish P03-settings-modal-chrome | 6 min | 3 tasks tasks | 10 files files |
+| Phase 04-launcher-ui-polish P04-theme-picker-appearance | 4 min | 2 tasks tasks | 5 files files |
 
 ## Accumulated Context
 
@@ -156,6 +157,10 @@ Recent decisions affecting current work:
 - [Phase 04-launcher-ui-polish]: Plan 04-03: Imported 'Dialog as DialogPrimitive' from unified radix-ui v1.4.3 (not @radix-ui/react-dialog) — consistent with Phase 2 components/ui/dialog.tsx and 2026 shadcn unified-Radix convention. All Dialog.Root/Portal/Overlay/Content/Close/Title primitives resolve with forceMount+asChild unchanged.
 - [Phase 04-launcher-ui-polish]: Plan 04-03: AccountPane renders FULL UUID (break-all + font-mono, no truncation) while AccountBadge dropdown continues 8-char truncation. Asymmetry is intentional per D-10: modal is deep-context copy-target surface for admin/support; dropdown is hover-reveal optimised for compactness. Sign out stays instant (D-15 preservation from Phase 2) — no confirm dialog; same useAuthStore.logout binding as dropdown.
 - [Phase 04-launcher-ui-polish]: Plan 04-03 [Rule 3 auto-fix]: Added ResizeObserver stub to SettingsModal.test.tsx — default openPane='general' now mounts RamSlider via GeneralPane, which triggers Radix Slider's ResizeObserver on mount. Same stub pattern as Phase 3 RamSlider.test.tsx. 7 tests moved from failing to passing.
+- [Phase 04-launcher-ui-polish]: Plan 04-04: ThemePicker uses aria-pressed over aria-selected/Radix ToggleGroup for active-preset indicator — simpler semantics for toggle-style swatch grid, no Radix jsdom plumbing.
+- [Phase 04-launcher-ui-polish]: Plan 04-04: EyeDropper feature-probed via typeof window.EyeDropper !== 'undefined' (Chromium 146/Electron 41 only); rejection silenced (only documented path is user-cancel via ESC). Hex input validates component-side via /^#[0-9a-fA-F]{6}$/ before hitting setAccent, avoiding IPC round-trips for invalid input.
+- [Phase 04-launcher-ui-polish]: Plan 04-04 [Rule 3 auto-fix]: toHaveAttribute matcher not registered — jest-dom isn't wired in this project; rewrote the two assertions as raw getAttribute('aria-pressed') === 'true' checks. Semantically equivalent, zero new dependencies (adding jest-dom would be a Rule 4 architectural decision).
+- [Phase 04-launcher-ui-polish]: Plan 04-04: SettingsModal.tsx appearance stub swapped for <AppearancePane /> with testid renamed from 'appearance-pane-stub' to 'appearance-pane' — matches general-pane/account-pane/about-pane convention; -stub was a Plan 04-03 anchor-point artifact that is now obsolete.
 
 ### Pending Todos
 
@@ -169,6 +174,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T06:18:39.252Z
-Stopped at: Completed Phase 04 Plan 03 (settings-modal-chrome) — SettingsModal bottom-slide + SettingsSubSidebar + 3/5 panes real (General/Account/About); Appearance + Spotify remain testid stubs for Plans 04-04 + 04-06
+Last session: 2026-04-24T06:26:33.285Z
+Stopped at: Completed Phase 04 Plan 04 (theme-picker-appearance) — ThemePicker (8 presets + hex input + EyeDropper D-14) + AppearancePane (ThemePicker + reduce-motion D-24 select) shipped; SettingsModal appearance-pane-stub swapped for <AppearancePane />; 470 passed + 6 todo
 Resume file: None
