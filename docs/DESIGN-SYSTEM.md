@@ -20,9 +20,8 @@ Three non-negotiables govern every design decision in this phase:
   motion mode collapses every animation to 0 ms without branching component
   code.
 - **Empty states are honest.** Cosmetics renders "Coming soon" with zero
-  interactive elements; Spotify idle shows connect-only chrome. No
-  "notify me," no fake-engagement buttons, no placeholders that pretend to
-  be real.
+  interactive elements. No "notify me," no fake-engagement buttons, no
+  placeholders that pretend to be real.
 
 ## 2. Tokens
 
@@ -114,9 +113,6 @@ Reduced motion: Settings → Appearance → "Reduce motion" with three states
   `AnimatePresence` INSIDE the Portal; `{open && ...}` guard INSIDE
   `AnimatePresence` wraps Overlay + Content. Slide `y: '100%' → 0` over
   `--duration-slow` with `--ease-emphasized`.
-- **Spotify mini-player**: Pinned at sidebar bottom above Settings gear.
-  6 visual states (disconnected / connecting / idle / playing / offline /
-  no-premium). Album art crossfades via `AnimatePresence` keyed by URL.
 - **Theme picker**: 8 preset swatches + custom hex input + EyeDropper button
   (Chromium 146 native). Live `--color-accent` swap on `:root`; persists to
   `settings.json v2`.
@@ -193,9 +189,7 @@ Full enumeration:
 | Settings modal — General               | —           | —    | —       |
 | Settings modal — Account               | —           | —    | —       |
 | Settings modal — Appearance            | —           | —    | —       |
-| Settings modal — Spotify               | —           | —    | —       |
 | Settings modal — About                 | —           | —    | —       |
-| Spotify mini-player (all 6 states)     | —           | —    | —       |
 | Crash viewer                           | —           | —    | —       |
 | Loading screen                         | —           | —    | —       |
 
@@ -203,7 +197,7 @@ Full enumeration:
 
 - **2026-04-24** — v0.1 initial design system. 8 accent presets, 3 motion
   durations, 2 CSS easings + 1 spring, Inter + JetBrains Mono typography,
-  Radix + motion/react component primitives, Spotify mini-player + Theme
-  picker + Settings modal shipped. UI-05 Exclusion checklist authored;
+  Radix + motion/react component primitives, Theme picker + Settings modal
+  shipped. UI-05 Exclusion checklist authored;
   `launcher/src/renderer/src/test/antiBloat.test.tsx` enforces the banned-
   pattern grep in CI.
