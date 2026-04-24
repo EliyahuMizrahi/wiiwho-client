@@ -2,7 +2,7 @@
  * Spotify PKCE Authorization Code flow + one-shot loopback callback server.
  *
  * REDIRECT URI CORRECTION CHAIN (Pitfall 6):
- *   CONTEXT D-31 (original plan) said: "http://127.0.0.1:*" wildcard — WRONG.
+ *   CONTEXT D-31 (original plan) said: "http://127.0.0.1" + wildcard-port — WRONG.
  *   Plan 04-00 Task 2 correction said: bare "http://127.0.0.1/callback" — ALSO WRONG.
  *   Actual 2026-04 Spotify rule (post 2025-11-27 OAuth migration):
  *     Redirect URIs MUST be exact-match and MUST include an explicit port

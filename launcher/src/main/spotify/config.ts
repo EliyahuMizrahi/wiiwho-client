@@ -6,7 +6,7 @@
  *
  * IMPORTANT — two CORRECTIONS relative to the original plan / CONTEXT D-31:
  *
- * 1. CONTEXT D-31 said: Redirect URI "http://127.0.0.1:*" (wildcard). That was
+ * 1. CONTEXT D-31 said: Redirect URI "http://127.0.0.1" + wildcard-port. That was
  *    already wrong before Spotify's 2025-11-27 OAuth migration (no wildcards).
  *
  * 2. Plan 04-00 then corrected to a single bare "http://127.0.0.1/callback"
