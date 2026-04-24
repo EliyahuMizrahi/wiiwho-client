@@ -22,7 +22,7 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 - [x] **UI-03**: View transitions, modal open/close, button hovers, and loading/progress states use consistent animations with documented timing curves and durations (no instant or janky state swaps for primary interactions)
 - [x] **UI-04**: Main launcher surface uses sidebar navigation with sections at minimum: Play, Settings, Account, Cosmetics (placeholder acceptable). Primary CTA is Play.
 - [x] **UI-05**: Launcher does NOT display: ads, news feeds, concurrent-user counts, friends lists, or marketing content. Verified against a written exclusion checklist in `docs/DESIGN-SYSTEM.md`.
-- [x] **UI-06**: User can connect a Spotify account via OAuth (Spotify Web API). When connected, launcher displays an embedded mini-player (current song, album art, play/pause/skip). Disconnection/offline state degrades gracefully (no crash, no error modal spam).
+- [~] **UI-06**: ~~User can connect a Spotify account via OAuth (Spotify Web API). When connected, launcher displays an embedded mini-player (current song, album art, play/pause/skip). Disconnection/offline state degrades gracefully (no crash, no error modal spam).~~ **DROPPED from v0.1 (2026-04-24)** — integrated and working end-to-end during Phase 4 execution, but the owner decided mid-smoke-test that Spotify is out of scope for a Minecraft launcher. Source fully removed in commits `8ff0272` + `1d69342`. May be revived in a future milestone if demand materializes.
 - [x] **UI-07**: Design system is documented — design tokens (color, spacing, typography, motion) live in code; `docs/DESIGN-SYSTEM.md` captures rationale, usage examples, and (if Figma MCP is configured) asset/icon provenance.
 
 ### Authentication
@@ -203,7 +203,7 @@ Which phases cover which requirements.
 | UI-03 | Phase 4 | Complete |
 | UI-04 | Phase 4 | Complete |
 | UI-05 | Phase 4 | Complete |
-| UI-06 | Phase 4 | Complete |
+| UI-06 | Phase 4 | Dropped (2026-04-24, v0.1) |
 | UI-07 | Phase 4 | Complete |
 | PERF-01 | Phase 7 | Pending |
 | PERF-02 | Phase 7 | Pending |
@@ -228,7 +228,7 @@ Which phases cover which requirements.
 - Phase 1 (Foundations): 8 requirements — COMP-04, MOD-01, MOD-02, MOD-03, MOD-04, LAUN-01, LAUN-02, LAUN-06
 - Phase 2 (Microsoft Auth): 6 requirements — AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
 - Phase 3 (Vanilla Launch, JRE, Packaging): 15 requirements — LCH-01, LCH-02, LCH-03, LCH-05, LCH-06, LCH-07, JRE-01, JRE-02, JRE-03, PKG-01, PKG-02, LAUN-03, LAUN-04, LAUN-05, COMP-05
-- Phase 4 (Launcher UI Polish): 6 requirements — UI-01, UI-03, UI-04, UI-05, UI-06, UI-07
+- Phase 4 (Launcher UI Polish): 5 requirements (UI-06 dropped 2026-04-24) — UI-01, UI-03, UI-04, UI-05, UI-07
 - Phase 5 (Forge Integration, HUD Framework, HUDs): 10 requirements — LCH-04, MOD-05, MOD-06, HUD-01, HUD-02, HUD-03, HUD-04, COMP-01, COMP-02, COMP-03
 - Phase 6 (Cosmetics Pipeline): 2 requirements — COSM-01, COSM-02
 - Phase 7 (Performance): 3 requirements — PERF-01, PERF-02, PERF-03
