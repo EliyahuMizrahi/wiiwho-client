@@ -126,10 +126,20 @@ function freshApi(): {
       })
     },
     settings: {
-      get: vi.fn().mockResolvedValue({ version: 1, ramMb: 2048, firstRunSeen: false }),
+      get: vi.fn().mockResolvedValue({
+        version: 2,
+        ramMb: 2048,
+        firstRunSeen: false,
+        theme: { accent: '#16e0ee', reduceMotion: 'system' }
+      }),
       set: vi.fn().mockResolvedValue({
         ok: true,
-        settings: { version: 1, ramMb: 2048, firstRunSeen: false }
+        settings: {
+          version: 2,
+          ramMb: 2048,
+          firstRunSeen: false,
+          theme: { accent: '#16e0ee', reduceMotion: 'system' }
+        }
       })
     },
     logs: {
@@ -185,11 +195,14 @@ beforeEach(async () => {
     subscribed: false
   })
   useSettingsStore.setState({
-    version: 1,
+    version: 2,
     ramMb: 2048,
     firstRunSeen: false,
-    hydrated: true
-  })
+    theme: { accent: '#16e0ee', reduceMotion: 'system' },
+    hydrated: true,
+    modalOpen: false,
+    openPane: 'general'
+  } as never)
 })
 
 afterEach(() => {
@@ -359,11 +372,14 @@ describe('App.tsx (Plan 03-10 Task 3)', () => {
     // We pre-seeded hydrated=true in beforeEach to skip the flash; reset it
     // here so initialize actually hits the IPC.
     useSettingsStore.setState({
-      version: 1,
+      version: 2,
       ramMb: 2048,
       firstRunSeen: false,
-      hydrated: false
-    })
+      theme: { accent: '#16e0ee', reduceMotion: 'system' },
+      hydrated: false,
+      modalOpen: false,
+      openPane: 'general'
+    } as never)
 
     render(<App />)
     await skipLoadingHold()

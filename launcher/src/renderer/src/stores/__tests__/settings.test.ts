@@ -18,9 +18,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 type SettingsSnapshot = {
-  version: 1
+  version: 2
   ramMb: number
   firstRunSeen: boolean
+  theme: { accent: string; reduceMotion: 'system' | 'on' | 'off' }
+}
+
+const V2_THEME_DEFAULTS = {
+  accent: '#16e0ee',
+  reduceMotion: 'system' as const
 }
 
 type SettingsAPI = {
@@ -43,11 +49,14 @@ import { useSettingsStore } from '../settings'
 
 function resetStore(): void {
   useSettingsStore.setState({
-    version: 1,
+    version: 2,
     ramMb: 2048,
     firstRunSeen: false,
-    hydrated: false
-  })
+    theme: { ...V2_THEME_DEFAULTS },
+    hydrated: false,
+    modalOpen: false,
+    openPane: 'general'
+  } as never)
 }
 
 describe('useSettingsStore', () => {
@@ -59,7 +68,7 @@ describe('useSettingsStore', () => {
 
   it('initial state has D-04 default ramMb=2048 and hydrated=false', () => {
     const s = useSettingsStore.getState()
-    expect(s.version).toBe(1)
+    expect(s.version).toBe(2)
     expect(s.ramMb).toBe(2048)
     expect(s.firstRunSeen).toBe(false)
     expect(s.hydrated).toBe(false)
@@ -67,14 +76,15 @@ describe('useSettingsStore', () => {
 
   it('initialize() populates from window.wiiwho.settings.get() and sets hydrated=true', async () => {
     const snap: SettingsSnapshot = {
-      version: 1,
+      version: 2,
       ramMb: 3072,
-      firstRunSeen: true
+      firstRunSeen: true,
+      theme: { ...V2_THEME_DEFAULTS }
     }
     settingsApi.get.mockResolvedValue(snap)
     await useSettingsStore.getState().initialize()
     const s = useSettingsStore.getState()
-    expect(s.version).toBe(1)
+    expect(s.version).toBe(2)
     expect(s.ramMb).toBe(3072)
     expect(s.firstRunSeen).toBe(true)
     expect(s.hydrated).toBe(true)
@@ -82,9 +92,10 @@ describe('useSettingsStore', () => {
 
   it('initialize() is idempotent — second call does not re-invoke get()', async () => {
     settingsApi.get.mockResolvedValue({
-      version: 1,
+      version: 2,
       ramMb: 2048,
-      firstRunSeen: false
+      firstRunSeen: false,
+      theme: { ...V2_THEME_DEFAULTS }
     } satisfies SettingsSnapshot)
     await useSettingsStore.getState().initialize()
     await useSettingsStore.getState().initialize()
@@ -101,9 +112,10 @@ describe('useSettingsStore', () => {
 
   it('setRamMb(3072) calls settings.set and updates the store from returned snapshot', async () => {
     const returned: SettingsSnapshot = {
-      version: 1,
+      version: 2,
       ramMb: 3072,
-      firstRunSeen: false
+      firstRunSeen: false,
+      theme: { ...V2_THEME_DEFAULTS }
     }
     settingsApi.set.mockResolvedValue({ ok: true, settings: returned })
     await useSettingsStore.getState().setRamMb(3072)
@@ -116,9 +128,10 @@ describe('useSettingsStore', () => {
     // Store sends the raw value; main clamps to 4096 per Plan 03-02. Store
     // mirrors whatever main returns — single source of truth for clamp.
     const returned: SettingsSnapshot = {
-      version: 1,
+      version: 2,
       ramMb: 4096,
-      firstRunSeen: false
+      firstRunSeen: false,
+      theme: { ...V2_THEME_DEFAULTS }
     }
     settingsApi.set.mockResolvedValue({ ok: true, settings: returned })
     await useSettingsStore.getState().setRamMb(99999)
@@ -135,9 +148,10 @@ describe('useSettingsStore', () => {
 
   it('setFirstRunSeen(true) patches firstRunSeen and persists', async () => {
     const returned: SettingsSnapshot = {
-      version: 1,
+      version: 2,
       ramMb: 2048,
-      firstRunSeen: true
+      firstRunSeen: true,
+      theme: { ...V2_THEME_DEFAULTS }
     }
     settingsApi.set.mockResolvedValue({ ok: true, settings: returned })
     await useSettingsStore.getState().setFirstRunSeen(true)

@@ -53,11 +53,14 @@ import { useSettingsStore } from '../../stores/settings'
 
 function resetStore(): void {
   useSettingsStore.setState({
-    version: 1,
+    version: 2,
     ramMb: 2048,
     firstRunSeen: false,
-    hydrated: true
-  })
+    theme: { accent: '#16e0ee', reduceMotion: 'system' },
+    hydrated: true,
+    modalOpen: false,
+    openPane: 'general'
+  } as never)
 }
 
 describe('SettingsDrawer', () => {
@@ -65,7 +68,12 @@ describe('SettingsDrawer', () => {
     settingsApi.get.mockReset()
     settingsApi.set.mockReset().mockResolvedValue({
       ok: true,
-      settings: { version: 1, ramMb: 2048, firstRunSeen: false }
+      settings: {
+        version: 2,
+        ramMb: 2048,
+        firstRunSeen: false,
+        theme: { accent: '#16e0ee', reduceMotion: 'system' }
+      }
     })
     resetStore()
   })
