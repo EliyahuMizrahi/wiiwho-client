@@ -52,15 +52,6 @@ const WINDOWS_ENV_USERNAME_PATTERN = /%USERNAME%/g
 const UNIX_ENV_USER_PATTERN = /\$USER\b/g
 const UNIX_ENV_HOME_PATTERN = /\$HOME\b/g
 
-// ---- Phase 4 Plan 04-05 extension: Spotify access tokens --------------------
-//
-// Spotify Bearer access tokens appear in Authorization headers the API wrapper
-// sends to api.spotify.com. They must never leak to logs even though we don't
-// deliberately log the header — third-party libraries could re-log a Request
-// object, and this is defense-in-depth. The length bound (>= 30) keeps false
-// positives off normal prose that happens to mention the word "Bearer".
-const SPOTIFY_BEARER_PATTERN = /Bearer\s+[A-Za-z0-9_-]{30,}/g
-
 /**
  * Apply all patterns in a fixed order — longest/most-specific FIRST so an
  * inner match never gets eaten by a broader regex that runs first.
@@ -68,24 +59,19 @@ const SPOTIFY_BEARER_PATTERN = /Bearer\s+[A-Za-z0-9_-]{30,}/g
  * Order rationale:
  *   1. MC_TOKEN_CLI    — longest specific prefix (`--accessToken ...`)
  *   2. MC_ACCESS       — JSON-shape access token (`"accessToken": "..."`)
- *   3. SPOTIFY_BEARER  — runs BEFORE JWT so the Bearer envelope replacement
- *                         wins over a JWT-inside-Bearer eyJ... match. If JWT
- *                         ran first we'd get `Bearer eyJ[REDACTED]` instead
- *                         of the cleaner `Bearer [REDACTED]` envelope.
- *   4. JWT             — eyJ... bodies (may still appear inside JSON bodies)
- *   5. REFRESH_TOKEN   — generic refresh_token field
- *   6. ACCESS_TOKEN    — generic access_token field
- *   7. WINDOWS path    — most-specific OS path shape
- *   8. MACOS path
- *   9. %USERNAME%
- *   10. $USER
- *   11. $HOME
+ *   3. JWT             — eyJ... bodies (may still appear inside JSON bodies)
+ *   4. REFRESH_TOKEN   — generic refresh_token field
+ *   5. ACCESS_TOKEN    — generic access_token field
+ *   6. WINDOWS path    — most-specific OS path shape
+ *   7. MACOS path
+ *   8. %USERNAME%
+ *   9. $USER
+ *   10. $HOME
  */
 function scrub(s: string): string {
   return s
     .replace(MC_TOKEN_CLI_PATTERN, '--accessToken [REDACTED]')
     .replace(MC_ACCESS_PATTERN, '"accessToken": "[REDACTED]"')
-    .replace(SPOTIFY_BEARER_PATTERN, 'Bearer [REDACTED]')
     .replace(JWT_PATTERN, 'eyJ[REDACTED]')
     .replace(REFRESH_TOKEN_PATTERN, 'refresh_token: [REDACTED]')
     .replace(ACCESS_TOKEN_PATTERN, 'access_token: [REDACTED]')
@@ -142,6 +128,5 @@ export const __test__ = {
   MACOS_USER_PATH_PATTERN,
   WINDOWS_ENV_USERNAME_PATTERN,
   UNIX_ENV_USER_PATTERN,
-  UNIX_ENV_HOME_PATTERN,
-  SPOTIFY_BEARER_PATTERN
+  UNIX_ENV_HOME_PATTERN
 }

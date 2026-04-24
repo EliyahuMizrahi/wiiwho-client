@@ -5,7 +5,6 @@ import { registerAuthHandlers } from './ipc/auth'
 import { registerGameHandlers } from './ipc/game'
 import { registerSettingsHandlers } from './ipc/settings'
 import { registerLogsHandlers } from './ipc/logs'
-import { registerSpotifyHandlers } from './ipc/spotify'
 import { registerSecurityHandlers, setAuditedPrefs } from './ipc/security'
 import { installRedactor } from './auth/redact'
 import { getAuthManager } from './auth/AuthManager'
@@ -76,10 +75,6 @@ app.whenReady().then(() => {
   registerGameHandlers(() => mainWindowRef)
   registerSettingsHandlers()
   registerLogsHandlers()
-  // Plan 04-07: Spotify handlers wired here (not auto-registered at module-
-  // load by launcher/src/main/ipc/spotify.ts — tests import spotifyManager
-  // in isolation without triggering ipcMain.handle side-effects).
-  registerSpotifyHandlers(() => mainWindowRef)
   registerSecurityHandlers()
 
   createWindow()

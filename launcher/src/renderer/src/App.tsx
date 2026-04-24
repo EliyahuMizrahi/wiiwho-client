@@ -17,19 +17,14 @@
  * Lifecycle (useEffect on mount):
  *   - initializeAuth()       — Phase 2
  *   - initializeSettings()   — Phase 3 / 04-01 (also re-applies theme.accent to :root)
- *   - initializeSpotify()    — Plan 04-06 (subscribes to onStatusChanged + window
- *                               focus/blur for polling cadence + seeds from
- *                               document.visibilityState)
  *   - subscribeGame()        — Phase 3 (onStatus/onProgress/onLog/onExited/onCrashed)
  *   - onDeviceCode subscription — Phase 2 (pushes payload into auth store)
  *   - securityAudit()        — Phase 1 (one-shot diagnostic log)
  *
- * On unmount: release every subscription, clear timers, tear down Spotify
- * focus/blur listeners.
+ * On unmount: release every subscription, clear timers.
  *
  * Decision refs:
  *   D-01 Sidebar-driven main surface
- *   D-02 Row order: Play, Cosmetics, (divider), Spotify, Settings
  *   D-08 Bottom-slide Settings modal (replaces D-01 Phase-3 drawer)
  *   D-18 Crash viewer is a full-page takeover
  *   E-03 Account reachable only via AccountBadge dropdown + Settings Account pane
@@ -40,7 +35,6 @@ import { motion, AnimatePresence } from 'motion/react'
 import { useAuthStore } from './stores/auth'
 import { useGameStore } from './stores/game'
 import { useSettingsStore } from './stores/settings'
-import { useSpotifyStore } from './stores/spotify'
 import { useActiveSectionStore } from './stores/activeSection'
 import { LoginScreen } from './components/LoginScreen'
 import { LoadingScreen } from './components/LoadingScreen'
@@ -78,17 +72,12 @@ function App(): React.JSX.Element {
   const resetGame = useGameStore((s) => s.resetToIdle)
   const playGame = useGameStore((s) => s.play)
   const initSettings = useSettingsStore((s) => s.initialize)
-  const initSpotify = useSpotifyStore((s) => s.initialize)
-  const teardownSpotify = useSpotifyStore((s) => s.teardown)
   const activeSection = useActiveSectionStore((s) => s.section)
   const [loadingHeld, setLoadingHeld] = useState(true)
 
   useEffect(() => {
     void initializeAuth()
     void initSettings()
-    // initSpotify wires onStatusChanged + window focus/blur + seeds visibility
-    // from document.visibilityState (Plan 04-06 initialize contract).
-    void initSpotify()
     const unsubscribeGame = subscribeGame()
 
     // Subscribe to auth:device-code push events (frozen IPC channel, Plan 03).
@@ -117,12 +106,10 @@ function App(): React.JSX.Element {
     return (): void => {
       unsubDeviceCode()
       unsubscribeGame()
-      // teardownSpotify removes focus/blur listeners + unsubscribes onStatusChanged.
-      teardownSpotify()
       clearTimeout(fallback)
       clearTimeout(minHold)
     }
-  }, [initializeAuth, subscribeGame, initSettings, initSpotify, teardownSpotify])
+  }, [initializeAuth, subscribeGame, initSettings])
 
   // LoadingScreen held until both (a) store resolves out of 'loading'
   //  AND (b) minimum visible duration has elapsed — prevents a <100ms flash.

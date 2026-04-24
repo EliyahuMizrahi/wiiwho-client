@@ -9,21 +9,9 @@ type Unsubscribe = () => void
  *
  * Named channels only — never expose ipcRenderer directly (LAUN-06).
  *
- * D-11 (frozen IPC surface — Phase 1): The original 5 top-level keys — auth,
- * game, settings, logs, __debug — were locked. Phase 3 Plan 03-09 extended
- * under those existing keys without adding new top-level ones.
- *
- * DELIBERATE DEVIATION from Phase 1 D-11 (Pitfall 10, Phase 4 UI-06):
- *   Phase 4 adds `spotify` as a 6th top-level key. This is the ONLY intended
- *   extension of the D-11 surface in v0.1. Rationale:
- *     - spotify semantics (OAuth + external-service playback control) are
- *       orthogonal to every other namespace — no clean nest exists.
- *     - Nesting under `settings` or `__debug` would mis-group user-facing
- *       music-player state with opaque-config or debug telemetry.
- *     - One deliberate expansion is cheaper than a taxonomy refactor.
- *   The key-count regression test in preload/__tests__/index.test.ts is
- *   updated from 5 → 6 to ratchet this as the new invariant. Adding a 7th
- *   key in future phases requires the same deliberate process.
+ * D-11 (frozen IPC surface — Phase 1): The 5 top-level keys — auth, game,
+ * settings, logs, __debug — are locked. Phase 3 Plan 03-09 extended under
+ * those existing keys without adding new top-level ones.
  */
 contextBridge.exposeInMainWorld('wiiwho', {
   auth: {
@@ -81,25 +69,5 @@ contextBridge.exposeInMainWorld('wiiwho', {
   },
   __debug: {
     securityAudit: () => ipcRenderer.invoke('__security:audit')
-  },
-  // Phase 4 UI-06 — DELIBERATE 6th top-level key (Pitfall 10; see header above).
-  spotify: {
-    connect: () => ipcRenderer.invoke('spotify:connect'),
-    disconnect: () => ipcRenderer.invoke('spotify:disconnect'),
-    status: () => ipcRenderer.invoke('spotify:status'),
-    control: {
-      play: () => ipcRenderer.invoke('spotify:control:play'),
-      pause: () => ipcRenderer.invoke('spotify:control:pause'),
-      next: () => ipcRenderer.invoke('spotify:control:next'),
-      previous: () => ipcRenderer.invoke('spotify:control:previous')
-    },
-    setVisibility: (v: 'focused' | 'backgrounded') =>
-      ipcRenderer.invoke('spotify:set-visibility', v),
-    openApp: () => ipcRenderer.invoke('spotify:open-app'),
-    onStatusChanged: (cb: (s: unknown) => void): Unsubscribe => {
-      const h = (_: unknown, s: unknown): void => cb(s)
-      ipcRenderer.on('spotify:status-changed', h)
-      return () => ipcRenderer.off('spotify:status-changed', h)
-    }
   }
 })

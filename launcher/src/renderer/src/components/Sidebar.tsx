@@ -4,9 +4,7 @@
  * Row order (D-02), top-to-bottom:
  *   1. Play          (lucide Play icon)
  *   2. Cosmetics     (lucide Shirt icon)
- *   3. Thin divider
- *   4. Spotify slot  (placeholder — Plan 04-06 replaces with real mini-player)
- *   5. Settings gear (lucide Settings; opens modal via setModalOpen(true))
+ *   3. Settings gear (lucide Settings; opens modal via setModalOpen(true))
  *
  * Active-state visual (D-03): two motion.div elements with shared layoutIds
  * ("sidebar-nav-pill" + "sidebar-nav-bar") glide between the active rows.
@@ -30,7 +28,6 @@ import { Play, Shirt, Settings as SettingsIcon } from 'lucide-react'
 import { useActiveSectionStore, type ActiveSection } from '../stores/activeSection'
 import { useSettingsStore } from '../stores/settings'
 import { SPRING_STANDARD } from '../theme/motion'
-import { SpotifyMiniPlayer } from './SpotifyMiniPlayer'
 
 interface NavItem {
   id: ActiveSection
@@ -104,18 +101,6 @@ export function Sidebar(): React.JSX.Element {
           )
         })}
       </ul>
-
-      {/* Divider */}
-      <div className="border-t border-wiiwho-border" />
-
-      {/* Spotify mini-player slot (Plan 04-06).
-          Wrapper preserves data-testid="spotify-slot" so Plan 04-02's Sidebar
-          tests still pass; the real SpotifyMiniPlayer renders all 6 visual
-          states (disconnected / connecting / connected-idle / connected-playing
-          / offline / no-premium) against useSpotifyStore. */}
-      <div data-testid="spotify-slot">
-        <SpotifyMiniPlayer />
-      </div>
 
       {/* Settings gear — bottom pinned */}
       <div className="p-2 border-t border-wiiwho-border">

@@ -83,17 +83,3 @@ export function resolveModJar(): string {
     : path.join(process.resourcesPath, 'mod')
   return path.join(base, 'wiiwho-0.1.0.jar')
 }
-
-/**
- * Spotify OAuth token file (Phase 4 UI-06 / D-32).
- *
- * Encrypted via Electron safeStorage; sibling to the Phase 2 `auth.bin`.
- * Deliberately lives UNDER the same data root as other user data — the
- * launcher uninstall/reset story wipes the whole folder in one go.
- *
- * Consumed by launcher/src/main/spotify/tokenStore.ts exclusively — the
- * renderer must never read this file (IPC surface only).
- */
-export function resolveSpotifyTokenPath(): string {
-  return path.join(resolveDataRoot(), 'spotify.bin')
-}

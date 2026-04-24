@@ -1,7 +1,7 @@
 /**
  * Settings modal left sub-sidebar — D-10.
  *
- * 180px wide. Pane order: General, Account, Appearance, Spotify, About.
+ * 180px wide. Pane order: General, Account, Appearance, About.
  * Active pane uses motion layoutId "settings-subnav-pill" for glide animation
  * matching the main sidebar's pattern (RESEARCH §Sub-sidebar + pane routing).
  *
@@ -13,14 +13,13 @@ import { motion } from 'motion/react'
 import { useSettingsStore } from '../../stores/settings'
 import { SPRING_STANDARD } from '../../theme/motion'
 
-export const SETTINGS_PANES = ['general', 'account', 'appearance', 'spotify', 'about'] as const
+export const SETTINGS_PANES = ['general', 'account', 'appearance', 'about'] as const
 export type SettingsPane = (typeof SETTINGS_PANES)[number]
 
 const LABELS: Record<SettingsPane, string> = {
   general: 'General',
   account: 'Account',
   appearance: 'Appearance',
-  spotify: 'Spotify',
   about: 'About'
 }
 

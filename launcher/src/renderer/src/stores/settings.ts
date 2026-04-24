@@ -33,7 +33,7 @@
 import { create } from 'zustand'
 
 /** Panes exposed by the settings modal (Plan 04-03 wiring; referenced here). */
-export type SettingsPane = 'general' | 'account' | 'appearance' | 'spotify' | 'about'
+export type SettingsPane = 'general' | 'account' | 'appearance' | 'about'
 
 /** The persisted settings shape — matches main-process SettingsV2. */
 export interface SettingsSnapshot {

@@ -5,7 +5,7 @@
  *
  * Covers:
  *   - D-01 fixed 220px column
- *   - D-02 row order: Play → Cosmetics → divider → Spotify slot → Settings gear
+ *   - D-02 row order: Play → Cosmetics → Settings gear
  *   - D-03 active-state (aria-current="page" + motion layoutId pill/bar)
  *   - E-03 NO top-level Account row
  *   - UI-05 anti-bloat (no ads/news/friends markup)
@@ -56,11 +56,6 @@ describe('Sidebar', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders Spotify slot placeholder (data-testid="spotify-slot")', () => {
-    render(<Sidebar />)
-    expect(screen.getByTestId('spotify-slot')).toBeInTheDocument()
-  })
-
   it('default active section is "play" (aria-current="page")', () => {
     render(<Sidebar />)
     expect(screen.getByRole('button', { name: /play/i })).toHaveAttribute(
@@ -97,7 +92,7 @@ describe('Sidebar', () => {
     )
   })
 
-  it('renders items in order: Play → Cosmetics → divider → Spotify slot → Settings gear', () => {
+  it('renders items in order: Play → Cosmetics → Settings gear', () => {
     const { container } = render(<Sidebar />)
     const buttons = Array.from(container.querySelectorAll('button')).map(
       (b) => b.getAttribute('aria-label') ?? b.textContent ?? ''

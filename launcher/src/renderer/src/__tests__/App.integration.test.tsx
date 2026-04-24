@@ -13,7 +13,6 @@
  *   - App imports and mounts <DeviceCodeModal /> in the logged-in tree
  *   - DeviceCodeModal surfaces the device code during re-auth while logged-in
  *   - Crashed phase still routes to CrashViewer (Phase 3 D-18 preserved)
- *   - App useEffect initializes useSpotifyStore (window.wiiwho.spotify.status called)
  *
  * Motion mock strategy: motion/react is mocked to a bare proxy so AnimatePresence
  * passes children through instantly and animated motion.* elements render as
@@ -92,7 +91,6 @@ import App from '../App'
 import { useAuthStore } from '../stores/auth'
 import { useGameStore } from '../stores/game'
 import { useSettingsStore } from '../stores/settings'
-import { useSpotifyStore } from '../stores/spotify'
 import { useActiveSectionStore } from '../stores/activeSection'
 
 beforeEach(() => {
@@ -144,19 +142,6 @@ beforeEach(() => {
         sandbox: true,
         allTrue: true
       })
-    },
-    spotify: {
-      connect: vi.fn(),
-      disconnect: vi.fn(),
-      status: vi.fn().mockResolvedValue({ connected: false }),
-      control: {
-        play: vi.fn(),
-        pause: vi.fn(),
-        next: vi.fn(),
-        previous: vi.fn()
-      },
-      setVisibility: vi.fn().mockResolvedValue({ ok: true }),
-      onStatusChanged: vi.fn().mockReturnValue(() => {})
     }
   }
 
@@ -181,16 +166,6 @@ beforeEach(() => {
     hydrated: true,
     modalOpen: false,
     openPane: 'general'
-  } as never)
-  useSpotifyStore.setState({
-    state: 'disconnected',
-    displayName: null,
-    isPremium: 'unknown',
-    currentTrack: null,
-    lastError: null,
-    _unsubStatus: null,
-    _onFocus: null,
-    _onBlur: null
   } as never)
   useActiveSectionStore.setState({ section: 'play' } as never)
 })
@@ -329,14 +304,4 @@ describe('App — logged-in integration (Plan 04-07)', () => {
     ).toBeInTheDocument()
   })
 
-  it('App useEffect initializes useSpotifyStore (window.wiiwho.spotify.status called)', async () => {
-    render(<App />)
-    await skipLoadingHold()
-    // Spotify initialize() is kicked synchronously from the useEffect;
-    // the IPC status() promise resolves on a microtask.
-    await act(async () => {
-      await Promise.resolve()
-    })
-    expect(window.wiiwho.spotify.status).toHaveBeenCalled()
-  })
 })

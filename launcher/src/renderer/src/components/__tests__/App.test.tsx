@@ -84,27 +84,12 @@ type LogsApi = {
   listCrashReports: ReturnType<typeof vi.fn>
 }
 
-type SpotifyApi = {
-  connect: ReturnType<typeof vi.fn>
-  disconnect: ReturnType<typeof vi.fn>
-  status: ReturnType<typeof vi.fn>
-  control: {
-    play: ReturnType<typeof vi.fn>
-    pause: ReturnType<typeof vi.fn>
-    next: ReturnType<typeof vi.fn>
-    previous: ReturnType<typeof vi.fn>
-  }
-  setVisibility: ReturnType<typeof vi.fn>
-  onStatusChanged: ReturnType<typeof vi.fn>
-}
-
 function freshApi(): {
   auth: AuthApi
   game: GameApi
   settings: SettingsApi
   logs: LogsApi
   __debug: { securityAudit: ReturnType<typeof vi.fn> }
-  spotify: SpotifyApi
 } {
   const noop = (): (() => void) => () => {}
   return {
@@ -171,22 +156,6 @@ function freshApi(): {
         sandbox: true,
         allTrue: true
       })
-    },
-    // Plan 04-07: App.tsx now calls useSpotifyStore.initialize() on mount,
-    // which reaches into window.wiiwho.spotify.*. Stub the surface so the
-    // renderer tree's passive effects don't throw during App.tsx render.
-    spotify: {
-      connect: vi.fn().mockResolvedValue({ ok: true }),
-      disconnect: vi.fn().mockResolvedValue({ ok: true }),
-      status: vi.fn().mockResolvedValue({ connected: false }),
-      control: {
-        play: vi.fn().mockResolvedValue({ ok: true }),
-        pause: vi.fn().mockResolvedValue({ ok: true }),
-        next: vi.fn().mockResolvedValue({ ok: true }),
-        previous: vi.fn().mockResolvedValue({ ok: true })
-      },
-      setVisibility: vi.fn().mockResolvedValue({ ok: true }),
-      onStatusChanged: vi.fn(() => noop() as never)
     }
   }
 }

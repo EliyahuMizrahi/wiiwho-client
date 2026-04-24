@@ -5,7 +5,7 @@
  *
  * Covers:
  *   - Mount / unmount on modalOpen
- *   - Sub-sidebar renders all 5 panes in D-10 order
+ *   - Sub-sidebar renders all 4 panes in D-10 order
  *   - X close button (aria-label "Close settings")
  *   - ESC key closes (Radix DismissableLayer)
  *   - openPane switch renders correct pane / stub
@@ -126,10 +126,10 @@ describe('SettingsModal', () => {
     expect(screen.getByRole('dialog')).toBeDefined()
   })
 
-  it('renders sub-sidebar with all 5 panes (General, Account, Appearance, Spotify, About) in order', () => {
+  it('renders sub-sidebar with all 4 panes (General, Account, Appearance, About) in order', () => {
     useSettingsStore.setState({ modalOpen: true, openPane: 'general' } as never)
     render(<SettingsModal />)
-    const names = ['General', 'Account', 'Appearance', 'Spotify', 'About']
+    const names = ['General', 'Account', 'Appearance', 'About']
     for (const name of names) {
       expect(screen.getByRole('button', { name })).toBeDefined()
     }
@@ -167,12 +167,6 @@ describe('SettingsModal', () => {
     useSettingsStore.setState({ modalOpen: true, openPane: 'appearance' } as never)
     render(<SettingsModal />)
     expect(screen.getByTestId('appearance-pane')).toBeDefined()
-  })
-
-  it('openPane="spotify" renders SpotifyPane (testid "spotify-pane")', () => {
-    useSettingsStore.setState({ modalOpen: true, openPane: 'spotify' } as never)
-    render(<SettingsModal />)
-    expect(screen.getByTestId('spotify-pane')).toBeDefined()
   })
 
   it('sr-only Dialog.Title "Settings" is rendered for a11y', () => {

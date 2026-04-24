@@ -5,7 +5,7 @@
  *
  * Covers:
  *   - SETTINGS_PANES tuple shape + order (D-10)
- *   - 5 buttons with display labels
+ *   - 4 buttons with display labels
  *   - aria-current="page" on active pane
  *   - Click routes through useSettingsStore.setOpenPane
  *   - Nav width is 180px per D-10
@@ -49,19 +49,18 @@ describe('SettingsSubSidebar', () => {
   })
   afterEach(cleanup)
 
-  it('SETTINGS_PANES exports 5 panes in order: general, account, appearance, spotify, about', () => {
+  it('SETTINGS_PANES exports 4 panes in order: general, account, appearance, about', () => {
     expect([...SETTINGS_PANES]).toEqual([
       'general',
       'account',
       'appearance',
-      'spotify',
       'about'
     ])
   })
 
-  it('renders 5 buttons with display labels', () => {
+  it('renders 4 buttons with display labels', () => {
     render(<SettingsSubSidebar />)
-    for (const label of ['General', 'Account', 'Appearance', 'Spotify', 'About']) {
+    for (const label of ['General', 'Account', 'Appearance', 'About']) {
       expect(screen.getByRole('button', { name: label })).toBeDefined()
     }
   })
