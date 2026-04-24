@@ -41,11 +41,17 @@ afterEach(async () => {
 })
 
 describe('settings/store.ts — schema + defaults + clamp', () => {
-  it('Test 1: readSettings() on missing file returns DEFAULTS (D-04)', async () => {
+  it('Test 1: readSettings() on missing file returns DEFAULTS (D-04 + D-18)', async () => {
     const { readSettings, DEFAULTS } = await import('./store')
     const s = await readSettings()
     expect(s).toEqual(DEFAULTS)
-    expect(s).toEqual({ version: 1, ramMb: 2048, firstRunSeen: false })
+    // v2 shape per Plan 04-01 — D-18 theme slice added to D-04 baseline.
+    expect(s).toEqual({
+      version: 2,
+      ramMb: 2048,
+      firstRunSeen: false,
+      theme: { accent: '#16e0ee', reduceMotion: 'system' }
+    })
   })
 
   it('Test 2: readSettings() on corrupted non-JSON file returns DEFAULTS', async () => {
@@ -57,10 +63,10 @@ describe('settings/store.ts — schema + defaults + clamp', () => {
   })
 
   it('Test 3: round-trips write→read across fresh module import (LAUN-04)', async () => {
-    // Write with module instance A.
+    // Write with module instance A. writeSettings is patch-based post-v2.
     {
       const { writeSettings } = await import('./store')
-      await writeSettings({ version: 1, ramMb: 3072, firstRunSeen: true })
+      await writeSettings({ ramMb: 3072, firstRunSeen: true })
     }
     // Simulate a process restart: drop the module graph, re-import fresh.
     vi.resetModules()
@@ -71,7 +77,12 @@ describe('settings/store.ts — schema + defaults + clamp', () => {
     {
       const { readSettings } = await import('./store')
       const s = await readSettings()
-      expect(s).toEqual({ version: 1, ramMb: 3072, firstRunSeen: true })
+      expect(s).toEqual({
+        version: 2,
+        ramMb: 3072,
+        firstRunSeen: true,
+        theme: { accent: '#16e0ee', reduceMotion: 'system' }
+      })
     }
   })
 
@@ -118,7 +129,8 @@ describe('settings/store.ts — schema + defaults + clamp', () => {
       'utf8'
     )
     const s = await readSettings()
-    expect(s.version).toBe(1)
+    // Readers always resolve to current schema — v2 post-Plan-04-01.
+    expect(s.version).toBe(2)
     expect(s.ramMb).toBe(DEFAULTS.ramMb) // 2048 — defaulted
     expect(s.firstRunSeen).toBe(true) // preserved valid field
   })
@@ -128,7 +140,7 @@ describe('settings/store.ts — schema + defaults + clamp', () => {
     const renameSpy = vi.spyOn(fsMod.promises, 'rename')
 
     const { writeSettings } = await import('./store')
-    await writeSettings({ version: 1, ramMb: 2048, firstRunSeen: false })
+    await writeSettings({ ramMb: 2048, firstRunSeen: false })
 
     // First, writeFile should have been called with `<tempFile>.tmp` — NEVER the final path.
     const writeCallTargets = writeSpy.mock.calls.map((c) => String(c[0]))
@@ -149,7 +161,7 @@ describe('settings/store.ts — schema + defaults + clamp', () => {
   it('Test 11 (bonus): writeSettings re-clamps ramMb even when caller passes a raw number', async () => {
     const { writeSettings, readSettings } = await import('./store')
     // Caller passes out-of-range/un-stepped value — writeSettings must clamp.
-    await writeSettings({ version: 1, ramMb: 99999, firstRunSeen: false })
+    await writeSettings({ ramMb: 99999, firstRunSeen: false })
     const s = await readSettings()
     expect(s.ramMb).toBe(4096)
   })

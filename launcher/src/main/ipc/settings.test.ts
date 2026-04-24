@@ -1,11 +1,11 @@
 // @vitest-environment node
 /**
- * Plan 03-02 Task 2 — ipc/settings.ts (store-backed handlers).
+ * Plan 03-02 Task 2 + Plan 04-01 Task 2 — ipc/settings.ts (store-backed handlers).
  *
  * Replaces the Phase 1 in-memory stub tests with store-backed assertions:
- *   - settings:get returns a full SettingsV1 (no Record<string, unknown>)
+ *   - settings:get returns a full SettingsV2 (post-Plan 04-01 migration)
  *   - settings:set merges a patch, clamps ramMb via the store, and returns
- *     {ok:true, settings: SettingsV1}
+ *     {ok:true, settings: SettingsV2}
  *   - patch merge semantics: omitted keys preserve current values
  *   - defensive: non-number ramMb ignored, drops back to current/default
  *   - logs:read-crash stub UNTOUCHED (Plan 03-10 owns that handler)
@@ -14,6 +14,13 @@
  * Uses a real temp-file `resolveSettingsFile` mock so the tests exercise
  * the same disk round-trip as production.
  */
+
+const V2_DEFAULTS = {
+  version: 2,
+  ramMb: 2048,
+  firstRunSeen: false,
+  theme: { accent: '#16e0ee', reduceMotion: 'system' as const }
+}
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { promises as fs, readFileSync } from 'node:fs'
@@ -57,20 +64,16 @@ async function register(): Promise<void> {
 }
 
 describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
-  it('Test 1: settings:get returns a full SettingsV1 shape', async () => {
+  it('Test 1: settings:get returns a full SettingsV2 shape', async () => {
     await register()
-    const r = (await handlers.get('settings:get')?.({} as unknown)) as {
-      version: 1
-      ramMb: number
-      firstRunSeen: boolean
-    }
-    expect(r).toEqual({ version: 1, ramMb: 2048, firstRunSeen: false })
+    const r = await handlers.get('settings:get')?.({} as unknown)
+    expect(r).toEqual(V2_DEFAULTS)
   })
 
   it('Test 2: settings:get on missing file returns DEFAULTS', async () => {
     await register()
     const r = await handlers.get('settings:get')?.({} as unknown)
-    expect(r).toEqual({ version: 1, ramMb: 2048, firstRunSeen: false })
+    expect(r).toEqual(V2_DEFAULTS)
     // And assert no file exists on disk (confirm we're actually in defaults mode).
     await expect(fs.stat(tempFile)).rejects.toMatchObject({ code: 'ENOENT' })
   })
@@ -79,18 +82,14 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
     await register()
     const res = (await handlers.get('settings:set')?.({} as unknown, { ramMb: 3072 })) as {
       ok: boolean
-      settings: { version: 1; ramMb: number; firstRunSeen: boolean }
+      settings: typeof V2_DEFAULTS
     }
     expect(res.ok).toBe(true)
-    expect(res.settings).toEqual({
-      version: 1,
-      ramMb: 3072,
-      firstRunSeen: false
-    })
+    expect(res.settings).toEqual({ ...V2_DEFAULTS, ramMb: 3072 })
 
     // Next read reflects the write (store-backed, not in-memory).
     const follow = await handlers.get('settings:get')?.({} as unknown)
-    expect(follow).toEqual({ version: 1, ramMb: 3072, firstRunSeen: false })
+    expect(follow).toEqual({ ...V2_DEFAULTS, ramMb: 3072 })
   })
 
   it('Test 4: settings:set({ramMb: 99999}) clamps to 4096 before persisting', async () => {
@@ -110,10 +109,10 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
     // Patch ONLY firstRunSeen.
     const res = (await handlers.get('settings:set')?.({} as unknown, { firstRunSeen: true })) as {
       ok: boolean
-      settings: { version: 1; ramMb: number; firstRunSeen: boolean }
+      settings: typeof V2_DEFAULTS
     }
     expect(res.settings).toEqual({
-      version: 1,
+      ...V2_DEFAULTS,
       ramMb: 3584,
       firstRunSeen: true
     })
@@ -149,14 +148,10 @@ describe('ipc/settings.ts — store-backed handlers (Plan 03-02)', () => {
     await register()
     const res1 = (await handlers.get('settings:set')?.({} as unknown, undefined)) as {
       ok: boolean
-      settings: { version: 1; ramMb: number; firstRunSeen: boolean }
+      settings: typeof V2_DEFAULTS
     }
     expect(res1.ok).toBe(true)
-    expect(res1.settings).toEqual({
-      version: 1,
-      ramMb: 2048,
-      firstRunSeen: false
-    })
+    expect(res1.settings).toEqual(V2_DEFAULTS)
 
     const res2 = (await handlers.get('settings:set')?.({} as unknown, null)) as {
       ok: boolean

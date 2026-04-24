@@ -67,15 +67,25 @@ export interface WiiWhoAPI {
   }
   settings: {
     get: () => Promise<{
-      version: 1
+      version: 2
       ramMb: number
       firstRunSeen: boolean
+      theme: { accent: string; reduceMotion: 'system' | 'on' | 'off' }
     }>
     set: (
-      patch: Partial<{ ramMb: number; firstRunSeen: boolean }>
+      patch: Partial<{
+        ramMb: number
+        firstRunSeen: boolean
+        theme: Partial<{ accent: string; reduceMotion: 'system' | 'on' | 'off' }>
+      }>
     ) => Promise<{
       ok: boolean
-      settings: { version: 1; ramMb: number; firstRunSeen: boolean }
+      settings: {
+        version: 2
+        ramMb: number
+        firstRunSeen: boolean
+        theme: { accent: string; reduceMotion: 'system' | 'on' | 'off' }
+      }
     }>
   }
   logs: {
