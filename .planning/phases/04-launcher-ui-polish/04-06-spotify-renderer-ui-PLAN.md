@@ -510,6 +510,8 @@ From Phase 2/3 Zustand pattern — useAuthStore shape as reference.
     
     Decision: use simple `<a href="spotify://" target="_blank" rel="noopener noreferrer">` for "Open Spotify app" — no new IPC needed.
     - Tests cover all 6 states + album-art key change + context menu rendering
+
+    **DropdownMenu testing note (Radix Portal):** The shadcn DropdownMenu renders its content in a Radix Portal that is NOT in the DOM until the trigger (`<DropdownMenuTrigger aria-label="More options">`) is clicked. Any test that asserts on menu items (link/menuitem/button inside the dropdown) MUST first click the trigger with userEvent. Asserting getByRole('link'/'menuitem', …) before the click will throw because the portal subtree is not mounted.
   </behavior>
   <action>
     1. Replace Wave 0 test stub `launcher/src/renderer/src/components/__tests__/SpotifyMiniPlayer.test.tsx` with real tests. Mock motion/react to render plain divs, mock wiiwho.spotify.
@@ -709,23 +711,26 @@ From Phase 2/3 Zustand pattern — useAuthStore shape as reference.
     })
 
     describe('SpotifyMiniPlayer — context menu (D-33)', () => {
-      it('renders "Open Spotify app" link with href spotify://', () => {
+      it('renders "Open Spotify app" link with href spotify:// AFTER trigger click (Radix Portal)', async () => {
         useSpotifyStore.setState({ state: 'connected-playing', displayName: 'Owner', isPremium: 'yes', currentTrack: { id: 't1', name: 'S', artists: ['A'], isPlaying: true } } as never)
-        render(<SpotifyMiniPlayer />)
-        // Trigger context menu (chevron button or hover-reveal)
         const user = userEvent.setup()
-        // click the chevron trigger
-        // ... depending on implementation, may require user.click(screen.getByRole('button', { name: /more options|menu/i }))
+        render(<SpotifyMiniPlayer />)
+        // Radix DropdownMenu content lives in a Portal — NOT in DOM until trigger click.
+        await user.click(screen.getByRole('button', { name: /more options/i }))
+        // NOW the dropdown content is mounted and queryable:
         const link = screen.getByRole('link', { name: /open spotify app/i })
         expect(link.getAttribute('href')).toBe('spotify://')
         expect(link.getAttribute('rel')).toContain('noopener')
       })
 
-      it('renders "Disconnect" menu item that calls store.disconnect()', async () => {
+      it('renders "Disconnect" menu item that calls store.disconnect() AFTER trigger click', async () => {
         useSpotifyStore.setState({ state: 'connected-playing', displayName: 'Owner', isPremium: 'yes', currentTrack: { id: 't1', name: 'S', artists: ['A'], isPlaying: true } } as never)
         const user = userEvent.setup()
         render(<SpotifyMiniPlayer />)
-        await user.click(screen.getByRole('button', { name: /disconnect/i }))
+        // Trigger click first — portal mounts on open.
+        await user.click(screen.getByRole('button', { name: /more options/i }))
+        // Disconnect is a DropdownMenuItem with role="menuitem"; click it.
+        await user.click(screen.getByRole('menuitem', { name: /disconnect/i }))
         expect(disconnectMock).toHaveBeenCalledTimes(1)
       })
     })
@@ -749,7 +754,7 @@ From Phase 2/3 Zustand pattern — useAuthStore shape as reference.
 
     3. Implement SpotifyMiniPlayer.tsx. Keep it focused — each state is its own render branch to keep the test assertions surgical. Use lucide-react icons (`Play`, `Pause`, `SkipForward`, `SkipBack`, `MoreVertical` for context-menu trigger).
 
-    For the context menu, use the shadcn DropdownMenu already installed (Phase 2 DropdownMenu is imported from `@/components/ui/dropdown-menu`) — simpler than rolling a ContextMenu primitive. "Disconnect" is a button, "Open Spotify app" is a native `<a>` inside the menu item:
+    For the context menu, use the shadcn DropdownMenu already installed (Phase 2 DropdownMenu is imported from `@/components/ui/dropdown-menu`) — simpler than rolling a ContextMenu primitive. The trigger MUST carry `aria-label="More options"` so tests can find it by role. "Disconnect" is a DropdownMenuItem (which Radix gives `role="menuitem"`), "Open Spotify app" is a native `<a>` inside a DropdownMenuItem with `asChild`:
 
     ```tsx
     <DropdownMenu>
@@ -762,6 +767,8 @@ From Phase 2/3 Zustand pattern — useAuthStore shape as reference.
       </DropdownMenuContent>
     </DropdownMenu>
     ```
+
+    Portal behavior reminder: Radix DropdownMenu renders its content in a Portal — content is NOT in the DOM until the trigger is clicked. Tests assert against menu items ONLY after calling `await user.click(screen.getByRole('button', { name: /more options/i }))` — see the context-menu describe block.
   </action>
   <verify>
     <automated>cd launcher && pnpm vitest run src/renderer/src/components/__tests__/SpotifyMiniPlayer.test.tsx</automated>
@@ -774,9 +781,11 @@ From Phase 2/3 Zustand pattern — useAuthStore shape as reference.
     - `grep "Premium required" launcher/src/renderer/src/components/SpotifyMiniPlayer.tsx` returns ≥1 hit.
     - `grep "Nothing playing" launcher/src/renderer/src/components/SpotifyMiniPlayer.tsx` returns 1 hit.
     - `grep "(offline)" launcher/src/renderer/src/components/SpotifyMiniPlayer.tsx` returns ≥1 hit.
-    - All 15 test assertions pass across the 7 describes.
+    - `grep "aria-label=\"More options\"" launcher/src/renderer/src/components/SpotifyMiniPlayer.tsx` returns 1 hit (DropdownMenuTrigger accessible name — required for test-by-role).
+    - SpotifyMiniPlayer.test.tsx context-menu describe block performs `await user.click(screen.getByRole('button', { name: /more options/i }))` BEFORE asserting on the "Open Spotify app" link or the "Disconnect" menuitem — `grep "more options" launcher/src/renderer/src/components/__tests__/SpotifyMiniPlayer.test.tsx` returns ≥2 hits.
+    - All 15 test assertions pass across the 7 describes (incl. trigger-click-then-assert pattern for the 2 context-menu tests).
   </acceptance_criteria>
-  <done>SpotifyMiniPlayer renders all 6 states + crossfade + context menu; tests green.</done>
+  <done>SpotifyMiniPlayer renders all 6 states + crossfade + context menu; tests green (incl. Radix-Portal-aware context-menu pattern).</done>
 </task>
 
 <task type="auto" tdd="true">
@@ -1004,14 +1013,14 @@ From Phase 2/3 Zustand pattern — useAuthStore shape as reference.
 </verification>
 
 <success_criteria>
-UI-06 end-to-end delivered. All 6 mini-player states exposed (disconnected / connecting / idle / playing / offline / no-premium). Controls disabled with tooltip on free-tier accounts. Context menu offers Open Spotify app + Disconnect. Settings pane mirrors disconnect/reconnect flow. Visibility-driven polling cadence wired (focus/blur → setVisibility).
+UI-06 end-to-end delivered. All 6 mini-player states exposed (disconnected / connecting / idle / playing / offline / no-premium). Controls disabled with tooltip on free-tier accounts. Context menu offers Open Spotify app + Disconnect (tests correctly click the DropdownMenu trigger before asserting on menu items — Radix Portal is not in DOM until open). Settings pane mirrors disconnect/reconnect flow. Visibility-driven polling cadence wired (focus/blur → setVisibility).
 </success_criteria>
 
 <output>
 After completion, create `.planning/phases/04-launcher-ui-polish/04-06-spotify-renderer-ui-SUMMARY.md` documenting:
 - 6 mini-player states + which data drives each
 - premiumRequired UX behavior (disabled controls + tooltip)
-- Context menu item semantics (spotify:// URL vs disconnect)
+- Context menu item semantics (spotify:// URL vs disconnect) + Radix-Portal-aware test pattern
 - Visibility wiring (focus/blur)
 - Any UI deviations from RESEARCH
 </output>

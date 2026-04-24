@@ -30,6 +30,7 @@ must_haves:
     - "settings.json v1 → v2 migration preserves ramMb/firstRunSeen and adds theme: {accent: '#16e0ee', reduceMotion: 'system'} defaults"
     - "useMotionConfig() returns 0 durations when user override = 'on' OR when user = 'system' AND OS prefers-reduced-motion"
     - "@font-face loaders for Inter + JetBrains Mono are declared with font-display: swap"
+    - "presets.ts carries a leading comment noting D-13 → RESEARCH preset name/hex substitution (Red/Yellow/Gray illustrative → Crimson/Amber/Slate tuned for WCAG 2.1 SC 1.4.11 ≥3:1)"
   artifacts:
     - path: "launcher/src/renderer/src/global.css"
       provides: "Full token catalog in @theme + @font-face for Inter + JBMono"
@@ -125,6 +126,7 @@ This plan bumps `version: 1` → `version: 2` and adds `theme: { accent: string;
     - .planning/phases/04-launcher-ui-polish/04-RESEARCH.md §Tailwind v4 Theme Architecture → §Single-source token catalog (verbatim CSS block to write)
     - .planning/phases/04-launcher-ui-polish/04-RESEARCH.md §Tailwind v4 Theme Architecture → §@theme pitfall (literal values ONLY in @theme)
     - .planning/phases/04-launcher-ui-polish/04-RESEARCH.md §Accent Color Palette → §Final 8 presets (verbatim table of hex values)
+    - .planning/phases/04-launcher-ui-polish/04-CONTEXT.md §D-13 (illustrative preset name list — Red/Yellow/Gray replaced by RESEARCH's Crimson/Amber/Slate for WCAG contrast)
     - .planning/phases/04-launcher-ui-polish/04-RESEARCH.md §Typography → §Bundling strategy (verbatim @font-face block)
     - .planning/phases/04-launcher-ui-polish/04-RESEARCH.md §Motion Stack → §Duration / easing CSS variables
   </read_first>
@@ -158,7 +160,7 @@ This plan bumps `version: 1` → `version: 2` and adds `theme: { accent: string;
     - @font-face for JetBrains Mono points at ./assets/fonts/jetbrains-mono/JetBrainsMono-Variable.woff2 with font-display: swap
     - The old `--color-wiiwho-accent: #16e0ee` token is REMOVED (replaced by `--color-accent`) — legacy consumers fixed in Plan 04-07 integration
     - body font-family resolves to `var(--font-sans)` (replacing the literal -apple-system list currently on body)
-    - theme/presets.ts exports ACCENT_PRESETS as a readonly tuple of 8 objects with id/name/hex matching RESEARCH §Final 8 presets exactly (Cyan first as default)
+    - theme/presets.ts exports ACCENT_PRESETS as a readonly tuple of 8 objects with id/name/hex matching RESEARCH §Final 8 presets exactly (Cyan first as default). File carries a leading JSDoc block documenting the D-13 → RESEARCH substitution (Red/Yellow/Gray illustrative starting points retuned to Crimson/Amber/Slate for WCAG contrast on `#111111`).
     - theme/motion.ts exports the 6 constants in RESEARCH §Duration / easing CSS variables, JS-side duplication block
     - test/motion.test.ts (Wave 0 stub) gets real assertions: @theme contains all required tokens (static parse of global.css), ACCENT_PRESETS has length 8, first entry is cyan, each entry has /^#[0-9a-f]{6}$/i hex, DURATION_FAST === 0.12 exactly
   </behavior>
@@ -240,11 +242,18 @@ This plan bumps `version: 1` → `version: 2` and adds `theme: { accent: string;
 
     ```ts
     /**
-     * Accent preset catalog — single source of truth for the ThemePicker swatches
-     * (components/ThemePicker.tsx). Mirrors the 8 --color-preset-* CSS vars in global.css.
+     * 8 accent color presets per CONTEXT D-13 + RESEARCH tuning.
      *
-     * WCAG 2.1 Non-text Contrast (≥3:1 UI on #111111 bg) — all 8 presets verified
-     * (RESEARCH §Accent Color Palette §Final 8 presets).
+     * D-13 listed illustrative values for Red/Yellow/Gray; RESEARCH retuned to
+     * Crimson/Amber/Slate for WCAG 2.1 SC 1.4.11 Non-text Contrast ≥3:1 against
+     * --color-wiiwho-bg (#111111). All 8 hexes verified against #111111 background
+     * by RESEARCH. D-13's "Exact preset hexes are research/planner discretion"
+     * grant authorizes this substitution; this file is the single source of truth.
+     *
+     * Downstream consumers:
+     *   - docs/DESIGN-SYSTEM.md §Colors table mirrors this list (Plan 04-07).
+     *   - global.css @theme block declares a --color-preset-<id> CSS var per entry.
+     *   - ThemePicker (Plan 04-04) renders one swatch per entry.
      */
     export interface AccentPreset {
       readonly id: 'cyan' | 'mint' | 'violet' | 'tangerine' | 'pink' | 'crimson' | 'amber' | 'slate'
@@ -258,9 +267,9 @@ This plan bumps `version: 1` → `version: 2` and adds `theme: { accent: string;
       { id: 'violet',    name: 'Violet',    hex: '#a855f7' },
       { id: 'tangerine', name: 'Tangerine', hex: '#f97316' },
       { id: 'pink',      name: 'Pink',      hex: '#ec4899' },
-      { id: 'crimson',   name: 'Crimson',   hex: '#f87171' },
-      { id: 'amber',     name: 'Amber',     hex: '#fbbf24' },
-      { id: 'slate',     name: 'Slate',     hex: '#cbd5e1' },
+      { id: 'crimson',   name: 'Crimson',   hex: '#f87171' },  // RESEARCH-tuned (D-13 listed "Red" as illustrative)
+      { id: 'amber',     name: 'Amber',     hex: '#fbbf24' },  // RESEARCH-tuned (D-13 listed "Yellow" as illustrative)
+      { id: 'slate',     name: 'Slate',     hex: '#cbd5e1' },  // RESEARCH-tuned (D-13 listed "Gray" as illustrative)
     ] as const
 
     /** Default accent if user hasn't picked one (D-13 cyan lock preserves Phase 1 D-09). */
@@ -341,6 +350,12 @@ This plan bumps `version: 1` → `version: 2` and adds `theme: { accent: string;
         for (const p of ACCENT_PRESETS) expect(p.hex).toMatch(/^#[0-9a-f]{6}$/i)
       })
       it('DEFAULT_ACCENT_HEX === "#16e0ee"', () => expect(DEFAULT_ACCENT_HEX).toBe('#16e0ee'))
+      it('documents D-13 → RESEARCH substitution in a leading JSDoc comment', () => {
+        const src = readFileSync(resolve(__dirname, '../theme/presets.ts'), 'utf8')
+        expect(src).toMatch(/D-13 listed illustrative values/i)
+        expect(src).toMatch(/RESEARCH retuned to\s+Crimson\/Amber\/Slate/i)
+        expect(src).toMatch(/WCAG 2\.1 SC 1\.4\.11/)
+      })
     })
 
     describe('theme/motion.ts', () => {
@@ -358,9 +373,6 @@ This plan bumps `version: 1` → `version: 2` and adds `theme: { accent: string;
       })
     })
     ```
-  </behavior>
-  <action>
-    Follow the behavior block above exactly. TDD cycle: (a) replace test/motion.test.ts with the real tests → run → see failures / green where applicable; (b) rewrite global.css; (c) create theme/presets.ts + theme/motion.ts; (d) run the test file — all should pass.
   </action>
   <verify>
     <automated>cd launcher && pnpm vitest run src/renderer/src/test/motion.test.ts</automated>
@@ -373,10 +385,12 @@ This plan bumps `version: 1` → `version: 2` and adds `theme: { accent: string;
     - `grep "font-display: swap" launcher/src/renderer/src/global.css` returns 2 hits (Inter + JBMono).
     - `grep "\\-\\-color-wiiwho-accent" launcher/src/renderer/src/` returns 0 hits (old token fully removed — Plan 04-07 has legacy cleanup).
     - `launcher/src/renderer/src/theme/presets.ts` exports `ACCENT_PRESETS` with 8 entries, first id === 'cyan', hex === '#16e0ee'.
+    - `grep "D-13 listed illustrative values" launcher/src/renderer/src/theme/presets.ts` returns 1 hit (D-13 → RESEARCH substitution documented).
+    - `grep "WCAG 2.1 SC 1.4.11" launcher/src/renderer/src/theme/presets.ts` returns 1 hit (contrast rationale documented).
     - `launcher/src/renderer/src/theme/motion.ts` exports `DURATION_FAST === 0.12`, `DURATION_MED === 0.20`, `DURATION_SLOW === 0.32`.
-    - `pnpm vitest run src/renderer/src/test/motion.test.ts` exits 0 with all assertions green.
+    - `pnpm vitest run src/renderer/src/test/motion.test.ts` exits 0 with all assertions green (including the new presets.ts JSDoc grep test).
   </acceptance_criteria>
-  <done>global.css rewritten with full token catalog; theme/presets.ts + theme/motion.ts created; motion.test.ts green.</done>
+  <done>global.css rewritten with full token catalog; theme/presets.ts (with D-13/RESEARCH substitution comment) + theme/motion.ts created; motion.test.ts green.</done>
 </task>
 
 <task type="auto" tdd="true">
@@ -796,7 +810,7 @@ This plan bumps `version: 1` → `version: 2` and adds `theme: { accent: string;
 </verification>
 
 <success_criteria>
-UI-01 foundation: accent persistence + runtime :root mutation verified. UI-03 foundation: duration/easing tokens in global.css + useMotionConfig resolver with correct OS/user-override precedence. UI-07 foundation: token catalog single-source-of-truth established (global.css @theme authoritative, theme/presets.ts + theme/motion.ts mirror for JS consumers).
+UI-01 foundation: accent persistence + runtime :root mutation verified. UI-03 foundation: duration/easing tokens in global.css + useMotionConfig resolver with correct OS/user-override precedence. UI-07 foundation: token catalog single-source-of-truth established (global.css @theme authoritative, theme/presets.ts + theme/motion.ts mirror for JS consumers). D-13 → RESEARCH preset substitution documented in presets.ts header (forwarded to Plan 04-07's DESIGN-SYSTEM.md §Colors footnote).
 </success_criteria>
 
 <output>
@@ -804,5 +818,6 @@ After completion, create `.planning/phases/04-launcher-ui-polish/04-01-tokens-an
 - Tokens added to @theme (list + values)
 - Settings schema v1→v2 migration behavior
 - useMotionConfig resolution table (user × OS → reduced)
+- presets.ts D-13 → RESEARCH substitution note (for forward-reference by DESIGN-SYSTEM.md)
 - Any deviations from RESEARCH values
 </output>

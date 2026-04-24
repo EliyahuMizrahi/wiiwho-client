@@ -125,7 +125,7 @@ From radix-ui (already installed):
 import * as Dialog from '@radix-ui/react-dialog'  // or via shadcn's ui/dialog.tsx
 ```
 
-RESEARCH §Radix Dialog Bottom-Slide — verbatim pattern: `Dialog.Portal forceMount` + `Dialog.Overlay asChild forceMount` + `Dialog.Content asChild forceMount` wrapped in `AnimatePresence`.
+RESEARCH §Radix Dialog Bottom-Slide — verbatim pattern: `Dialog.Portal forceMount` (UNCONDITIONAL — no {open &&} wrapper) + `AnimatePresence INSIDE the Portal` + `{open && (...)}` guard INSIDE AnimatePresence wrapping Overlay + Content, both using `asChild forceMount`.
 </interfaces>
 
 <tasks>
@@ -144,7 +144,9 @@ RESEARCH §Radix Dialog Bottom-Slide — verbatim pattern: `Dialog.Portal forceM
   <behavior>
     - SettingsModal reads `modalOpen` + `openPane` from useSettingsStore
     - Controlled Radix Dialog.Root with open={modalOpen} onOpenChange={setModalOpen}
-    - Inside AnimatePresence, Dialog.Portal forceMount → Dialog.Overlay asChild forceMount (motion.div fade) → Dialog.Content asChild forceMount (motion.div slide-up + fade)
+    - **CANONICAL NESTING (per RESEARCH §Radix Dialog Bottom-Slide):**
+      `Dialog.Root` → `Dialog.Portal forceMount` (ALWAYS MOUNTED — no `{open && ...}` wrapper around Portal!) → `AnimatePresence` (INSIDE Portal) → `{open && (<>...)</>}` guard INSIDE AnimatePresence → `Dialog.Overlay asChild forceMount` (motion.div fade) + `Dialog.Content asChild forceMount` (motion.div slide-up + fade).
+      This nesting is MANDATORY: wrapping Portal in `{open && ...}` unmounts the subtree before AnimatePresence can run exit animations, making `forceMount` meaningless at runtime even though grep may pass.
     - Overlay: className `fixed inset-0 bg-black/60 z-40`, initial/animate/exit opacity
     - Content: className `fixed bottom-0 left-[220px] right-0 z-50 h-[560px] bg-wiiwho-surface border-t border-wiiwho-border rounded-t-lg shadow-2xl flex overflow-hidden`
     - Slide animation: `y: reduced ? 0 : '100%'` → `y: 0` → `y: reduced ? 0 : '100%'`; transition duration: durationSlow (0.32 or 0), ease: EASE_EMPHASIZED
@@ -406,7 +408,9 @@ RESEARCH §Radix Dialog Bottom-Slide — verbatim pattern: `Dialog.Portal forceM
     }
     ```
 
-    4. Create `launcher/src/renderer/src/components/SettingsModal.tsx` — use Radix Dialog PRIMITIVES directly (import from `@radix-ui/react-dialog` or use the unified `radix-ui` package the project already ships). Follow RESEARCH §Canonical Settings modal implementation verbatim:
+    4. Create `launcher/src/renderer/src/components/SettingsModal.tsx` — use Radix Dialog PRIMITIVES directly (import from `@radix-ui/react-dialog` or use the unified `radix-ui` package the project already ships). Follow RESEARCH §Canonical Settings modal implementation verbatim.
+
+    **CRITICAL NESTING (per checker-verified canonical pattern):** Portal is ALWAYS mounted (no `{open && ...}` wrapper around Portal). `AnimatePresence` lives INSIDE the Portal. The `{open && (...)}` guard lives INSIDE AnimatePresence and wraps ONLY Overlay + Content. If you wrap Portal in `{open && ...}`, React unmounts the subtree BEFORE AnimatePresence can run exit animations — `forceMount` becomes meaningless at runtime even though a grep for `forceMount` still passes.
 
     ```tsx
     /**
@@ -416,9 +420,15 @@ RESEARCH §Radix Dialog Bottom-Slide — verbatim pattern: `Dialog.Portal forceM
      * D-09: height 560px, width = viewport minus sidebar (left-[220px] right-0).
      * Three dismissal gestures (D-08): X button + ESC + backdrop click.
      *
-     * Architecture (RESEARCH §Radix Dialog Bottom-Slide):
+     * Architecture (RESEARCH §Radix Dialog Bottom-Slide — CANONICAL):
      *   - Controlled Radix Dialog.Root (modalOpen state from useSettingsStore).
-     *   - AnimatePresence wraps Portal so framer-motion owns mount lifecycle.
+     *   - Portal is ALWAYS mounted — forceMount, no {open && ...} guard around it.
+     *     (Guarding Portal unmounts the subtree BEFORE framer-motion can run exit;
+     *      forceMount then becomes a runtime no-op even though grep still finds it.)
+     *   - AnimatePresence lives INSIDE the Portal.
+     *   - {open && (...)} guard lives INSIDE AnimatePresence and wraps only
+     *     Overlay + Content — this lets AnimatePresence observe the children
+     *     toggle and run enter/exit animations.
      *   - Portal + Overlay + Content all use `forceMount` (Pitfall 4) so Radix
      *     doesn't unmount before framer-motion runs exit.
      *   - Slide uses y: '100%' → 0 → '100%' collapsed to y: 0 when motion is reduced.
@@ -443,58 +453,60 @@ RESEARCH §Radix Dialog Bottom-Slide — verbatim pattern: `Dialog.Portal forceM
 
       return (
         <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
-          <AnimatePresence>
-            {open && (
-              <DialogPrimitive.Portal forceMount>
-                <DialogPrimitive.Overlay asChild forceMount>
-                  <motion.div
-                    className="fixed inset-0 bg-black/60 z-40"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: durationMed }}
-                  />
-                </DialogPrimitive.Overlay>
-                <DialogPrimitive.Content asChild forceMount aria-describedby={undefined}>
-                  <motion.div
-                    className="fixed bottom-0 left-[220px] right-0 z-50 h-[560px] bg-wiiwho-surface border-t border-wiiwho-border rounded-t-lg shadow-2xl flex overflow-hidden"
-                    initial={{ opacity: 0, y: reduced ? 0 : '100%' }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: reduced ? 0 : '100%' }}
-                    transition={{ duration: durationSlow, ease: [...EASE_EMPHASIZED] as unknown as [number, number, number, number] }}
-                  >
-                    <DialogPrimitive.Title className="sr-only">Settings</DialogPrimitive.Title>
+          <DialogPrimitive.Portal forceMount>
+            <AnimatePresence>
+              {open && (
+                <>
+                  <DialogPrimitive.Overlay asChild forceMount>
+                    <motion.div
+                      className="fixed inset-0 bg-black/60 z-40"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: durationMed, ease: [0.4, 0, 0.2, 1] }}
+                    />
+                  </DialogPrimitive.Overlay>
+                  <DialogPrimitive.Content asChild forceMount aria-describedby={undefined}>
+                    <motion.div
+                      className="fixed bottom-0 left-[220px] right-0 z-50 h-[560px] bg-wiiwho-surface border-t border-wiiwho-border rounded-t-lg shadow-2xl flex overflow-hidden"
+                      initial={{ opacity: 0, y: reduced ? 0 : '100%' }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: reduced ? 0 : '100%' }}
+                      transition={{ duration: durationSlow, ease: [...EASE_EMPHASIZED] as unknown as [number, number, number, number] }}
+                    >
+                      <DialogPrimitive.Title className="sr-only">Settings</DialogPrimitive.Title>
 
-                    <SettingsSubSidebar />
+                      <SettingsSubSidebar />
 
-                    <div className="flex-1 p-6 overflow-y-auto relative">
-                      <DialogPrimitive.Close asChild>
-                        <button
-                          type="button"
-                          aria-label="Close settings"
-                          className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-200 p-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                        >
-                          <X className="size-5" aria-hidden="true" />
-                        </button>
-                      </DialogPrimitive.Close>
+                      <div className="flex-1 p-6 overflow-y-auto relative">
+                        <DialogPrimitive.Close asChild>
+                          <button
+                            type="button"
+                            aria-label="Close settings"
+                            className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-200 p-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                          >
+                            <X className="size-5" aria-hidden="true" />
+                          </button>
+                        </DialogPrimitive.Close>
 
-                      {openPane === 'general'    && <GeneralPane />}
-                      {openPane === 'account'    && <AccountPane />}
-                      {openPane === 'appearance' && <div data-testid="appearance-pane-stub" className="text-neutral-500">Appearance (Plan 04-04)</div>}
-                      {openPane === 'spotify'    && <div data-testid="spotify-pane-stub" className="text-neutral-500">Spotify (Plan 04-06)</div>}
-                      {openPane === 'about'      && <AboutPane />}
-                    </div>
-                  </motion.div>
-                </DialogPrimitive.Content>
-              </DialogPrimitive.Portal>
-            )}
-          </AnimatePresence>
+                        {openPane === 'general'    && <GeneralPane />}
+                        {openPane === 'account'    && <AccountPane />}
+                        {openPane === 'appearance' && <div data-testid="appearance-pane-stub" className="text-neutral-500">Appearance (Plan 04-04)</div>}
+                        {openPane === 'spotify'    && <div data-testid="spotify-pane-stub" className="text-neutral-500">Spotify (Plan 04-06)</div>}
+                        {openPane === 'about'      && <AboutPane />}
+                      </div>
+                    </motion.div>
+                  </DialogPrimitive.Content>
+                </>
+              )}
+            </AnimatePresence>
+          </DialogPrimitive.Portal>
         </DialogPrimitive.Root>
       )
     }
     ```
 
-    NOTE: If `@radix-ui/react-dialog` is not directly exposed by the unified `radix-ui` package (4.x uses a different import style), use the shadcn primitives already installed under `components/ui/dialog.tsx` and wrap its exports. Consult `launcher/src/renderer/src/components/ui/dialog.tsx` (Phase 2 shadcn addition) to see which primitive-level components are available (`Dialog.Root`, `Dialog.Portal`, `Dialog.Overlay`, `Dialog.Content`, `Dialog.Close`, `Dialog.Title`). The `forceMount` prop is standard Radix across both import paths.
+    NOTE: If `@radix-ui/react-dialog` is not directly exposed by the unified `radix-ui` package (4.x uses a different import style), use the shadcn primitives already installed under `components/ui/dialog.tsx` and wrap its exports. Consult `launcher/src/renderer/src/components/ui/dialog.tsx` (Phase 2 shadcn addition) to see which primitive-level components are available (`Dialog.Root`, `Dialog.Portal`, `Dialog.Overlay`, `Dialog.Content`, `Dialog.Close`, `Dialog.Title`). The `forceMount` prop is standard Radix across both import paths. **The nesting above must be preserved regardless of import path.**
 
     5. Run tests and verify all assertions pass.
   </action>
@@ -503,6 +515,9 @@ RESEARCH §Radix Dialog Bottom-Slide — verbatim pattern: `Dialog.Portal forceM
   </verify>
   <acceptance_criteria>
     - `grep "forceMount" launcher/src/renderer/src/components/SettingsModal.tsx` returns ≥3 hits (Portal + Overlay + Content — Pitfall 4).
+    - `grep "DialogPrimitive.Portal forceMount>" launcher/src/renderer/src/components/SettingsModal.tsx` returns ≥1 hit — **and the line IMMEDIATELY before it must NOT contain `{open &&` (Portal is unconditionally mounted; guarding it defeats forceMount at runtime).**
+    - In SettingsModal.tsx, the line containing `<AnimatePresence` must appear AFTER the line containing `<DialogPrimitive.Portal` in source order (AnimatePresence lives INSIDE the Portal, not outside it). Verify with: `awk '/<DialogPrimitive.Portal/{p=NR} /<AnimatePresence/{a=NR} END{exit !(p < a)}' launcher/src/renderer/src/components/SettingsModal.tsx` returns 0.
+    - In SettingsModal.tsx, the `{open && (` guard must appear AFTER `<AnimatePresence` and BEFORE `<DialogPrimitive.Overlay` in source order (the guard wraps only Overlay + Content, which is how AnimatePresence observes the children toggle). Verify with a similar awk ordering check.
     - `grep "from 'motion/react'" launcher/src/renderer/src/components/SettingsModal.tsx` returns 1 hit.
     - `grep "layoutId=\"settings-subnav-pill\"" launcher/src/renderer/src/components/SettingsPanes/SettingsSubSidebar.tsx` returns 1 hit.
     - `grep "left-\\[220px\\]" launcher/src/renderer/src/components/SettingsModal.tsx` returns 1 hit (D-09 "over main area only").
@@ -925,19 +940,22 @@ RESEARCH §Radix Dialog Bottom-Slide — verbatim pattern: `Dialog.Portal forceM
 - `cd launcher && pnpm --filter ./launcher run test:run` exits 0.
 - `pnpm --filter ./launcher run typecheck` exits 0.
 - `grep "forceMount" launcher/src/renderer/src/components/SettingsModal.tsx` returns ≥3 hits.
+- The SettingsModal.tsx source has Portal UNCONDITIONALLY mounted (no `{open && ...}` wrapper around `<DialogPrimitive.Portal`); AnimatePresence lives INSIDE the Portal; the `{open && (...)}` guard lives INSIDE AnimatePresence wrapping Overlay + Content.
 - `grep "layoutId" launcher/src/renderer/src/components/SettingsPanes/SettingsSubSidebar.tsx` returns 1 hit.
-- Opening the modal via `useSettingsStore.getState().setModalOpen(true)` in dev-mode renders the bottom slide shell with sub-sidebar + active pane.
+- Opening the modal via `useSettingsStore.getState().setModalOpen(true)` in dev-mode renders the bottom slide shell with sub-sidebar + active pane AND, upon close, plays the full 320ms slide-down exit animation (not an instant unmount).
 </verification>
 
 <success_criteria>
-Settings modal chrome + 3 of 5 panes ship. UI-03 motion stack proven end-to-end on the modal (slide-up + fade + reduced-motion collapse). UI-04 sidebar → modal dispatch works. UI-05 anti-bloat grep clean across modal + all new panes. Plan 04-04 can slot ThemePicker into the Appearance stub; Plan 04-06 can slot Spotify pane content into the Spotify stub.
+Settings modal chrome + 3 of 5 panes ship. UI-03 motion stack proven end-to-end on the modal (slide-up + fade + reduced-motion collapse, with EXIT animations actually running — not skipped). UI-04 sidebar → modal dispatch works. UI-05 anti-bloat grep clean across modal + all new panes. Plan 04-04 can slot ThemePicker into the Appearance stub; Plan 04-06 can slot Spotify pane content into the Spotify stub.
 </success_criteria>
 
 <output>
 After completion, create `.planning/phases/04-launcher-ui-polish/04-03-settings-modal-chrome-SUMMARY.md` documenting:
 - forceMount verification (Portal + Overlay + Content all present)
+- Nesting confirmation: Portal unconditional; AnimatePresence INSIDE Portal; {open &&} guard INSIDE AnimatePresence
 - Sub-sidebar pane order + labels
 - GeneralPane content summary (includes RamSlider migration note)
 - AccountPane D-15 preservation (no confirm dialog)
 - Remaining stubs for Plans 04-04 (Appearance) + 04-06 (Spotify)
+</output>
 </output>

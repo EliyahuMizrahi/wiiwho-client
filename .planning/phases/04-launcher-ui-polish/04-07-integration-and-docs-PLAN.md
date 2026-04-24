@@ -40,6 +40,7 @@ must_haves:
     - "main/index.ts registers the Spotify IPC handlers on app.whenReady()"
     - "docs/DESIGN-SYSTEM.md contains all D-36 sections including the literal 'Exclusion checklist' heading with all 18 enumerated items"
     - "The exclusion checklist literal string 'WiiWho does NOT display: ads, news feeds, concurrent-user counts, friends lists, marketing content' appears verbatim"
+    - "DESIGN-SYSTEM.md §Colors preset table carries a footnote: 'Preset names and hexes reflect RESEARCH-tuned values; D-13 listed Red/Yellow/Gray as illustrative starting points.'"
     - "scripts/check-docs.mjs extended with a DESIGN-SYSTEM section validator"
     - "A repo-wide grep test verifies zero ad/news/friends/concurrent-user markup in launcher/src/renderer outside of the exclusion-checklist doc"
   artifacts:
@@ -56,9 +57,9 @@ must_haves:
       provides: "Extended with DESIGN-SYSTEM section validators"
   key_links:
     - from: "launcher/src/renderer/src/App.tsx"
-      to: "Sidebar + Play + Cosmetics + SettingsModal + SpotifyMiniPlayer"
+      to: "Sidebar + Play + Cosmetics + SettingsModal + SpotifyMiniPlayer + DeviceCodeModal"
       via: "conditional render based on authState + activeSection"
-      pattern: "<Sidebar|<SettingsModal|<Play|<Cosmetics"
+      pattern: "<Sidebar|<SettingsModal|<Play|<Cosmetics|<DeviceCodeModal"
     - from: "launcher/src/main/index.ts"
       to: "registerSpotifyHandlers"
       via: "app.whenReady() bootstrap"
@@ -87,6 +88,8 @@ Output: Integrated App.tsx + bootstrap wiring + docs/DESIGN-SYSTEM.md + extended
 @.planning/phases/04-launcher-ui-polish/04-RESEARCH.md
 @.planning/phases/04-launcher-ui-polish/04-VALIDATION.md
 @launcher/src/renderer/src/App.tsx
+@launcher/src/renderer/src/components/DeviceCodeModal.tsx
+@launcher/src/renderer/src/components/LoginScreen.tsx
 @launcher/src/main/index.ts
 @scripts/check-docs.mjs
 @.planning/phases/04-launcher-ui-polish/04-01-tokens-and-settings-SUMMARY.md
@@ -120,6 +123,15 @@ export const useSettingsStore  // with theme + modal state + initialize that re-
 export function LoginScreen, LoadingScreen, DeviceCodeModal, CrashViewer, AccountBadge
 ```
 
+Phase 2 DeviceCodeModal contract (re-verified by executor):
+```typescript
+// launcher/src/renderer/src/components/DeviceCodeModal.tsx
+export function DeviceCodeModal(): React.JSX.Element
+// Self-contained: reads useAuthStore.deviceCode; renders nothing when undefined.
+// Safe to mount in multiple branches — internally guards against missing payload.
+```
+Phase 2 rendered DeviceCodeModal inside LoginScreen. Phase 4 ADDITIONALLY mounts it in the logged-in tree so re-auth / token-refresh device-code pushes surface correctly without routing the user back to LoginScreen.
+
 From Plan 04-05:
 ```typescript
 export function registerSpotifyHandlers(getPrimaryWindow: () => BrowserWindow | null): void
@@ -134,6 +146,8 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
   <files>launcher/src/renderer/src/App.tsx, launcher/src/renderer/src/__tests__/App.integration.test.tsx, launcher/src/main/index.ts</files>
   <read_first>
     - launcher/src/renderer/src/App.tsx (current shape — keep auth + crash + device-code lifecycle, rewrite logged-in tree)
+    - launcher/src/renderer/src/components/DeviceCodeModal.tsx (Phase 2 contract — self-contained, reads useAuthStore.deviceCode, safe to mount anywhere)
+    - launcher/src/renderer/src/components/LoginScreen.tsx (currently also renders DeviceCodeModal — Phase 2 behavior preserved; we ADD a second mount to the logged-in tree, not replace)
     - launcher/src/main/index.ts (current bootstrap order — installRedactor + registerAuthHandlers + registerGameHandlers + registerSettingsHandlers + registerLogsHandlers)
     - launcher/src/renderer/src/components/Sidebar.tsx + MainArea/Play.tsx + MainArea/Cosmetics.tsx + SettingsModal.tsx
     - launcher/src/renderer/src/stores/spotify.ts (initialize + teardown lifecycle)
@@ -157,11 +171,12 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
         <DeviceCodeModal />
       </div>
       ```
+    - **DeviceCodeModal MUST be mounted in the logged-in tree** (belt-and-suspenders): Phase 2's LoginScreen mount covers first-login device-code pushes; the new logged-in-tree mount covers re-auth / token-refresh pushes that fire while the user is on Play/Cosmetics. DeviceCodeModal is self-guarding (renders nothing when useAuthStore.deviceCode is undefined), so double-mounting during state transitions is safe.
     - App.tsx useEffect adds `useSpotifyStore.getState().initialize()` + `useSpotifyStore.getState().teardown()` teardown on unmount
     - Remove: gear icon button in top-right + SettingsDrawer import + settingsOpen local state (that's now in useSettingsStore)
     - CrashViewer branch unchanged (still a full-page takeover)
     - main/index.ts: registerSpotifyHandlers call added after the existing logs handlers. Import: `import { registerSpotifyHandlers } from './ipc/spotify'`
-    - App.integration.test.tsx verifies the logged-in tree: Sidebar + Play visible by default, click Cosmetics → Play unmounts + Cosmetics mounts, click Settings gear → Modal appears; crashed state still renders CrashViewer full-page (regression check)
+    - App.integration.test.tsx verifies the logged-in tree: Sidebar + Play visible by default, click Cosmetics → Play unmounts + Cosmetics mounts, click Settings gear → Modal appears; DeviceCodeModal mounts (and surfaces the device code when auth store fires a device-code payload); crashed state still renders CrashViewer full-page (regression check)
   </behavior>
   <action>
     1. Create `launcher/src/renderer/src/__tests__/App.integration.test.tsx`:
@@ -235,6 +250,7 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
         initialized: true,
         initialize: vi.fn().mockResolvedValue(undefined),
         logout: vi.fn().mockResolvedValue(undefined),
+        deviceCode: undefined,
       } as never)
       useGameStore.setState({ phase: { state: 'idle' }, subscribe: () => () => {}, play: vi.fn(), resetToIdle: vi.fn() } as never)
       useSettingsStore.setState({
@@ -250,7 +266,6 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
     describe('App — logged-in integration', () => {
       it('renders Sidebar (nav with Play + Cosmetics + Settings gear)', () => {
         render(<App />)
-        // minimum-hold timer — fast-forward or advance
         expect(screen.getByRole('navigation', { name: /primary navigation/i })).toBeDefined()
       })
 
@@ -284,6 +299,28 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
         expect(src).not.toMatch(/SettingsDrawer/)
       })
 
+      it('App imports and mounts <DeviceCodeModal /> in the logged-in tree (Phase 2 regression guard)', async () => {
+        const fs = await import('node:fs')
+        const src = fs.readFileSync(new URL('../App.tsx', import.meta.url), 'utf8')
+        expect(src).toMatch(/import\s*\{\s*DeviceCodeModal\s*\}\s*from\s*['"]\.\/components\/DeviceCodeModal['"]/)
+        expect(src).toMatch(/<DeviceCodeModal\s*\/?>/)
+      })
+
+      it('DeviceCodeModal surfaces the device code when auth store fires a device-code payload while logged-in', () => {
+        // Simulate a re-auth device-code push arriving during logged-in state.
+        useAuthStore.setState({
+          deviceCode: {
+            userCode: 'WIIW-TEST',
+            verificationUri: 'https://microsoft.com/link',
+            expiresInSec: 900,
+          },
+        } as never)
+        render(<App />)
+        // DeviceCodeModal renders the user code when deviceCode payload is present.
+        // Exact text assertion matches DeviceCodeModal's current output (Phase 2).
+        expect(screen.getByText(/WIIW-TEST/)).toBeDefined()
+      })
+
       it('crashed gamePhase still routes to CrashViewer (Phase 3 D-18 preserved)', () => {
         useGameStore.setState({ phase: { state: 'crashed', sanitizedBody: 'crash body', crashId: 'c-1' }, subscribe: () => () => {}, play: vi.fn(), resetToIdle: vi.fn() } as never)
         render(<App />)
@@ -292,11 +329,8 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
       })
 
       it('App useEffect initializes useSpotifyStore', async () => {
-        const spy = vi.spyOn(useSpotifyStore.getState(), 'initialize' as never)
         render(<App />)
         await new Promise((r) => setTimeout(r, 20))
-        // initialize is called via useEffect; may be called through store instead
-        // Simpler assertion: window.wiiwho.spotify.status was called (which initialize does)
         expect(window.wiiwho.spotify.status).toHaveBeenCalled()
       })
     })
@@ -309,11 +343,16 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
      * App root — Phase 4 layout.
      *
      * Logged-in branch:
-     *   <Sidebar /> | <main> AnimatePresence(Play | Cosmetics) + <AccountBadge> </main> | <SettingsModal /> overlay
+     *   <Sidebar /> | <main> AnimatePresence(Play | Cosmetics) + <AccountBadge> </main> | <SettingsModal /> | <DeviceCodeModal />
      *
      * Phase 3 SettingsDrawer and the top-right gear icon were removed:
      *   - The gear moved into Sidebar bottom (Plan 04-02).
      *   - The drawer was replaced with a bottom-slide modal (Plan 04-03).
+     *
+     * DeviceCodeModal is mounted in BOTH LoginScreen (Phase 2, first-login) AND
+     * here (Phase 4, covers re-auth / token-refresh pushes that fire while
+     * logged-in). The component is self-guarding — it renders nothing when
+     * useAuthStore.deviceCode is undefined, so double-mount is safe.
      *
      * Lifecycle:
      *   - initializeAuth (Phase 2)
@@ -331,6 +370,7 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
     import { LoginScreen } from './components/LoginScreen'
     import { LoadingScreen } from './components/LoadingScreen'
     import { AccountBadge } from './components/AccountBadge'
+    import { DeviceCodeModal } from './components/DeviceCodeModal'
     import { Sidebar } from './components/Sidebar'
     import { SettingsModal } from './components/SettingsModal'
     import { Play } from './components/MainArea/Play'
@@ -428,12 +468,15 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
             </div>
           </main>
           <SettingsModal />
+          <DeviceCodeModal />
         </div>
       )
     }
 
     export default App
     ```
+
+    **NOTE on DeviceCodeModal placement:** Place `<DeviceCodeModal />` immediately after `<SettingsModal />` inside the root `<div>`. Both are top-level overlays; order does not affect z-index (each owns its own portal/fixed positioning), but keeping them adjacent makes the "overlay rack" visually obvious to future readers. Before writing, read the current `launcher/src/renderer/src/components/DeviceCodeModal.tsx` to confirm it takes no required props.
 
     3. Update `launcher/src/main/index.ts`:
        - Read current bootstrap order; add `registerSpotifyHandlers(getPrimaryWindow)` call after `registerLogsHandlers`.
@@ -450,16 +493,18 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
     - `grep "<SettingsModal" launcher/src/renderer/src/App.tsx` returns 1 hit.
     - `grep "<Play" launcher/src/renderer/src/App.tsx` returns 1 hit.
     - `grep "<Cosmetics" launcher/src/renderer/src/App.tsx` returns 1 hit.
+    - `grep "<DeviceCodeModal" launcher/src/renderer/src/App.tsx` returns ≥1 hit (Phase 2 regression guard — device-code flow accessible in logged-in tree for re-auth / token-refresh).
+    - `grep "import { DeviceCodeModal } from './components/DeviceCodeModal'" launcher/src/renderer/src/App.tsx` returns 1 hit.
     - `grep "SettingsDrawer" launcher/src/renderer/src/App.tsx` returns 0 hits (fully removed).
     - `grep "SettingsIcon" launcher/src/renderer/src/App.tsx` returns 0 hits (gear moved to sidebar).
     - `grep "AnimatePresence" launcher/src/renderer/src/App.tsx` returns 1 hit.
     - `grep "initSpotify" launcher/src/renderer/src/App.tsx` returns ≥1 hit.
     - `grep "registerSpotifyHandlers" launcher/src/main/index.ts` returns ≥1 hit.
-    - App.integration.test.tsx (8 assertions) passes.
+    - App.integration.test.tsx (10 assertions incl. DeviceCodeModal import-grep + runtime device-code surfacing) passes.
     - `pnpm typecheck` exits 0.
     - `pnpm --filter ./launcher run test:run` full suite exits 0.
   </acceptance_criteria>
-  <done>App.tsx integrated; main bootstrap wires Spotify handlers; full suite green.</done>
+  <done>App.tsx integrated (incl. DeviceCodeModal in logged-in tree); main bootstrap wires Spotify handlers; full suite green.</done>
 </task>
 
 <task type="auto" tdd="true">
@@ -468,6 +513,7 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
   <read_first>
     - .planning/phases/04-launcher-ui-polish/04-RESEARCH.md §DESIGN-SYSTEM.md Outline (skeleton to expand)
     - .planning/phases/04-launcher-ui-polish/04-CONTEXT.md §D-36 (exact sections + "Exclusion checklist" content)
+    - .planning/phases/04-launcher-ui-polish/04-CONTEXT.md §D-13 (preset color names — Red/Yellow/Gray illustrative; RESEARCH retuned to Crimson/Amber/Slate for WCAG contrast)
     - scripts/check-docs.mjs (existing Phase 1 policy doc validator — extend with new section checks)
     - launcher/src/renderer/src/test/antiBloat.test.tsx (Wave 0 stub — replace with real grep test)
     - docs/ANTICHEAT-SAFETY.md (Phase 1 style reference for how docs are structured)
@@ -482,6 +528,7 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
       6. ## Hero art provenance (owner-drawn — placeholder gradient stub in v0.1)
       7. ## Exclusion checklist — with the LITERAL string "WiiWho does NOT display: ads, news feeds, concurrent-user counts, friends lists, marketing content" plus all 18 bulleted items from RESEARCH
       8. ## Changelog
+    - §Colors > Presets table carries a footnote line: "Preset names and hexes reflect RESEARCH-tuned values; D-13 listed Red/Yellow/Gray as illustrative starting points." (one-line documentation of the D-13 → RESEARCH substitution that Plan 04-01's presets.ts already implements — Crimson/Amber/Slate rather than Red/Yellow/Gray, for WCAG 2.1 SC 1.4.11 contrast on `#111111`).
     - Reviewer sign-off table with one row per section
     - check-docs.mjs extended to scan docs/DESIGN-SYSTEM.md for the 8 required headings + the literal exclusion-checklist substring
     - antiBloat.test.tsx reads every .tsx/.ts file under launcher/src/renderer/src/ (excluding node_modules, excluding the exclusion-checklist doc path, excluding test files themselves), scans source text for banned markers, asserts 0 hits. Banned markers: common ad/news/social strings in visible copy (not in comments).
@@ -528,6 +575,12 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
     | Amber                 | `#fbbf24` | 11.2:1 |
     | Slate                 | `#cbd5e1` | 11.6:1 |
 
+    > **Note:** Preset names and hexes reflect RESEARCH-tuned values; D-13 listed
+    > Red/Yellow/Gray as illustrative starting points. RESEARCH retuned those three
+    > slots to Crimson (`#f87171`), Amber (`#fbbf24`), and Slate (`#cbd5e1`) to meet
+    > WCAG 2.1 SC 1.4.11 Non-text Contrast ≥3:1 against `--color-wiiwho-bg` (`#111111`).
+    > See `launcher/src/renderer/src/theme/presets.ts` for the authoritative tuple.
+
     ### 2.2 Typography
 
     - **Inter Variable** (SIL OFL 1.1) — body + UI. Self-hosted woff2 at `launcher/src/renderer/src/assets/fonts/inter/`.
@@ -571,7 +624,7 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
 
     - **Play button**: `bg-accent` + `text-wiiwho-bg` + press feedback via `transform: scale(0.98)` on `:active`.
     - **Sidebar with active pill**: 220px fixed column; active row uses `motion.div` with `layoutId="sidebar-nav-pill"` + left accent bar `layoutId="sidebar-nav-bar"`. Spring config above.
-    - **Settings modal (bottom-slide)**: Radix Dialog + motion/react with `forceMount` on Portal + Overlay + Content. Slide `y: '100%' → 0` over `--duration-slow` with `--ease-emphasized`.
+    - **Settings modal (bottom-slide)**: Radix Dialog + motion/react with `forceMount` on Portal + Overlay + Content. Portal unconditionally mounted; AnimatePresence INSIDE the Portal; `{open && ...}` guard INSIDE AnimatePresence wraps Overlay + Content. Slide `y: '100%' → 0` over `--duration-slow` with `--ease-emphasized`.
     - **Spotify mini-player**: Pinned at sidebar bottom above Settings gear. 6 visual states (disconnected / connecting / idle / playing / offline / no-premium). Album art crossfades via AnimatePresence keyed by URL.
     - **Theme picker**: 8 preset swatches + custom hex input + EyeDropper button (Chromium 146 native). Live `--color-accent` swap on :root; persists to `settings.json v2`.
 
@@ -661,8 +714,9 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
       /^## 8\. Changelog$/m,
     ]
     const EXCLUSION_LITERAL = 'WiiWho does NOT display: ads, news feeds, concurrent-user counts, friends lists, marketing content'
+    const D13_NOTE_LITERAL = 'D-13 listed Red/Yellow/Gray as illustrative starting points'
 
-    // Read the doc; for each heading regex, assert match; assert literal substring.
+    // Read the doc; for each heading regex, assert match; assert literal substrings.
     // Emit clear per-miss error if validation fails; nonzero exit on any miss.
     ```
 
@@ -765,12 +819,13 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
     - `docs/DESIGN-SYSTEM.md` exists.
     - `grep "## 7. Exclusion checklist" docs/DESIGN-SYSTEM.md` returns 1 hit.
     - `grep "WiiWho does NOT display: ads, news feeds, concurrent-user counts, friends lists, marketing content" docs/DESIGN-SYSTEM.md` returns 1 hit.
+    - `grep "D-13 listed Red/Yellow/Gray as illustrative starting points" docs/DESIGN-SYSTEM.md` returns 1 hit (RESEARCH tuning footnote).
     - `grep "## 1. Philosophy" docs/DESIGN-SYSTEM.md` returns 1 hit.
     - `grep "## 8. Changelog" docs/DESIGN-SYSTEM.md` returns 1 hit.
     - `node scripts/check-docs.mjs` exits 0.
     - antiBloat.test.tsx passes with 0 offenders (except items in ALLOWLIST with documented rationale).
   </acceptance_criteria>
-  <done>Design system doc shipped; check-docs validates it; anti-bloat grep green.</done>
+  <done>Design system doc shipped (incl. D-13/RESEARCH substitution footnote); check-docs validates it; anti-bloat grep green.</done>
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
@@ -779,7 +834,7 @@ Registered via main/index.ts alongside existing auth/game/settings/logs handlers
   <how-to-verify>
     Walk through the Manual-Only Verifications table in `.planning/phases/04-launcher-ui-polish/04-VALIDATION.md`. For each row, perform the Test Instructions and record pass/fail:
 
-    1. **Settings modal slide-up visual feel** (UI-03) — Launch `pnpm --filter ./launcher dev`; click Settings gear at sidebar bottom; observe slide-up from bottom over ~320ms. Close via X / ESC / backdrop click (all three).
+    1. **Settings modal slide-up visual feel** (UI-03) — Launch `pnpm --filter ./launcher dev`; click Settings gear at sidebar bottom; observe slide-up from bottom over ~320ms. Close via X / ESC / backdrop click (all three). Verify the close animation actually PLAYS (~320ms slide-down) — not an instant unmount (forceMount + nesting regression guard).
     2. **Accent color swap visual feel across all surfaces** (UI-01) — Settings → Appearance → cycle all 8 presets + enter custom hex `#ff00aa`. Verify: Play button bg, focus rings (Tab through), active sidebar pill, modal sub-nav pill ALL use the new accent; body text / headings do NOT.
     3. **Sidebar nav pill glide** (UI-03) — Click Cosmetics → Play → Cosmetics. Pill + left-bar glide smoothly ~200ms.
     4. **EyeDropper picks a color** (UI-01) — Appearance → Custom → eyedropper button → pick a color anywhere on screen. Hex field + accent update.
@@ -866,21 +921,24 @@ Deliberate deviations (documented):
 - `cd launcher && pnpm --filter ./launcher run typecheck` exits 0.
 - `node scripts/check-docs.mjs` exits 0 (DESIGN-SYSTEM.md structure valid).
 - `docs/DESIGN-SYSTEM.md` contains literal exclusion-checklist string.
+- `docs/DESIGN-SYSTEM.md` contains the D-13/RESEARCH substitution footnote.
 - `git status` clean after Task 4.
 - `grep -i "account" launcher/src/renderer/src/components/Sidebar.tsx` returns 0 hits (E-03 preserved).
 - `grep "registerSpotifyHandlers" launcher/src/main/index.ts` returns ≥1 hit.
+- `grep "<DeviceCodeModal" launcher/src/renderer/src/App.tsx` returns ≥1 hit (Phase 2 regression guard).
 - Manual UAT: 14 rows signed off in 04-VALIDATION.md (Task 3 checkpoint).
 </verification>
 
 <success_criteria>
-All 6 UI requirements delivered + documented + smoke-verified. UI-01 / UI-03 / UI-04 / UI-05 / UI-06 / UI-07 all pass. docs/DESIGN-SYSTEM.md shipped with exclusion checklist signed off. Anti-bloat grep enforced automatically in the test suite. Phase 4 complete; Phase 5 (Forge Integration) unblocked.
+All 6 UI requirements delivered + documented + smoke-verified. UI-01 / UI-03 / UI-04 / UI-05 / UI-06 / UI-07 all pass. docs/DESIGN-SYSTEM.md shipped with exclusion checklist signed off + D-13/RESEARCH substitution footnote. Anti-bloat grep enforced automatically in the test suite. DeviceCodeModal present in logged-in tree (Phase 2 re-auth flow preserved). Phase 4 complete; Phase 5 (Forge Integration) unblocked.
 </success_criteria>
 
 <output>
 After completion, create `.planning/phases/04-launcher-ui-polish/04-07-integration-and-docs-SUMMARY.md` documenting:
-- App.tsx final architecture (logged-in tree composition)
+- App.tsx final architecture (logged-in tree composition, including DeviceCodeModal mount position)
 - main/index.ts bootstrap order (redact → auth → game → settings → logs → spotify)
 - docs/DESIGN-SYSTEM.md section list verbatim
+- D-13 → RESEARCH preset name/hex substitution record (Red→Crimson, Yellow→Amber, Gray→Slate) with WCAG rationale
 - antiBloat.test.tsx allowlist (should be empty)
 - UAT sign-off reference (row-by-row verdicts in 04-VALIDATION.md)
 - Deliberate deviations summary (Pitfalls 6 + 10) for future maintainers
