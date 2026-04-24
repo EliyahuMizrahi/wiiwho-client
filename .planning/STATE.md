@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed Phase 04 Plan 04 (theme-picker-appearance) — ThemePicker (8 presets + hex input + EyeDropper D-14) + AppearancePane (ThemePicker + reduce-motion D-24 select) shipped; SettingsModal appearance-pane-stub swapped for <AppearancePane />; 470 passed + 6 todo
-last_updated: "2026-04-24T06:26:33.290Z"
+stopped_at: Completed Phase 04 Plan 05 (spotify-main-process) — PKCE OAuth + port fallback + safeStorage tokens + Web API 401/429/403 PREMIUM_REQUIRED + SpotifyManager singleton + IPC + DELIBERATE 6th preload key; 550 passed + 3 todo
+last_updated: "2026-04-24T06:52:09.907Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 33
-  completed_plans: 29
+  completed_plans: 30
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 04 (launcher-ui-polish) — EXECUTING
-Plan: 6 of 8
+Plan: 7 of 8
 Status: Ready to execute
 Last activity: 2026-04-24
 
@@ -81,6 +81,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04-launcher-ui-polish P02-sidebar-and-main-area | 7 min | 3 tasks tasks | 15 files files |
 | Phase 04-launcher-ui-polish P03-settings-modal-chrome | 6 min | 3 tasks tasks | 10 files files |
 | Phase 04-launcher-ui-polish P04-theme-picker-appearance | 4 min | 2 tasks tasks | 5 files files |
+| Phase 04-launcher-ui-polish P05-spotify-main-process | 20min | 4 tasks tasks | 17 files files |
 
 ## Accumulated Context
 
@@ -161,6 +162,11 @@ Recent decisions affecting current work:
 - [Phase 04-launcher-ui-polish]: Plan 04-04: EyeDropper feature-probed via typeof window.EyeDropper !== 'undefined' (Chromium 146/Electron 41 only); rejection silenced (only documented path is user-cancel via ESC). Hex input validates component-side via /^#[0-9a-fA-F]{6}$/ before hitting setAccent, avoiding IPC round-trips for invalid input.
 - [Phase 04-launcher-ui-polish]: Plan 04-04 [Rule 3 auto-fix]: toHaveAttribute matcher not registered — jest-dom isn't wired in this project; rewrote the two assertions as raw getAttribute('aria-pressed') === 'true' checks. Semantically equivalent, zero new dependencies (adding jest-dom would be a Rule 4 architectural decision).
 - [Phase 04-launcher-ui-polish]: Plan 04-04: SettingsModal.tsx appearance stub swapped for <AppearancePane /> with testid renamed from 'appearance-pane-stub' to 'appearance-pane' — matches general-pane/account-pane/about-pane convention; -stub was a Plan 04-03 anchor-point artifact that is now obsolete.
+- [Phase 04-launcher-ui-polish]: Plan 04-05: Spotify OAuth uses in-order port fallback over SPOTIFY_REDIRECT_PORTS [53682,53681,53683]; EADDRINUSE skips to next; all-busy throws PORTS_BUSY for renderer-side 'try again' CTA. No runtime-random ports — Spotify validates redirect_uri against exact dashboard-registered URIs.
+- [Phase 04-launcher-ui-polish]: Plan 04-05: OAuth loopback server attaches request handler EAGERLY (not lazily inside awaitCallback) — prevents a browser callback that arrives before startPKCEFlow's await-call from being dropped. Single settled-once promise + .catch(noop) safeguard keeps Node from flagging synchronous rejects as unhandled.
+- [Phase 04-launcher-ui-polish]: Plan 04-05: SpotifyManager.play/pause/next/previous short-circuit when cached isPremium==='no' (spare the /api round-trip + guaranteed 403). API-disagreement path: 403 PREMIUM_REQUIRED on supposedly-premium account flips in-memory isPremium back to 'no' + persists + emits status-changed.
+- [Phase 04-launcher-ui-polish]: Plan 04-05: Preload top-level key count ratcheted 5 → 6 (new 'spotify' key — Pitfall 10 DELIBERATE DEVIATION from Phase 1 D-11). File header documents why spotify cannot cleanly nest under any existing key. Regression test locks the expected sorted-keys array; any future 7th key requires same deliberate process.
+- [Phase 04-launcher-ui-polish]: Plan 04-05: IPC handler module exports registerSpotifyHandlers(getPrimaryWindow) — NOT auto-registered at module-load. Plan 04-07 wires this into main/index.ts so tests + Plan 04-06 can import spotifyManager in isolation without triggering ipcMain.handle side-effects.
 
 ### Pending Todos
 
@@ -174,6 +180,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T06:26:33.285Z
-Stopped at: Completed Phase 04 Plan 04 (theme-picker-appearance) — ThemePicker (8 presets + hex input + EyeDropper D-14) + AppearancePane (ThemePicker + reduce-motion D-24 select) shipped; SettingsModal appearance-pane-stub swapped for <AppearancePane />; 470 passed + 6 todo
+Last session: 2026-04-24T06:51:46.117Z
+Stopped at: Completed Phase 04 Plan 05 (spotify-main-process) — PKCE OAuth + port fallback + safeStorage tokens + Web API 401/429/403 PREMIUM_REQUIRED + SpotifyManager singleton + IPC + DELIBERATE 6th preload key; 550 passed + 3 todo
 Resume file: None

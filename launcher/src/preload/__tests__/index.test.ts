@@ -7,8 +7,8 @@
  *     [__debug, auth, game, logs, settings, spotify]
  *     The 6th key `spotify` is a DELIBERATE deviation from Phase 1 D-11
  *     (Pitfall 10 in Phase 4 CONTEXT).
- *   - spotify namespace exposes expected methods (connect/disconnect/status/
- *     control.*/setVisibility/onStatusChanged)
+ *   - spotify namespace exposes expected methods (connect, disconnect, status,
+ *     control.play|pause|next|previous, setVisibility, onStatusChanged)
  *   - control is a nested object with play/pause/next/previous methods
  *   - File header contains the Pitfall 10 / D-11 deviation note
  */
