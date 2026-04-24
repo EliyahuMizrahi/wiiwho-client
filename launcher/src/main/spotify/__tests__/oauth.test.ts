@@ -10,7 +10,7 @@
  * so runtime-random ports would never match `redirect_uri` at /token.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { createServer as createRealServer } from 'node:http'
 import type { Server } from 'node:http'
 

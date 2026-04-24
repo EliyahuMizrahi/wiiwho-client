@@ -2,11 +2,12 @@
  * The Wiiwho preload bridge contract.
  *
  * Phase 2 fills the `auth.*` handler bodies; Phase 3 fills `game.*`, `settings.*`,
- * and `logs.*`. Neither phase adds new top-level keys.
+ * and `logs.*`. Phase 4 adds `spotify` as a DELIBERATE 6th top-level key
+ * (Pitfall 10 — extends D-11 frozen surface with one ratcheted addition).
  *
- * D-11 (frozen IPC surface): 5 top-level keys — auth, game, settings, logs,
- * __debug. Phase 3 Plan 03-09 adds new subscriptions/invokes UNDER existing
- * keys (no new top-level keys).
+ * D-11 (Phase 1): 5 original top-level keys — auth, game, settings, logs, __debug.
+ * Phase 4 UI-06: adds `spotify` (6 total). See launcher/src/preload/index.ts
+ * header for the full deviation note.
  *
  * This file is the single source of truth for the renderer↔main IPC surface.
  */
@@ -105,6 +106,49 @@ export interface WiiWhoAPI {
       sandbox: boolean
       allTrue: boolean
     }>
+  }
+  // Phase 4 UI-06 — DELIBERATE 6th top-level key (Pitfall 10):
+  spotify: {
+    connect: () => Promise<{
+      ok: boolean
+      displayName?: string
+      error?: string
+    }>
+    disconnect: () => Promise<{ ok: boolean }>
+    status: () => Promise<{
+      connected: boolean
+      displayName?: string
+      isPremium?: 'yes' | 'no' | 'unknown'
+      currentTrack?: {
+        id: string
+        name: string
+        artists: string[]
+        albumArtUrl?: string
+        isPlaying: boolean
+      } | null
+    }>
+    control: {
+      play: () => Promise<{ ok: boolean; premiumRequired?: boolean }>
+      pause: () => Promise<{ ok: boolean; premiumRequired?: boolean }>
+      next: () => Promise<{ ok: boolean; premiumRequired?: boolean }>
+      previous: () => Promise<{ ok: boolean; premiumRequired?: boolean }>
+    }
+    setVisibility: (v: 'focused' | 'backgrounded') => Promise<{ ok: boolean }>
+    onStatusChanged: (
+      cb: (s: {
+        connected: boolean
+        displayName?: string
+        isPremium?: 'yes' | 'no' | 'unknown'
+        currentTrack?: {
+          id: string
+          name: string
+          artists: string[]
+          albumArtUrl?: string
+          isPlaying: boolean
+        } | null
+        premiumRequired?: boolean
+      }) => void
+    ) => () => void
   }
 }
 
