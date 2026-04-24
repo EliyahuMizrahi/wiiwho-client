@@ -84,12 +84,27 @@ type LogsApi = {
   listCrashReports: ReturnType<typeof vi.fn>
 }
 
+type SpotifyApi = {
+  connect: ReturnType<typeof vi.fn>
+  disconnect: ReturnType<typeof vi.fn>
+  status: ReturnType<typeof vi.fn>
+  control: {
+    play: ReturnType<typeof vi.fn>
+    pause: ReturnType<typeof vi.fn>
+    next: ReturnType<typeof vi.fn>
+    previous: ReturnType<typeof vi.fn>
+  }
+  setVisibility: ReturnType<typeof vi.fn>
+  onStatusChanged: ReturnType<typeof vi.fn>
+}
+
 function freshApi(): {
   auth: AuthApi
   game: GameApi
   settings: SettingsApi
   logs: LogsApi
   __debug: { securityAudit: ReturnType<typeof vi.fn> }
+  spotify: SpotifyApi
 } {
   const noop = (): (() => void) => () => {}
   return {
@@ -156,6 +171,22 @@ function freshApi(): {
         sandbox: true,
         allTrue: true
       })
+    },
+    // Plan 04-07: App.tsx now calls useSpotifyStore.initialize() on mount,
+    // which reaches into window.wiiwho.spotify.*. Stub the surface so the
+    // renderer tree's passive effects don't throw during App.tsx render.
+    spotify: {
+      connect: vi.fn().mockResolvedValue({ ok: true }),
+      disconnect: vi.fn().mockResolvedValue({ ok: true }),
+      status: vi.fn().mockResolvedValue({ connected: false }),
+      control: {
+        play: vi.fn().mockResolvedValue({ ok: true }),
+        pause: vi.fn().mockResolvedValue({ ok: true }),
+        next: vi.fn().mockResolvedValue({ ok: true }),
+        previous: vi.fn().mockResolvedValue({ ok: true })
+      },
+      setVisibility: vi.fn().mockResolvedValue({ ok: true }),
+      onStatusChanged: vi.fn(() => noop() as never)
     }
   }
 }
@@ -236,16 +267,20 @@ describe('App.tsx (Plan 03-10 Task 3)', () => {
     render(<App />)
     await skipLoadingHold()
 
-    // PlayButton centered — its 'Play' label is rendered.
-    expect(screen.getByRole('button', { name: /^play$/i })).toBeInTheDocument()
+    // Plan 04-07: the Phase-4 layout has TWO buttons matching /^play$/i —
+    // the Sidebar nav row AND the MainArea PlayButton. getAllByRole is the
+    // correct query; we only need to assert BOTH mount when idle.
+    expect(screen.getAllByRole('button', { name: /^play$/i }).length).toBeGreaterThanOrEqual(1)
 
-    // Gear icon button — accessible name 'Open settings'.
+    // Gear icon button — accessible name 'Open settings'. Moved from the
+    // top-right chrome into the Sidebar bottom (Plan 04-02). Still a single
+    // button at the DOM level.
     expect(screen.getByRole('button', { name: /open settings/i })).toBeInTheDocument()
 
-    // Wordmark still present.
+    // Wordmark still present (rendered by MainArea/Play — Plan 04-02 D-04).
     expect(screen.getByRole('heading', { name: /wiiwho client/i })).toBeInTheDocument()
 
-    // v0.1.0-dev tag.
+    // v0.1.0-dev tag (moved into MainArea/Play footer; Plan 04-02 D-04).
     expect(screen.getByText('v0.1.0-dev')).toBeInTheDocument()
   })
 
@@ -308,8 +343,12 @@ describe('App.tsx (Plan 03-10 Task 3)', () => {
     // Store phase should have reset to idle.
     expect(useGameStore.getState().phase.state).toBe('idle')
 
-    // Home re-renders — PlayButton's 'Play' label is visible again.
-    expect(screen.getByRole('button', { name: /^play$/i })).toBeInTheDocument()
+    // Home re-renders — Plan 04-07 layout has BOTH the Sidebar nav Play
+    // row and the MainArea PlayButton's Play button visible. Either one's
+    // presence proves we're back in the Phase-4 logged-in shell.
+    expect(
+      screen.getAllByRole('button', { name: /^play$/i }).length
+    ).toBeGreaterThanOrEqual(1)
   })
 
   it('Test 6: Play again on CrashViewer invokes useGameStore.play() → game.play IPC', async () => {
