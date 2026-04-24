@@ -69,58 +69,76 @@ describe('generatePkcePair', () => {
 
 // -------- One-shot callback server ------------------------------------------
 
-describe('startOneShotCallbackServer (port fallback)', () => {
-  const occupied: Server[] = []
+/** Track every real-http server we start, close deterministically in afterEach. */
+const trackedServers: Server[] = []
 
+async function closeTracked(s: Server): Promise<void> {
+  await new Promise<void>((r) => s.close(() => r()))
+}
+
+async function listenOn(port: number): Promise<Server> {
+  const s = createRealServer()
+  await new Promise<void>((resolve, reject) => {
+    s.once('error', reject)
+    s.listen(port, '127.0.0.1', () => {
+      s.off('error', reject)
+      resolve()
+    })
+  })
+  trackedServers.push(s)
+  return s
+}
+
+describe('startOneShotCallbackServer (port fallback)', () => {
   afterEach(async () => {
-    for (const s of occupied.splice(0)) {
-      await new Promise<void>((r) => s.close(() => r()))
-    }
+    for (const s of trackedServers.splice(0)) await closeTracked(s)
   })
 
   it('binds to the first port in SPOTIFY_REDIRECT_PORTS when free', async () => {
     const { startOneShotCallbackServer } = await import('../oauth')
     const server = await startOneShotCallbackServer()
-    expect(server.port).toBe(57821)
-    server.close()
+    try {
+      expect(server.port).toBe(57821)
+    } finally {
+      server.close()
+    }
   })
 
   it('falls back to port 2 when port 1 is occupied (EADDRINUSE)', async () => {
-    // Occupy 57821.
-    const blocker = createRealServer()
-    await new Promise<void>((r) => blocker.listen(57821, '127.0.0.1', r))
-    occupied.push(blocker)
-
+    await listenOn(57821)
     const { startOneShotCallbackServer } = await import('../oauth')
     const server = await startOneShotCallbackServer()
-    expect(server.port).toBe(57822)
-    server.close()
+    try {
+      expect(server.port).toBe(57822)
+    } finally {
+      server.close()
+    }
   })
 
   it('falls back to port 3 when ports 1 and 2 are occupied', async () => {
-    const b1 = createRealServer()
-    const b2 = createRealServer()
-    await new Promise<void>((r) => b1.listen(57821, '127.0.0.1', r))
-    await new Promise<void>((r) => b2.listen(57822, '127.0.0.1', r))
-    occupied.push(b1, b2)
-
+    await listenOn(57821)
+    await listenOn(57822)
     const { startOneShotCallbackServer } = await import('../oauth')
     const server = await startOneShotCallbackServer()
-    expect(server.port).toBe(57823)
-    server.close()
+    try {
+      expect(server.port).toBe(57823)
+    } finally {
+      server.close()
+    }
   })
 
   it('throws PORTS_BUSY when all three ports are occupied', async () => {
-    const b1 = createRealServer()
-    const b2 = createRealServer()
-    const b3 = createRealServer()
-    await new Promise<void>((r) => b1.listen(57821, '127.0.0.1', r))
-    await new Promise<void>((r) => b2.listen(57822, '127.0.0.1', r))
-    await new Promise<void>((r) => b3.listen(57823, '127.0.0.1', r))
-    occupied.push(b1, b2, b3)
-
+    await listenOn(57821)
+    await listenOn(57822)
+    await listenOn(57823)
     const { startOneShotCallbackServer } = await import('../oauth')
     await expect(startOneShotCallbackServer()).rejects.toThrow(/PORTS_BUSY/)
+  })
+})
+
+describe('startOneShotCallbackServer (callback request handling)', () => {
+  afterEach(async () => {
+    for (const s of trackedServers.splice(0)) await closeTracked(s)
   })
 
   it('resolves awaitCallback on GET /callback?code=X&state=Y', async () => {
@@ -137,8 +155,11 @@ describe('startOneShotCallbackServer (port fallback)', () => {
     const { startOneShotCallbackServer } = await import('../oauth')
     const server = await startOneShotCallbackServer()
     const pending = server.awaitCallback()
+    // Attach the .rejects assertion BEFORE triggering the rejection so Node
+    // doesn't see the promise as unhandled on the synchronous reject path.
+    const asserted = expect(pending).rejects.toThrow(/access_denied/)
     await fetch(`http://127.0.0.1:${server.port}/callback?error=access_denied`)
-    await expect(pending).rejects.toThrow(/access_denied/)
+    await asserted
   })
 
   it('returns HTTP 200 with HTML body to the browser', async () => {
@@ -295,33 +316,44 @@ describe('refreshAccessToken', () => {
 // -------- End-to-end PKCE flow orchestration (state CSRF validation) --------
 
 describe('startPKCEFlow', () => {
+  // Capture the real fetch so the mock openExternal can still reach the
+  // loopback server after we stub global fetch for the /token call.
+  const realFetch = globalThis.fetch
+
   afterEach(() => vi.unstubAllGlobals())
 
   it('opens external browser, awaits callback, validates state, exchanges code for tokens', async () => {
+    const electron = (await import('electron')) as unknown as {
+      shell: { openExternal: ReturnType<typeof vi.fn> }
+    }
+    // Stub fetch so /api/token sees a canned Spotify response, but route
+    // loopback-server fetches back to the real network stack.
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(
-        new Response(
+      vi.fn(async (url: string | URL, init?: RequestInit): Promise<Response> => {
+        const u = typeof url === 'string' ? url : url.toString()
+        if (u.startsWith('http://127.0.0.1:')) {
+          return realFetch(u, init)
+        }
+        // /api/token response
+        return new Response(
           JSON.stringify({
             access_token: 'FLOW_AT',
             refresh_token: 'FLOW_RT',
             expires_in: 3600,
-            scope: 'user-read-currently-playing user-read-playback-state user-modify-playback-state'
+            scope:
+              'user-read-currently-playing user-read-playback-state user-modify-playback-state'
           }),
           { status: 200 }
         )
-      )
+      })
     )
-    const electron = (await import('electron')) as unknown as {
-      shell: { openExternal: ReturnType<typeof vi.fn> }
-    }
-    // Intercept openExternal — instead of opening a browser, immediately GET
-    // the callback URL back into our own loopback server.
     electron.shell.openExternal.mockImplementation(async (authUrl: string) => {
       const u = new URL(authUrl)
       const redirectUri = u.searchParams.get('redirect_uri')!
       const state = u.searchParams.get('state')!
-      await fetch(`${redirectUri}?code=FAKE_CODE&state=${encodeURIComponent(state)}`)
+      // Use realFetch to actually hit the loopback server.
+      await realFetch(`${redirectUri}?code=FAKE_CODE&state=${encodeURIComponent(state)}`)
     })
 
     const { startPKCEFlow } = await import('../oauth')
@@ -339,10 +371,13 @@ describe('startPKCEFlow', () => {
       const u = new URL(authUrl)
       const redirectUri = u.searchParams.get('redirect_uri')!
       // WRONG state deliberately.
-      await fetch(`${redirectUri}?code=C&state=WRONG_STATE_VALUE`)
+      await realFetch(`${redirectUri}?code=C&state=WRONG_STATE_VALUE`)
     })
 
     const { startPKCEFlow } = await import('../oauth')
+    // startPKCEFlow internally rejects on state mismatch — the whole flow
+    // rejects, which we assert directly via `.rejects`.
     await expect(startPKCEFlow()).rejects.toThrow(/state mismatch/i)
   })
 })
+
