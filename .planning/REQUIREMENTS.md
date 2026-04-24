@@ -18,12 +18,12 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 
 ### Launcher UI (Polish)
 
-- [ ] **UI-01**: User can pick a primary accent color (at least 3 presets + custom hex input); selected color is applied across the launcher (buttons, focus rings, highlights, active states) and persists across restarts
-- [ ] **UI-03**: View transitions, modal open/close, button hovers, and loading/progress states use consistent animations with documented timing curves and durations (no instant or janky state swaps for primary interactions)
-- [ ] **UI-04**: Main launcher surface uses sidebar navigation with sections at minimum: Play, Settings, Account, Cosmetics (placeholder acceptable). Primary CTA is Play.
-- [ ] **UI-05**: Launcher does NOT display: ads, news feeds, concurrent-user counts, friends lists, or marketing content. Verified against a written exclusion checklist in `docs/DESIGN-SYSTEM.md`.
-- [ ] **UI-06**: User can connect a Spotify account via OAuth (Spotify Web API). When connected, launcher displays an embedded mini-player (current song, album art, play/pause/skip). Disconnection/offline state degrades gracefully (no crash, no error modal spam).
-- [ ] **UI-07**: Design system is documented — design tokens (color, spacing, typography, motion) live in code; `docs/DESIGN-SYSTEM.md` captures rationale, usage examples, and (if Figma MCP is configured) asset/icon provenance.
+- [x] **UI-01**: User can pick a primary accent color (at least 3 presets + custom hex input); selected color is applied across the launcher (buttons, focus rings, highlights, active states) and persists across restarts
+- [x] **UI-03**: View transitions, modal open/close, button hovers, and loading/progress states use consistent animations with documented timing curves and durations (no instant or janky state swaps for primary interactions)
+- [x] **UI-04**: Main launcher surface uses sidebar navigation with sections at minimum: Play, Settings, Account, Cosmetics (placeholder acceptable). Primary CTA is Play.
+- [x] **UI-05**: Launcher does NOT display: ads, news feeds, concurrent-user counts, friends lists, or marketing content. Verified against a written exclusion checklist in `docs/DESIGN-SYSTEM.md`.
+- [x] **UI-06**: User can connect a Spotify account via OAuth (Spotify Web API). When connected, launcher displays an embedded mini-player (current song, album art, play/pause/skip). Disconnection/offline state degrades gracefully (no crash, no error modal spam).
+- [x] **UI-07**: Design system is documented — design tokens (color, spacing, typography, motion) live in code; `docs/DESIGN-SYSTEM.md` captures rationale, usage examples, and (if Figma MCP is configured) asset/icon provenance.
 
 ### Authentication
 
@@ -199,12 +199,12 @@ Which phases cover which requirements.
 | HUD-02 | Phase 5 | Pending |
 | HUD-03 | Phase 5 | Pending |
 | HUD-04 | Phase 5 | Pending |
-| UI-01 | Phase 4 | Pending |
-| UI-03 | Phase 4 | Pending |
-| UI-04 | Phase 4 | Pending |
-| UI-05 | Phase 4 | Pending |
-| UI-06 | Phase 4 | Pending |
-| UI-07 | Phase 4 | Pending |
+| UI-01 | Phase 4 | Complete |
+| UI-03 | Phase 4 | Complete |
+| UI-04 | Phase 4 | Complete |
+| UI-05 | Phase 4 | Complete |
+| UI-06 | Phase 4 | Complete |
+| UI-07 | Phase 4 | Complete |
 | PERF-01 | Phase 7 | Pending |
 | PERF-02 | Phase 7 | Pending |
 | PERF-03 | Phase 7 | Pending |

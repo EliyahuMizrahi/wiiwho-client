@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Phase 4 context gathered
-last_updated: "2026-04-24T03:25:13.794Z"
-last_activity: 2026-04-21
+stopped_at: Completed Phase 04 Plan 00 (infrastructure) — motion dep + fonts + Spotify config + 12 Nyquist stubs
+last_updated: "2026-04-24T05:35:46.676Z"
+last_activity: 2026-04-24
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 25
-  completed_plans: 24
+  total_plans: 33
+  completed_plans: 25
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-20)
 
 **Core value:** A single-click path from "open launcher" to "in a 1.8.9 game that runs faster than Optifine and has the HUD I want" — all without tripping PvP server anticheats.
-**Current focus:** Phase 03 — vanilla-launch-jre-bundling-packaging
+**Current focus:** Phase 04 — launcher-ui-polish
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
+Phase: 04 (launcher-ui-polish) — EXECUTING
+Plan: 2 of 8
 Status: Ready to execute
-Last activity: 2026-04-21
+Last activity: 2026-04-24
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -76,6 +76,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-vanilla-launch-jre-bundling-packaging P10 | 17min | 3 tasks | 10 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P11 | 23min | 3 tasks | 8 files |
 | Phase 03-vanilla-launch-jre-bundling-packaging P12 | 5min (CHECKPOINT) | 0 tasks | 1 files |
+| Phase 04-launcher-ui-polish P00 | ~45min | 4 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,9 @@ Recent decisions affecting current work:
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-11: PKG-01 NSIS smoke-build BLOCKED by environmental issue — electron-builder 26.8.1 unconditionally extracts winCodeSign-2.6.0.7z (contains macOS dylib symlinks); Windows without Developer Mode/admin cannot create symlinks. Unblock via Settings → Privacy & Security → For developers → Developer Mode: On. electron-builder.yml config + dist:win script chain verified complete; win-unpacked/ produced correctly with all extraResources.
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-11: prefetch-jre.mjs Windows-specific hardening — bsdtar (System32/tar.exe) for .tar.gz (MSYS GNU tar misparses C:\ as rsh host:path); renameSync retry+cpSync fallback for AV/indexer handle-retention EPERM races. Idempotent per-slot population check via <slot>/bin/javaw.exe or <slot>/Contents/Home/bin/java probe.
 - [Phase 03-vanilla-launch-jre-bundling-packaging]: 03-12: CHECKPOINT — macOS DMG requires Mac build machine; all prep artifacts authored in Plan 03-11; PKG-02 + JRE-02 remain Pending in REQUIREMENTS.md (correct — verifier flags as human_needed). SUMMARY.md documents exact resume command for a Mac operator.
+- [Phase 04-launcher-ui-polish]: Plan 04-00: JetBrains Mono actual upstream license is SIL OFL 1.1 (not Apache 2.0 as plan assumed). Both bundled fonts ship verbatim OFL 1.1.
+- [Phase 04-launcher-ui-polish]: Plan 04-00: Spotify post-2025-11-27 OAuth rules require exact-match redirect URI with explicit port (not wildcards, not bare loopback). Owner registered 3 loopback ports [53682 primary, 53681 fallback1, 53683 fallback2]. config.ts exports SPOTIFY_REDIRECT_PORTS + buildRedirectUri(port) helper — Plan 04-05 must consume these, NOT a single SPOTIFY_REDIRECT_URI constant.
+- [Phase 04-launcher-ui-polish]: Plan 04-00: SPOTIFY_CLIENT_ID (1829b668...8d06) committed as plaintext in config.ts — PKCE public client, non-secret (matches Phase 2 D-18 Azure AD pattern).
 
 ### Pending Todos
 
@@ -148,6 +152,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T03:25:13.790Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-launcher-ui-polish/04-CONTEXT.md
+Last session: 2026-04-24T05:35:46.672Z
+Stopped at: Completed Phase 04 Plan 00 (infrastructure) — motion dep + fonts + Spotify config + 12 Nyquist stubs
+Resume file: None
