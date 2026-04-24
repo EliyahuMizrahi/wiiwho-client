@@ -24,8 +24,8 @@ async function createWindow(): Promise<void> {
   setAuditedPrefs(webPreferences)
 
   const mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 650,
+    width: 1280,
+    height: 800,
     resizable: false,
     maximizable: false,
     fullscreenable: false,

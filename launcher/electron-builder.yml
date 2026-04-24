@@ -46,7 +46,7 @@ nsis:
   oneClick: false
   allowElevation: true
   perMachine: false
-  allowToChangeInstallationDirectory: false
+  allowToChangeInstallationDirectory: true
   createDesktopShortcut: always
   createStartMenuShortcut: true
   shortcutName: Wiiwho Client
