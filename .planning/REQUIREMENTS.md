@@ -19,7 +19,6 @@ Requirements for v0.1 release. Each maps to exactly one roadmap phase.
 ### Launcher UI (Polish)
 
 - [ ] **UI-01**: User can pick a primary accent color (at least 3 presets + custom hex input); selected color is applied across the launcher (buttons, focus rings, highlights, active states) and persists across restarts
-- [ ] **UI-02**: User can toggle between dark and light modes; selection persists across restarts
 - [ ] **UI-03**: View transitions, modal open/close, button hovers, and loading/progress states use consistent animations with documented timing curves and durations (no instant or janky state swaps for primary interactions)
 - [ ] **UI-04**: Main launcher surface uses sidebar navigation with sections at minimum: Play, Settings, Account, Cosmetics (placeholder acceptable). Primary CTA is Play.
 - [ ] **UI-05**: Launcher does NOT display: ads, news feeds, concurrent-user counts, friends lists, or marketing content. Verified against a written exclusion checklist in `docs/DESIGN-SYSTEM.md`.
@@ -201,7 +200,6 @@ Which phases cover which requirements.
 | HUD-03 | Phase 5 | Pending |
 | HUD-04 | Phase 5 | Pending |
 | UI-01 | Phase 4 | Pending |
-| UI-02 | Phase 4 | Pending |
 | UI-03 | Phase 4 | Pending |
 | UI-04 | Phase 4 | Pending |
 | UI-05 | Phase 4 | Pending |
@@ -222,15 +220,15 @@ Which phases cover which requirements.
 | COMP-05 | Phase 3 | Complete |
 
 **Coverage:**
-- v1 requirements: 52 total
-- Mapped to phases: 52 (100%)
+- v1 requirements: 51 total
+- Mapped to phases: 51 (100%)
 - Unmapped: 0
 
 **Per-phase distribution:**
 - Phase 1 (Foundations): 8 requirements — COMP-04, MOD-01, MOD-02, MOD-03, MOD-04, LAUN-01, LAUN-02, LAUN-06
 - Phase 2 (Microsoft Auth): 6 requirements — AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
 - Phase 3 (Vanilla Launch, JRE, Packaging): 15 requirements — LCH-01, LCH-02, LCH-03, LCH-05, LCH-06, LCH-07, JRE-01, JRE-02, JRE-03, PKG-01, PKG-02, LAUN-03, LAUN-04, LAUN-05, COMP-05
-- Phase 4 (Launcher UI Polish): 7 requirements — UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07
+- Phase 4 (Launcher UI Polish): 6 requirements — UI-01, UI-03, UI-04, UI-05, UI-06, UI-07
 - Phase 5 (Forge Integration, HUD Framework, HUDs): 10 requirements — LCH-04, MOD-05, MOD-06, HUD-01, HUD-02, HUD-03, HUD-04, COMP-01, COMP-02, COMP-03
 - Phase 6 (Cosmetics Pipeline): 2 requirements — COSM-01, COSM-02
 - Phase 7 (Performance): 3 requirements — PERF-01, PERF-02, PERF-03
@@ -238,4 +236,5 @@ Which phases cover which requirements.
 
 ---
 *Requirements defined: 2026-04-20*
-*Last updated: 2026-04-23 — inserted Phase 4 "Launcher UI Polish" (UI-01..07); renumbered Forge/HUDs→5, Cosmetics→6, Performance→7, Release Hardening→8*
+*Last updated: 2026-04-23 — dropped UI-02 (dark/light mode toggle) per Phase 4 CONTEXT.md E-01; owner wants dark-only. Total drops to 51 requirements.*
+*2026-04-23 — inserted Phase 4 "Launcher UI Polish" (UI-01..07); renumbered Forge/HUDs→5, Cosmetics→6, Performance→7, Release Hardening→8*

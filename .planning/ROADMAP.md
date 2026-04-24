@@ -91,9 +91,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 4: Launcher UI Polish
 **Goal**: Transform the functional v0.1 launcher (login → play → settings drawer) into a polished, themeable, animated experience that feels better than Lunar Client — minus the social/marketing bloat. User can pick their accent color (not locked to blue), every interaction has smooth motion, and Spotify is integrated as a launcher-side mini-player. No ads, no news feed, no concurrent-user counter, no friends list.
 **Depends on**: Phase 3 (a functional launcher UI exists to polish)
-**Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07
+**Requirements**: UI-01, UI-03, UI-04, UI-05, UI-06, UI-07
 **Success Criteria** (what must be TRUE):
-  1. User picks an accent color from at least 3 presets or enters a custom hex; choice applies across the launcher (buttons, focus rings, highlights) and persists across restarts. Dark/light mode toggle also persists.
+  1. User picks an accent color from at least 3 presets or enters a custom hex; choice applies across the launcher (buttons, focus rings, highlights) and persists across restarts.
   2. All view transitions, modal open/close, button hovers, and loading states use consistent motion (documented timing curves + durations); no janky or instant state-swap remains for primary interactions.
   3. Main launcher surface uses sidebar navigation with sections at minimum: Play, Settings, Account, Cosmetics (placeholder allowed). Primary CTA is Play. No ads, news feeds, online-user counts, friends list, or marketing content anywhere in the UI — verified against a written exclusion checklist.
   4. User can connect a Spotify account via OAuth (Spotify Web API); when connected, launcher displays an embedded mini-player showing current song, album art, and play/pause/skip controls. Disconnection or offline state degrades gracefully (no crash, no error modal spam).
