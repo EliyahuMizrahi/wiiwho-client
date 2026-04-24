@@ -1,8 +1,60 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-wiiwho-accent: #16e0ee;
-  --color-wiiwho-bg: #111111;
+  /* --- COLORS --- */
+  --color-wiiwho-bg:      #111111;
+  --color-wiiwho-surface: #1a1a1a;
+  --color-wiiwho-border:  #262626;
+
+  /* Default accent — mutable at runtime via :root override */
+  --color-accent: #16e0ee;
+
+  /* 8 preset swatches (static — ThemePicker references by slot) */
+  --color-preset-cyan:      #16e0ee;
+  --color-preset-mint:      #22c55e;
+  --color-preset-violet:    #a855f7;
+  --color-preset-tangerine: #f97316;
+  --color-preset-pink:      #ec4899;
+  --color-preset-crimson:   #f87171;
+  --color-preset-amber:     #fbbf24;
+  --color-preset-slate:     #cbd5e1;
+
+  /* --- TYPOGRAPHY --- */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', Menlo, monospace;
+
+  /* --- MOTION (D-21 durations, D-22 CSS-expressible easings) --- */
+  --duration-fast: 120ms;
+  --duration-med:  200ms;
+  --duration-slow: 320ms;
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);
+  /* --ease-spring lives in theme/motion.ts (CSS can't express springs) */
+
+  /* --- SIZING --- */
+  --layout-sidebar-width: 220px;
+  --layout-window-width:  1280px;
+  --layout-window-height: 800px;
+  --layout-modal-height:  560px;
+}
+
+:root {
+  /* Runtime-mutable surface (kept in sync with @theme default).
+     setAccent(hex) writes here via document.documentElement.style.setProperty. */
+  --color-accent: #16e0ee;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./assets/fonts/inter/InterVariable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('./assets/fonts/jetbrains-mono/JetBrainsMono-Variable.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-display: swap;
 }
 
 html,
@@ -12,10 +64,5 @@ body,
   margin: 0;
   background-color: var(--color-wiiwho-bg);
   color: #e5e5e5;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  font-family: var(--font-sans);
 }
