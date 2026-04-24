@@ -219,7 +219,7 @@ describe('SpotifyMiniPlayer — no-premium overlay', () => {
 })
 
 describe('SpotifyMiniPlayer — context menu (D-33)', () => {
-  it('renders "Open Spotify app" link with href spotify:// AFTER trigger click (Radix Portal)', async () => {
+  it('renders "Open Spotify app" anchor with href spotify:// AFTER trigger click (Radix Portal)', async () => {
     useSpotifyStore.setState({
       state: 'connected-playing',
       displayName: 'Owner',
@@ -230,9 +230,13 @@ describe('SpotifyMiniPlayer — context menu (D-33)', () => {
     render(<SpotifyMiniPlayer />)
     // Radix DropdownMenu content lives in a Portal — NOT in DOM until trigger click.
     await user.click(screen.getByRole('button', { name: /more options/i }))
-    const link = screen.getByRole('link', { name: /open spotify app/i })
-    expect(link.getAttribute('href')).toBe('spotify://')
-    expect(link.getAttribute('rel')).toContain('noopener')
+    // Radix's DropdownMenuItem asChild forwards role="menuitem" onto the <a>,
+    // so getByRole('link') won't find it. Query the menu item by text and
+    // assert it's an <a> with spotify:// href.
+    const item = screen.getByRole('menuitem', { name: /open spotify app/i })
+    expect(item.tagName).toBe('A')
+    expect(item.getAttribute('href')).toBe('spotify://')
+    expect(item.getAttribute('rel')).toContain('noopener')
   })
 
   it('renders "Disconnect" menu item that calls store.disconnect() AFTER trigger click', async () => {
