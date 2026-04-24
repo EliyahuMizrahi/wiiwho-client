@@ -20,11 +20,19 @@ import userEvent from '@testing-library/user-event'
 
 // jsdom stubs for Radix Dialog (pointer capture + scrollIntoView) — MUST run
 // before any Radix primitive mounts under jsdom.
+// ResizeObserver is additionally required because the default pane (General)
+// renders RamSlider, whose Radix Slider primitive invokes ResizeObserver on
+// mount. Same stub pattern as Phase 3 RamSlider.test.tsx.
 ;(Element.prototype as unknown as { hasPointerCapture: () => boolean }).hasPointerCapture =
   () => false
 ;(Element.prototype as unknown as { releasePointerCapture: () => void }).releasePointerCapture =
   () => {}
 ;(Element.prototype as unknown as { scrollIntoView: () => void }).scrollIntoView = () => {}
+;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
 
 // Mock motion/react to render plain divs (no animation framework in jsdom) — we
 // care about the DOM contract, not the paint. useReducedMotion returns false so
