@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed Phase 04 Plan 05 (spotify-main-process) — PKCE OAuth + port fallback + safeStorage tokens + Web API 401/429/403 PREMIUM_REQUIRED + SpotifyManager singleton + IPC + DELIBERATE 6th preload key; 550 passed + 3 todo
-last_updated: "2026-04-24T06:52:09.907Z"
+stopped_at: Completed Phase 04 Plan 06 (spotify-renderer-ui) — useSpotifyStore 5-state machine + SpotifyMiniPlayer 6 visual states + SpotifyPane + slot integrations; 588 passed + 1 todo + 0 failed
+last_updated: "2026-04-24T07:05:40.879Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 33
-  completed_plans: 30
+  completed_plans: 31
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 04 (launcher-ui-polish) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Status: Ready to execute
 Last activity: 2026-04-24
 
@@ -82,6 +82,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04-launcher-ui-polish P03-settings-modal-chrome | 6 min | 3 tasks tasks | 10 files files |
 | Phase 04-launcher-ui-polish P04-theme-picker-appearance | 4 min | 2 tasks tasks | 5 files files |
 | Phase 04-launcher-ui-polish P05-spotify-main-process | 20min | 4 tasks tasks | 17 files files |
+| Phase 04-launcher-ui-polish P06-spotify-renderer-ui | 8min | 3 tasks tasks | 9 files files |
 
 ## Accumulated Context
 
@@ -167,6 +168,10 @@ Recent decisions affecting current work:
 - [Phase 04-launcher-ui-polish]: Plan 04-05: SpotifyManager.play/pause/next/previous short-circuit when cached isPremium==='no' (spare the /api round-trip + guaranteed 403). API-disagreement path: 403 PREMIUM_REQUIRED on supposedly-premium account flips in-memory isPremium back to 'no' + persists + emits status-changed.
 - [Phase 04-launcher-ui-polish]: Plan 04-05: Preload top-level key count ratcheted 5 → 6 (new 'spotify' key — Pitfall 10 DELIBERATE DEVIATION from Phase 1 D-11). File header documents why spotify cannot cleanly nest under any existing key. Regression test locks the expected sorted-keys array; any future 7th key requires same deliberate process.
 - [Phase 04-launcher-ui-polish]: Plan 04-05: IPC handler module exports registerSpotifyHandlers(getPrimaryWindow) — NOT auto-registered at module-load. Plan 04-07 wires this into main/index.ts so tests + Plan 04-06 can import spotifyManager in isolation without triggering ipcMain.handle side-effects.
+- [Phase 04-launcher-ui-polish]: Plan 04-06: useSpotifyStore 5-state machine (disconnected/connecting/connected-idle/connected-playing/offline) + reconcile() single state-derivation fn (priority: !connected > offline > isPlaying > idle); isPremium='no' short-circuits control actions before IPC to save the pointless 403 round-trip.
+- [Phase 04-launcher-ui-polish]: Plan 04-06: 'Open Spotify app' uses native <a href='spotify://'> inside DropdownMenuItem asChild — no new IPC channel. Electron 41 + sandbox routes URL schemes through shell.openExternal at OS layer, keeping D-11 + Plan 04-05 preload surface (6 top-level keys) frozen.
+- [Phase 04-launcher-ui-polish]: Plan 04-06: Radix DropdownMenu test pattern LOCKED — Portal is NOT in DOM until trigger clicked; tests MUST 'await user.click(getByRole button More options)' BEFORE querying menu items. Also: asChild forwards role='menuitem' onto child <a>, so getByRole('link') doesn't find it — query menuitem + assert tagName==='A'.
+- [Phase 04-launcher-ui-polish]: Plan 04-06: initialize() wires BOTH window focus/blur → setVisibility (D-34) AND seeds visibility from document.visibilityState on mount — so main's 5s/15s polling timer starts at the right cadence even if focus/blur isn't the first event after mount. teardown() removes BOTH listeners + unsubscribes status.
 
 ### Pending Todos
 
@@ -180,6 +185,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T06:51:46.117Z
-Stopped at: Completed Phase 04 Plan 05 (spotify-main-process) — PKCE OAuth + port fallback + safeStorage tokens + Web API 401/429/403 PREMIUM_REQUIRED + SpotifyManager singleton + IPC + DELIBERATE 6th preload key; 550 passed + 3 todo
+Last session: 2026-04-24T07:05:40.874Z
+Stopped at: Completed Phase 04 Plan 06 (spotify-renderer-ui) — useSpotifyStore 5-state machine + SpotifyMiniPlayer 6 visual states + SpotifyPane + slot integrations; 588 passed + 1 todo + 0 failed
 Resume file: None
