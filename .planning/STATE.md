@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v0.1
 milestone_name: Release Hardening
 status: executing
-stopped_at: Completed Phase 04 Plan 01 (tokens-and-settings) — full @theme catalog + v1→v2 settings migration + useMotionConfig hook
-last_updated: "2026-04-24T05:53:00.054Z"
+stopped_at: Completed Phase 04 Plan 02 (sidebar-and-main-area) — Sidebar + MainArea/Play + MainArea/Cosmetics + AccountBadge extension + SettingsDrawer removed
+last_updated: "2026-04-24T06:06:07.865Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 33
-  completed_plans: 26
+  completed_plans: 27
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-20)
 ## Current Position
 
 Phase: 04 (launcher-ui-polish) — EXECUTING
-Plan: 3 of 8
+Plan: 4 of 8
 Status: Ready to execute
 Last activity: 2026-04-24
 
@@ -78,6 +78,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03-vanilla-launch-jre-bundling-packaging P12 | 5min (CHECKPOINT) | 0 tasks | 1 files |
 | Phase 04-launcher-ui-polish P00 | ~45min | 4 tasks | 19 files |
 | Phase 04-launcher-ui-polish P01-tokens-and-settings | 12min | 3 tasks tasks | 17 files files |
+| Phase 04-launcher-ui-polish P02-sidebar-and-main-area | 7 min | 3 tasks tasks | 15 files files |
 
 ## Accumulated Context
 
@@ -145,6 +146,11 @@ Recent decisions affecting current work:
 - [Phase 04-launcher-ui-polish]: Plan 04-01: --color-wiiwho-accent token REMOVED from global.css (replaced by --color-accent with :root runtime override). button.tsx still references the old token — legacy cleanup intentionally deferred to Plan 04-07's integration pass. Button accent styling is a temporary no-op until 04-07.
 - [Phase 04-launcher-ui-polish]: Plan 04-01: setAccent applies :root CSS var BEFORE awaiting IPC for instant UI feedback. On IPC failure the :root remains at new colour until next initialize — UI-01 prioritises perceived responsiveness; persisted authority wins on next launch.
 - [Phase 04-launcher-ui-polish]: Plan 04-01: v1→v2 settings migration is read-time + in-memory only. readSettings() does NOT rewrite the on-disk v1 file; the next writeSettings call persists v2 atomically. Keeps readSettings idempotent — no surprise disk writes from a read.
+- [Phase 04-launcher-ui-polish]: Plan 04-02: activeSection store narrowed to 'play'|'cosmetics' literal union — Settings stays a modal, Account is never a section (E-03 enforced by negative test). Future section additions require deliberate type widening.
+- [Phase 04-launcher-ui-polish]: Plan 04-02: Sidebar active-state uses motion layoutId pill+bar (shared ids 'sidebar-nav-pill' + 'sidebar-nav-bar') with SPRING_STANDARD transition — framer-motion glides the pair between rows on setSection flip instead of stamp-and-fade.
+- [Phase 04-launcher-ui-polish]: Plan 04-02: Cosmetics empty state ships zero interactive elements (D-05) — enforced by querySelectorAll('button|input|a|select').length === 0 test. Prevents accidental 'Notify me' or 'Browse' stubs regressing the 'honest empty state' intent.
+- [Phase 04-launcher-ui-polish]: Plan 04-02 [Rule 3 Blocking deviation]: Plan said 'do NOT rewrite App.tsx' but also required deleting SettingsDrawer.tsx (which App.tsx imports) while keeping the test suite green. Resolved with minimum diff: dropped dangling import + <SettingsDrawer> JSX, re-routed gear click to useSettingsStore.setModalOpen(true). Full App.tsx Home-chrome rewrite still deferred to Plan 04-07 as intended. Tests 2 + 3 in App.test.tsx simplified/removed accordingly.
+- [Phase 04-launcher-ui-polish]: Plan 04-02: AccountBadge setOpenPane('account') call is atomic — single Zustand set writes openPane='account' AND modalOpen=true together (Pitfall 8 two-step race avoidance). Same atomicity is the contract Plan 04-03's SettingsModal binds to on mount.
 
 ### Pending Todos
 
@@ -158,6 +164,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T05:53:00.049Z
-Stopped at: Completed Phase 04 Plan 01 (tokens-and-settings) — full @theme catalog + v1→v2 settings migration + useMotionConfig hook
+Last session: 2026-04-24T06:05:51.488Z
+Stopped at: Completed Phase 04 Plan 02 (sidebar-and-main-area) — Sidebar + MainArea/Play + MainArea/Cosmetics + AccountBadge extension + SettingsDrawer removed
 Resume file: None
