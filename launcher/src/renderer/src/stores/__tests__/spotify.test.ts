@@ -32,6 +32,15 @@ interface SpotifyIpcMock {
 let spotifyIpcMock: SpotifyIpcMock
 
 beforeEach(() => {
+  // Tear down any focus/blur listeners left over from a prior test's
+  // initialize() call — without this, a lingering listener can call the
+  // NEW mock's setVisibility and break the teardown-isolation test.
+  try {
+    useSpotifyStore.getState().teardown()
+  } catch {
+    // store may not have teardown in a pathologically early run — ignore
+  }
+
   spotifyIpcMock = {
     connect: vi.fn(),
     disconnect: vi.fn().mockResolvedValue({ ok: true }),
@@ -66,7 +75,15 @@ beforeEach(() => {
   } as never)
   vi.clearAllMocks()
 })
-afterEach(cleanup)
+afterEach(() => {
+  // Defensive teardown — ensures no focus/blur listeners bleed into the next test.
+  try {
+    useSpotifyStore.getState().teardown()
+  } catch {
+    // noop
+  }
+  cleanup()
+})
 
 describe('useSpotifyStore — initial state', () => {
   it('default state is "disconnected" + isPremium="unknown"', () => {
