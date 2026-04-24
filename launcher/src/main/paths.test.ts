@@ -151,4 +151,14 @@ describe('paths.ts', () => {
     // Must traverse resources/jre — this is the JRE-03 guardrail.
     expect(p).toContain('/resources/jre/')
   })
+
+  // ---- Phase 4 Plan 04-05 extension: Spotify token path -----------------------
+  it('resolveSpotifyTokenPath returns userData/spotify.bin (sibling to auth.bin)', async () => {
+    const { resolveSpotifyTokenPath } = await import('./paths')
+    const p = resolveSpotifyTokenPath().replace(/\\/g, '/')
+    expect(p).toMatch(/\/spotify\.bin$/)
+    expect(p).not.toMatch(/\/auth\.bin$/)
+    // Should live under the same userData root as other data files.
+    expect(p.startsWith('/fake/userData/Wiiwho/')).toBe(true)
+  })
 })

@@ -260,3 +260,49 @@ describe('D-20 extended patterns (Phase 3)', () => {
     }
   })
 })
+
+// -----------------------------------------------------------------------------
+// Phase 4 Plan 04-05 extension: Spotify token redaction
+// -----------------------------------------------------------------------------
+//
+// Spotify access tokens appear as "Bearer <opaque-token>" in Authorization
+// headers (never logged deliberately, but redactor is defense-in-depth).
+// Spotify refresh tokens and access_token fields in JSON response bodies are
+// already covered by the Phase 2 REFRESH_TOKEN_PATTERN / ACCESS_TOKEN_PATTERN
+// — verified here to guard against regex drift.
+
+describe('Spotify token redaction (Phase 4 UI-06)', () => {
+  it('scrubs Bearer access token from Authorization header form', () => {
+    const input = 'GET /v1/me Authorization: Bearer BQD1234567890abcdef1234567890abcdef1234567890ABCD'
+    const out = scrub(input)
+    expect(out).not.toContain('BQD1234567890abcdef')
+    expect(out).toContain('Bearer [REDACTED]')
+  })
+
+  it('does not redact non-Bearer tokens on the word Bearer', () => {
+    // Short follow (< 30 chars) should NOT match — e.g. display-name mentions of "Bearer X".
+    const input = 'User talks about Bearer short'
+    expect(scrub(input)).toBe(input)
+  })
+
+  it('scrubs Spotify access_token JSON field (regression — covered by ACCESS_TOKEN_PATTERN)', () => {
+    const input = '{"access_token":"BQD1234567890abcdefABCDEFGHIJ","token_type":"Bearer"}'
+    const out = scrub(input)
+    expect(out).not.toContain('BQD1234567890abcdefABCDEFGHIJ')
+  })
+
+  it('scrubs Spotify refresh_token JSON field (regression — covered by REFRESH_TOKEN_PATTERN)', () => {
+    const input = '{"refresh_token":"AQD1234567890abcdefABCDEFGHIJ"}'
+    const out = scrub(input)
+    expect(out).not.toContain('AQD1234567890abcdefABCDEFGHIJ')
+  })
+
+  it('scrubs Bearer alongside user path in the same line', () => {
+    const input = 'C:\\Users\\Alice\\app.log: Authorization: Bearer BQD1234567890abcdef1234567890abcdef1234567890ABCD'
+    const out = scrub(input)
+    expect(out).not.toContain('Alice')
+    expect(out).not.toContain('BQD1234567890abcdef')
+    expect(out).toContain('Bearer [REDACTED]')
+    expect(out).toContain('<USER>')
+  })
+})
